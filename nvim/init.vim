@@ -1,4 +1,5 @@
 " let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
+" TODO make it work in Linux
 let s:vim_home = expand($USERPROFILE..'/.nvim')
 let &runtimepath = s:vim_home..','..&runtimepath
 let s:plug_file = expand(s:vim_home..'/autoload/plug.vim')
@@ -38,3 +39,6 @@ set clipboard+=unnamed
 
 nnoremap <silent> [<cr> <cmd>call luaeval("require'edit'.insert_empty_lines(_A)", {"above": 1, "count": v:count1})<cr>
 nnoremap <silent> ]<cr> <cmd>call luaeval("require'edit'.insert_empty_lines(_A)", {"count": v:count1})<cr>
+
+" Experimental: autosave when leaving insert mode working in vscode
+inoremap <esc> <c-o>:w<cr><esc>
