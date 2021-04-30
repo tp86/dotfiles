@@ -1,6 +1,10 @@
 " let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
-" TODO make it work in Linux
-let s:vim_home = expand($USERPROFILE..'/.nvim')
+
+if has('win32')
+  let s:vim_home = expand($USERPROFILE..'/.nvim')
+elseif has('unix')
+  let s:vim_home = expand($HOME..'/.config/nvim')
+endif
 let &runtimepath = s:vim_home..','..&runtimepath
 let s:plug_file = expand(s:vim_home..'/autoload/plug.vim')
 if empty(glob(s:plug_file))
