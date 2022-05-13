@@ -82,6 +82,10 @@ Simplify answering
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+end_src
+** Basic formatting 
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
 * Programming languages
 ** Common
 #+begin_src emacs-lisp
