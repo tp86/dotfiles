@@ -27,6 +27,10 @@
   (setq inhibit-startup-message t)
   (set-fringe-mode 10)
 #+end_src
+Prevent resizing windows
+#+begin_src emacs-lisp
+  (setq even-window-sizes nil)
+#+end_src
 ** Theme
 #+begin_src emacs-lisp
   (use-package gruvbox-theme
@@ -77,4 +81,16 @@ Restore previous window layout when editing
 Simplify answering
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+* Programming languages
+** Common
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+** Common Lisp
+#+begin_src emacs-lisp
+  (use-package slime
+    :config
+    (setq inferior-lisp-program "sbcl"))
 #+end_src
