@@ -1,0 +1,80 @@
+* Utils
+** Terminal
+#+begin_src emacs-lisp
+  (defvar term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive
+     (list term-shell)))
+  (ad-activate 'ansi-term)
+  (global-set-key (kbd "s-t") 'ansi-term)
+#+end_src
+** Files
+#+begin_src emacs-lisp
+  (setq auto-save-default nil)
+  (setq make-backup-files nil)
+#+end_src
+* Helpers
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init (which-key-mode))
+#+end_src
+* Look & feel
+** GUI
+#+begin_src emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq inhibit-startup-message t)
+  (set-fringe-mode 10)
+#+end_src
+** Theme
+#+begin_src emacs-lisp
+  (use-package gruvbox-theme
+    :init (load-theme 'gruvbox t))
+#+end_src
+** Fonts
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+		      :family "Hack"
+		      :height 120)
+  (set-face-attribute 'font-lock-comment-face nil
+		      :slant 'italic)
+  (set-face-attribute 'org-level-1 nil
+		      :inherit 'outline-1
+		      :height 1.4)
+  (set-face-attribute 'org-level-2 nil
+		      :inherit 'outline-2
+		      :height 1.2)
+  (set-face-attribute 'org-level-3 nil
+		      :inherit 'outline-3
+		      :height 1.1)
+  (set-face-attribute 'org-level-4 nil
+		      :inherit 'outline-4
+		      :height 1.05)
+#+end_src
+** Prog mode
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook (lambda ()
+			      (setq truncate-lines t)
+			      (setq display-fill-column-indicator-column 120)
+			      (hl-line-mode)
+			      (display-fill-column-indicator-mode)))
+#+end_src
+*** Hooks
+** Moving around
+*** Scrolling
+#+begin_src emacs-lisp
+  (setq scroll-conservatively 200)
+  (setq scroll-margin 2)
+#+end_src
+* Various
+** Org mode
+Restore previous window layout when editing
+#+begin_src emacs-lisp
+  (setq org-src-window-setup 'other-window)
+#+end_src
+** Interaction
+Simplify answering
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
