@@ -1,9 +1,12 @@
 # dotfiles
 
-## Folders
+Setup git repository inside HOME directory.
 
-* `nvim` - configuration of Neovim embedded into vscode (asvetliakov.vscode-neovim extension). Neovim has to be installed and configured (path) separately (e.g. using scoop).
+```bash
+git init
+git remote add origin <this-repo-link>
+git fetch
+git checkout -t origin/main
+```
 
-## VSCode
-
-Settings are synchronized with this GitHub account.
+Add `/*` to `.git/info/exclude` file.
