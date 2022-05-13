@@ -23,9 +23,11 @@
 #+begin_src emacs-lisp
   (tool-bar-mode -1)
   (menu-bar-mode -1)
-  (scroll-bar-mode -1)
+  (when (window-system)
+    (set-fringe-mode 10)
+    (scroll-bar-mode -1))
   (setq inhibit-startup-message t)
-  (set-fringe-mode 10)
+
 #+end_src
 Prevent resizing windows
 #+begin_src emacs-lisp
