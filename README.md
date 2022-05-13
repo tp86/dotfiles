@@ -10,3 +10,5 @@ git checkout -t origin/main
 ```
 
 Add `/*` to `.git/info/exclude` file.
+
+To add files to repository, use `git add -f <file-path>`.
