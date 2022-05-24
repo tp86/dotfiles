@@ -8,6 +8,8 @@ set autoindent
 set smartindent
 
 set number relativenumber
+set laststatus=2
+set noequalalways
 
 let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
 
@@ -32,21 +34,34 @@ let g:pear_tree_smart_backspace = 1
 Plug 'justinmk/vim-sneak'
 let g:sneak#label = v:true
 Plug 'tpope/vim-commentary'
-Plug 'junegunn/rainbow_parentheses.vim'
-let g:rainbow#max_level = 24
+" Plug 'junegunn/rainbow_parentheses.vim'
+" let g:rainbow#max_level = 16
+Plug 'luochen1990/rainbow'
+let g:rainbow_conf = {
+      \ 'ctermfgs': ['white', 'blue', 'red', 'green', 'yellow', 'magenta'],
+      \}
 augroup rainbow_activation
   autocmd!
-  autocmd FileType clojure RainbowParentheses
+  " autocmd FileType clojure,scheme RainbowParentheses
+  autocmd FileType scheme RainbowToggle
 augroup end
 
 Plug 'morhetz/gruvbox'
-let g:gruvbox_italic=1
+" let g:gruvbox_italic=1
+
+Plug 'axvr/zepl.vim'
+let g:repl_config = {
+      \ 'scheme': { 'cmd': 'rlwrap csi' },
+      \}
+
+Plug 'bhurlow/vim-parinfer'
+let g:vim_parinfer_filetypes = ['scheme']
 
 call plug#end()
 
 set hidden
 
-set termguicolors
+" set termguicolors
 set background=dark
 colorscheme gruvbox
 
@@ -55,15 +70,25 @@ let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extend
 set list
 set scrolloff=3
 set sidescrolloff=6
+set sidescroll=1
 augroup color_column
   autocmd!
   autocmd BufNewFile,BufRead,BufWinEnter,WinEnter *
-        \ let &l:colorcolumn = join(insert(range(120, 999), 80), ',')
+        \ if &filetype != 'help' |
+        \ let &l:colorcolumn = join(insert(range(120, 999), 80), ',') |
+        \ else |
+        \ let &l:colorcolumn = '' |
+        \ endif
   autocmd WinLeave * let &l:colorcolumn = join(range(1, 999), ',')
 augroup end
 augroup cursor_line
   autocmd!
-  autocmd BufNewFile,BufRead,BufWinEnter,WinEnter * let &l:cursorline = !&diff
+  autocmd BufNewFile,BufRead,BufWinEnter,WinEnter *
+        \ if &filetype != 'help' |
+        \ let &l:cursorline = !&diff |
+        \ else |
+        \ let &l:cursorline = 0 |
+        \ endif
   autocmd OptionSet diff let &l:cursorline = !v:option_new
   autocmd WinLeave * setlocal nocursorline
 augroup end
@@ -75,6 +100,12 @@ augroup end
 
 tnoremap <esc> <c-\><c-n>
 
+if !has("gui_running")
+  execute "set <a-h>=\eh"
+  execute "set <a-j>=\ej"
+  execute "set <a-k>=\ek"
+  execute "set <a-l>=\el"
+endif
 nnoremap <a-h> <c-w>h
 nnoremap <a-j> <c-w>j
 nnoremap <a-k> <c-w>k
