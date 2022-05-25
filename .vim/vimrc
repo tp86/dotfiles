@@ -12,7 +12,7 @@ set laststatus=2
 set noequalalways
 
 if has('gui_running')
-  set guioptions=aegitc
+  set guioptions=agic
   set guifont=Hack\ 12
 endif
 
@@ -27,6 +27,9 @@ if empty(glob(s:plug_file))
   silent execute '!' .. s:curl .. ' -fLo ' .. s:plug_file .. ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
+let &backupdir = join([s:vim_home .. '/tmp', '~/tmp'], ',')
+let &directory = join([s:vim_home .. '/tmp', '~/tmp'], ',')
 
 call plug#begin()
 
@@ -98,7 +101,7 @@ augroup cursor_line
   autocmd OptionSet diff let &l:cursorline = !v:option_new
   autocmd WinLeave * setlocal nocursorline
 augroup end
-"" open quickfix window always at the bottom of all windows
+" open quickfix window always at the bottom of all windows
 augroup quickfix_window
   autocmd!
   autocmd FileType qf wincmd J
@@ -164,19 +167,19 @@ endfunction
 nnoremap <silent> [<cr> :<c-u>call <sid>empty_lines(v:count1, v:true)<cr>
 nnoremap <silent> ]<cr> :<c-u>call <sid>empty_lines(v:count1, v:false)<cr>
 
-"" automatically replace tabs with spaces on saving
-"" set g:autoretab to false to turn off this behavior
+" automatically replace tabs with spaces on saving
+" set g:autoretab to false to turn off this behavior
 let g:autoretab = v:true
-"" ...or invoke this command to toggle option
+" ...or invoke this command to toggle option
 command! AutoRetabToggle let g:autoretab = !g:autoretab
 augroup auto_retab
   autocmd!
   autocmd BufWrite * if g:autoretab | retab | endif
 augroup end
-"" automatically remove trailing spaces
-"" set g:autoremove_trail_spaces to false to turn off this behavior
+" automatically remove trailing spaces
+" set g:autoremove_trail_spaces to false to turn off this behavior
 let g:autoremove_trail_spaces = v:true
-"" ...or invoke this command to toggle option
+" ...or invoke this command to toggle option
 command! AutoRemoveTrailSpaceToggle let g:autoremove_trail_spaces = !g:autoremove_trail_spaces
 augroup auto_remove_trail_space
   autocmd!
@@ -193,12 +196,12 @@ augroup end
 
 set ignorecase
 set smartcase
-"" highlight matches only during searching
+" highlight matches only during searching
 augroup searching_highlight
   autocmd!
   set nohlsearch
   autocmd CmdlineEnter /,\? set hlsearch
   autocmd CmdlineLeave /,\? set nohlsearch
 augroup end
-"" easier searching of visually selected text
+" easier searching of visually selected text
 vnoremap <c-s> y/<c-r>"<cr>
