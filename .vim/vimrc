@@ -7,7 +7,7 @@ set shiftround
 set autoindent
 set smartindent
 
-set number relativenumber
+set number relativenumber numberwidth=5
 set laststatus=2
 set noequalalways
 
