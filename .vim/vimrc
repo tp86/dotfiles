@@ -43,7 +43,8 @@ Plug 'tpope/vim-commentary'
 " let g:rainbow#max_level = 16
 Plug 'luochen1990/rainbow'
 let g:rainbow_conf = {
-      \ 'ctermfgs': ['white', 'blue', 'red', 'green', 'yellow', 'magenta'],
+      \ 'guifgs': ['white', 'orange', 'red', 'green', 'yellow', 'magenta', 'cyan'],
+      \ 'ctermfgs': ['white', 'blue', 'red', 'green', 'yellow', 'magenta', 'cyan'],
       \}
 augroup rainbow_activation
   autocmd!
