@@ -11,6 +11,11 @@ set number relativenumber
 set laststatus=2
 set noequalalways
 
+if has('gui_running')
+  set guioptions=aegitc
+  set guifont=Hack\ 12
+endif
+
 let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
 
 let s:plug_file = expand(s:vim_home..'/autoload/plug.vim')
