@@ -205,3 +205,34 @@ augroup searching_highlight
 augroup end
 " easier searching of visually selected text
 vnoremap <c-s> y/<c-r>"<cr>
+
+" statusline
+function! s:cwd()
+  if index(['help'], &filetype) < 0
+    let cwd = fnamemodify(getcwd(), ':~')
+    return pathshorten(cwd) .. ': '
+  endif
+  return ''
+endfunction
+function! s:relative_file_path()
+  let full_cwd = escape(fnamemodify(getcwd(), ':p'), '\%')
+  let bufname_full = fnamemodify(bufname(), ':p')
+  let relative_path = matchstr(bufname_full, '\v^' .. full_cwd .. '\zs.*$')
+  if strlen(relative_path) == 0
+    let relative_path = bufname_full
+  endif
+  let relative_dir = fnamemodify(relative_path, ':h')
+  if relative_dir =~ '\v^' .. expand("$HOME")
+    let relative_dir = substitute(relative_dir, '\v^' .. expand("$HOME"), '~', '')
+  endif
+  let filename = fnamemodify(bufname_full, ':t')
+  if empty(filename)
+    return '[No Name]'
+  endif
+  if relative_dir == '.'
+    return filename
+  else
+    return pathshorten(relative_dir) .. '/' .. filename
+  endif
+endfunction
+let &statusline="%{" .. expand("<SID>") .. "cwd()" .. "}%{" .. expand("<SID>") .. "relative_file_path()} %m"
