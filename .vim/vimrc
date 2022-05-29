@@ -39,6 +39,13 @@ let g:pear_tree_ft_disabled = ['vim']
 let g:pear_tree_smart_openers = 1
 let g:pear_tree_smart_closers = 1
 let g:pear_tree_smart_backspace = 1
+augroup scheme_pear_tree
+  autocmd!
+  autocmd FileType scheme let b:pear_tree_pairs = {
+        \ '(': {'closer': ')'},
+        \ '"': {'closer': '"'},
+        \}
+augroup end
 Plug 'justinmk/vim-sneak'
 let g:sneak#label = v:true
 Plug 'tpope/vim-commentary'
