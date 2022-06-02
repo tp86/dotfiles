@@ -67,7 +67,7 @@ Plug 'morhetz/gruvbox'
 
 Plug 'axvr/zepl.vim'
 let g:repl_config = {
-      \ 'scheme': { 'cmd': 'rlwrap csi' },
+      \ 'scheme': { 'cmd': 'rlwrap icyc' },
       \}
 
 Plug 'bhurlow/vim-parinfer'
@@ -134,10 +134,10 @@ vnoremap <a-h> <c-w>h
 vnoremap <a-j> <c-w>j
 vnoremap <a-k> <c-w>k
 vnoremap <a-l> <c-w>l
-tnoremap <a-h> <c-\><c-n><c-w>h
-tnoremap <a-j> <c-\><c-n><c-w>j
-tnoremap <a-k> <c-\><c-n><c-w>k
-tnoremap <a-l> <c-\><c-n><c-w>l
+tnoremap <a-h> <c-w>h
+tnoremap <a-j> <c-w>j
+tnoremap <a-k> <c-w>k
+tnoremap <a-l> <c-w>l
 
 noremap H ^
 noremap L $
