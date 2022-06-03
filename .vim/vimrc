@@ -201,6 +201,7 @@ augroup auto_remove_trail_space
   autocmd BufWrite * if g:autoremove_trail_spaces | call <sid>remove_trail_space() | endif
 augroup end
 
+set incsearch
 set ignorecase
 set smartcase
 " highlight matches only during searching
