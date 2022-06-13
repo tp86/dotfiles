@@ -41,8 +41,9 @@ let g:pear_tree_smart_closers = 1
 let g:pear_tree_smart_backspace = 1
 augroup scheme_pear_tree
   autocmd!
-  autocmd FileType scheme let b:pear_tree_pairs = {
+  autocmd FileType scheme,racket let b:pear_tree_pairs = {
         \ '(': {'closer': ')'},
+        \ '[': {'closer': ']'},
         \ '"': {'closer': '"'},
         \}
 augroup end
@@ -59,7 +60,7 @@ let g:rainbow_conf = {
 augroup rainbow_activation
   autocmd!
   " autocmd FileType clojure,scheme RainbowParentheses
-  autocmd FileType scheme RainbowToggle
+  autocmd FileType scheme,racket RainbowToggle
 augroup end
 
 Plug 'morhetz/gruvbox'
@@ -67,11 +68,13 @@ Plug 'morhetz/gruvbox'
 
 Plug 'axvr/zepl.vim'
 let g:repl_config = {
-      \ 'scheme': { 'cmd': 'rlwrap icyc' },
+      \ 'racket': { 'cmd': 'racket' },
       \}
 
 Plug 'bhurlow/vim-parinfer'
 let g:vim_parinfer_filetypes = ['scheme']
+
+Plug 'benknoble/vim-racket'
 
 call plug#end()
 
@@ -83,6 +86,8 @@ colorscheme gruvbox
 
 set nowrap
 let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extends:\u27eb"], ',')
+let &fillchars ..= ",vert: "
+highlight! link VertSplit StatusLine
 set list
 set scrolloff=3
 set sidescrolloff=6
