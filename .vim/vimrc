@@ -60,7 +60,7 @@ let g:rainbow_conf = {
 augroup rainbow_activation
   autocmd!
   " autocmd FileType clojure,scheme RainbowParentheses
-  autocmd FileType scheme,racket RainbowToggle
+  autocmd FileType scheme,racket RainbowToggleOn
 augroup end
 
 Plug 'morhetz/gruvbox'
@@ -68,7 +68,8 @@ Plug 'morhetz/gruvbox'
 
 Plug 'axvr/zepl.vim'
 let g:repl_config = {
-      \ 'racket': { 'cmd': 'racket' },
+      \ 'racket': { 'cmd': 'racket',
+      \           },
       \}
 
 Plug 'bhurlow/vim-parinfer'

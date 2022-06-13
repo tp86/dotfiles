@@ -1,1 +1,1 @@
-inoremap <buffer> <c-\> λ
+inoremap <buffer> <c-\> lambda<space>
