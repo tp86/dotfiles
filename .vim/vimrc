@@ -222,7 +222,8 @@ vnoremap <c-s> y/<c-r>"<cr>
 " statusline
 function! s:cwd()
   if index(['help'], &filetype) < 0
-    let cwd = fnamemodify(getcwd(), ':~')
+    let winid = win_getid()
+    let cwd = fnamemodify(getcwd(winid), ':~')
     return pathshorten(cwd) .. ': '
   endif
   return ''
