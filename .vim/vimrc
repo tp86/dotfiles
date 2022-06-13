@@ -220,17 +220,18 @@ augroup end
 vnoremap <c-s> y/<c-r>"<cr>
 
 " statusline
-function! s:cwd()
-  if index(['help'], &filetype) < 0
-    let winid = win_getid()
-    let cwd = fnamemodify(getcwd(winid), ':~')
+function! s:cwd(winid)
+  let ignored_filetypes = ['help']
+  if index(ignored_filetypes, &filetype) < 0
+    let cwd = fnamemodify(getcwd(a:winid), ':~')
     return pathshorten(cwd) .. ': '
   endif
   return ''
 endfunction
-function! s:relative_file_path()
-  let full_cwd = escape(fnamemodify(getcwd(), ':p'), '\%')
-  let bufname_full = fnamemodify(bufname(), ':p')
+
+function! s:relative_file_path(winid)
+  let full_cwd = escape(fnamemodify(getcwd(a:winid), ':p'), '\%')
+  let bufname_full = fnamemodify(bufname(winbufnr(a:winid)), ':p')
   let relative_path = matchstr(bufname_full, '\v^' .. full_cwd .. '\zs.*$')
   if strlen(relative_path) == 0
     let relative_path = bufname_full
@@ -249,4 +250,16 @@ function! s:relative_file_path()
     return pathshorten(relative_dir) .. '/' .. filename
   endif
 endfunction
-let &statusline="%{" .. expand("<SID>") .. "cwd()" .. "}%{" .. expand("<SID>") .. "relative_file_path()} %m"
+
+function! s:stl()
+  let s = expand("<SID>")
+  let winid = g:statusline_winid
+  return ''
+        \ .. '%{' .. s .. 'cwd(' .. winid .. ')}'
+        \ .. '%{' .. s .. 'relative_file_path(' .. winid .. ')}'
+        \ .. ' %m'
+        \ .. '%='
+        \ .. '%y'
+endfunction
+
+let &statusline = '%!' .. expand("<SID>") .. 'stl()'
