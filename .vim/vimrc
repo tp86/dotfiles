@@ -71,6 +71,12 @@ let g:repl_config = {
       \ 'racket': { 'cmd': 'racket',
       \           },
       \}
+augroup zepl_mappings
+  autocmd!
+  autocmd User ZeplTerminalWinOpen if b:zepl_cmd =~ 'racket'
+        \| tnoremap <c-\> λ
+        \| endif
+augroup end
 
 Plug 'bhurlow/vim-parinfer'
 let g:vim_parinfer_filetypes = ['scheme']
