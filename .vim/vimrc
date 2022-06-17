@@ -7,7 +7,7 @@ set shiftround
 set autoindent
 set smartindent
 
-set number relativenumber numberwidth=5
+set number relativenumber numberwidth=5 signcolumn=yes
 set laststatus=2
 set noequalalways
 
@@ -68,8 +68,8 @@ Plug 'morhetz/gruvbox'
 
 Plug 'axvr/zepl.vim'
 let g:repl_config = {
-      \ 'racket': { 'cmd': 'racket',
-      \           },
+      \ 'racket': { 'cmd': 'racket' },
+      \ 'python': { 'cmd': 'ipython' },
       \}
 augroup zepl_mappings
   autocmd!
@@ -79,9 +79,19 @@ augroup zepl_mappings
 augroup end
 
 Plug 'bhurlow/vim-parinfer'
-let g:vim_parinfer_filetypes = ['scheme']
+let g:vim_parinfer_filetypes = ['scheme', 'racket']
 
 Plug 'benknoble/vim-racket'
+
+Plug 'jmcantrell/vim-virtualenv'
+let g:virtualenv_stl_format = '(%n)'
+let g:virtualenv_directory = expand("$HOME") .. '/.venv'
+
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+set updatetime=400
+nnoremap <silent> cd <cmd>GitGutterPreviewHunk<cr>
+nnoremap <silent> cu <cmd>GitGutterUndoHunk<cr>
 
 call plug#end()
 
@@ -91,10 +101,20 @@ set hidden
 set background=dark
 colorscheme gruvbox
 
+highlight! link VertSplit StatusLine
+highlight! link SignColumn LineNr
+" GitGutter signs customization
+let signcolumn_add = synIDattr(synIDtrans(highlightID("DiffAdd")), "fg", "gui")
+let signcolumn_change = synIDattr(synIDtrans(highlightID("DiffChange")), "fg", "gui")
+let signcolumn_delete = synIDattr(synIDtrans(highlightID("DiffDelete")), "fg", "gui")
+execute "highlight! GitGutterAdd guifg=" .. signcolumn_add
+execute "highlight! GitGutterChange guifg=" .. signcolumn_change
+execute "highlight! GitGutterChangeDelete guifg=" .. signcolumn_delete
+execute "highlight! GitGutterDelete guifg=" .. signcolumn_delete
+
 set nowrap
 let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extends:\u27eb"], ',')
 let &fillchars ..= ",vert: "
-highlight! link VertSplit StatusLine
 set list
 set scrolloff=3
 set sidescrolloff=6
@@ -127,6 +147,30 @@ augroup quickfix_window
 augroup end
 
 tnoremap <esc> <c-\><c-n>
+augroup terminal_settings
+  autocmd!
+  autocmd TerminalOpen * setlocal nonumber norelativenumber termwinscroll=100000
+  autocmd TerminalOpen,BufEnter,WinEnter * if &buftype == 'terminal' | setlocal sidescrolloff=0 | endif
+augroup end
+
+augroup terminal_startup
+  autocmd!
+  function! s:terminal_startup()
+    if exists("$VIRTUAL_ENV") && !empty(expand("$VIRTUAL_ENV"))
+      let python_venv_path = fnamemodify(expand("$VIRTUAL_ENV"), ':p')
+      " Command running in terminal buffer
+      let cmd = join(split(bufname(), ':')[2:-1], ':')
+      if has("unix")
+        let activation_script = expand(python_venv_path .. "bin/activate")
+        let activation_cmd = "\<c-e>\<c-u>source " .. activation_script
+      endif
+      if !empty(activation_cmd)
+        call term_sendkeys('', activation_cmd .. "\<cr>")
+      endif
+    endif
+  endfunction
+  autocmd TerminalOpen * call <SID>terminal_startup()
+augroup end
 
 if !has("gui_running")
   execute "set <a-h>=\eh"
@@ -248,6 +292,9 @@ function! s:relative_file_path(winid)
     let relative_dir = substitute(relative_dir, '\v^' .. expand("$HOME"), '~', '')
   endif
   let filename = fnamemodify(bufname_full, ':t')
+  if bufname_full =~# '\v^fugitive:'
+    return filename
+  endif
   if empty(filename)
     return '[No Name]'
   endif
@@ -258,14 +305,49 @@ function! s:relative_file_path(winid)
   endif
 endfunction
 
+function! s:python_venv()
+  if &filetype == 'python'
+    return VirtualEnvStatusline() .. ' '
+  endif
+  return ''
+endfunction
+
+function! s:git_branch()
+  let branch = pathshorten(FugitiveHead(8))
+  if !empty(branch)
+    return '@(' .. branch .. ') '
+  endif
+  return ''
+endfunction
+
+function! s:git_file_type(winid)
+  const git_type_to_name = {
+        \ "0": "index",
+        \ "1": "current",
+        \ "2": "incoming",
+        \}
+  let bufname_full = fnamemodify(bufname(winbufnr(a:winid)), ':p')
+  if bufname_full =~# '\v^fugitive:' .. escape(expand("/"), '\') .. '{2,}'
+    let git_buf_type = matchstr(bufname_full, '\v' .. escape('.git' .. expand("/"), '.\') .. '{2}\zs\x+\ze')
+    if !empty(git_buf_type)
+      let git_type_name = get(git_type_to_name, git_buf_type, "(" .. git_buf_type[:7] .. ")")
+      return '@ ' .. git_type_name
+    endif
+  endif
+  return ''
+endfunction
+
 function! s:stl()
   let s = expand("<SID>")
   let winid = g:statusline_winid
   return ''
         \ .. '%{' .. s .. 'cwd(' .. winid .. ')}'
+        \ .. '%{' .. s .. 'git_branch()}'
         \ .. '%{' .. s .. 'relative_file_path(' .. winid .. ')}'
         \ .. ' %m'
+        \ .. '%{' .. s .. 'git_file_type(' .. winid .. ')}'
         \ .. '%='
+        \ .. '%{' .. s .. 'python_venv()}'
         \ .. '%y'
 endfunction
 
