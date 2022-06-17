@@ -16,6 +16,9 @@ if has('gui_running')
   set guifont=Hack\ 12
 endif
 
+let mapleader = " "
+let maplocalleader = " "
+
 let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
 
 let s:plug_file = expand(s:vim_home..'/autoload/plug.vim')
@@ -92,6 +95,12 @@ Plug 'airblade/vim-gitgutter'
 set updatetime=400
 nnoremap <silent> cd <cmd>GitGutterPreviewHunk<cr>
 nnoremap <silent> cu <cmd>GitGutterUndoHunk<cr>
+
+Plug 'davidhalter/jedi-vim'
+augroup python_jedi_completion
+  autocmd!
+  autocmd FileType python if exists("$VIRTUAL_ENV") | let b:jedi_environment_path = expand("$VIRTUAL_ENV") | endif
+augroup end
 
 call plug#end()
 
@@ -198,6 +207,8 @@ tnoremap <a-l> <c-w>l
 noremap H ^
 noremap L $
 nnoremap <backspace> <c-^>
+inoremap <c-j> <c-n>
+inoremap <c-k> <c-p>
 
 function! s:insert_put()
   let keys = "\<esc>g"
