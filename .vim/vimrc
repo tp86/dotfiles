@@ -158,8 +158,8 @@ augroup end
 tnoremap <esc> <c-\><c-n>
 augroup terminal_settings
   autocmd!
-  autocmd TerminalOpen * setlocal nonumber norelativenumber termwinscroll=100000
-  autocmd TerminalOpen,BufEnter,WinEnter * if &buftype == 'terminal' | setlocal sidescrolloff=0 | endif
+  autocmd TerminalWinOpen * setlocal nonumber norelativenumber termwinscroll=100000 signcolumn=no
+  autocmd TerminalWinOpen,BufEnter,WinEnter * if &buftype == 'terminal' | setlocal sidescrolloff=0 | endif
 augroup end
 
 augroup terminal_startup
