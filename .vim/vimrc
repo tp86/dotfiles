@@ -102,6 +102,17 @@ augroup python_jedi_completion
   autocmd FileType python if exists("$VIRTUAL_ENV") | let b:jedi_environment_path = expand("$VIRTUAL_ENV") | endif
 augroup end
 
+Plug 'xolox/vim-misc'
+Plug 'xolox/vim-session'
+let g:session_directory = s:vim_home .. "/sessions"
+set sessionoptions-=help
+set sessionoptions-=buffers
+set sessionoptions+=resize
+set sessionoptions+=winpos
+let g:session_autoload = "yes"
+let g:session_autosave = "yes"
+let g:session_default_to_last = v:true
+
 call plug#end()
 
 set hidden
@@ -132,7 +143,7 @@ augroup color_column
   autocmd!
   autocmd BufNewFile,BufRead,BufWinEnter,WinEnter *
         \ if &filetype != 'help' |
-        \ let &l:colorcolumn = join(insert(range(120, 999), 80), ',') |
+        \ let &l:colorcolumn = join([80, 120] + range(150, 999), ',') |
         \ else |
         \ let &l:colorcolumn = '' |
         \ endif
