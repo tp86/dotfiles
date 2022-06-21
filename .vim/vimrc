@@ -33,6 +33,9 @@ if empty(glob(s:plug_file))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+if empty(glob(s:vim_home .. '/tmp'))
+  call mkdir(s:vim_home .. '/tmp')
+endif
 let &backupdir = join([s:vim_home .. '/tmp', '~/tmp'], ',')
 let &directory = join([s:vim_home .. '/tmp', '~/tmp'], ',')
 
@@ -106,6 +109,9 @@ augroup end
 
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-session'
+if empty(glob(s:vim_home .. '/sessions'))
+  call mkdir(s:vim_home .. '/sessions')
+endif
 let g:session_directory = s:vim_home .. "/sessions"
 set sessionoptions-=help
 set sessionoptions-=buffers
