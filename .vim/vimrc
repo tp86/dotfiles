@@ -11,6 +11,8 @@ set number relativenumber numberwidth=5 signcolumn=yes
 set laststatus=2
 set noequalalways
 
+let g:netrw_liststyle = 3
+
 if has('gui_running')
   set guioptions=agic
   set guifont=Hack\ 12
