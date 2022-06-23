@@ -13,6 +13,8 @@ set noequalalways
 
 let g:netrw_liststyle = 3
 
+set clipboard^=unnamed,unnamedplus
+
 if has('gui_running')
   set guioptions=agic
   set guifont=Hack\ 12
@@ -120,6 +122,7 @@ set sessionoptions+=winpos
 let g:session_autoload = "yes"
 let g:session_autosave = "yes"
 let g:session_default_to_last = v:true
+command! SessionName :echo xolox#session#find_current_session()
 
 call plug#end()
 
@@ -151,11 +154,11 @@ augroup color_column
   autocmd!
   autocmd BufNewFile,BufRead,BufWinEnter,WinEnter *
         \ if &filetype != 'help' |
-        \ let &l:colorcolumn = join([80, 120] + range(150, 999), ',') |
+        \ let &l:colorcolumn = join([80, 120, 150], ',') |
         \ else |
         \ let &l:colorcolumn = '' |
         \ endif
-  autocmd WinLeave * let &l:colorcolumn = join(range(1, 999), ',')
+  autocmd WinLeave * let &l:colorcolumn = ''
 augroup end
 augroup cursor_line
   autocmd!
