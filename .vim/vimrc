@@ -20,6 +20,17 @@ if has('gui_running')
   set guifont=Hack\ 12
 endif
 
+set wildmenu
+set wildmode=longest,full
+set wildoptions=pum
+cnoremap <expr> <c-j> wildmenumode() ? "\<down>" : "\<c-j>"
+cnoremap <expr> <c-k> wildmenumode() ? "\<up>" : "\<c-k>"
+cnoremap <expr> <c-l> wildmenumode() ? "\<right>" : "\<c-l>"
+cnoremap <expr> <c-h> wildmenumode() ? "\<left>" : "\<c-h>"
+
+nnoremap [q :cprevious<cr>
+nnoremap ]q :cnext<cr>
+
 let mapleader = " "
 let maplocalleader = " "
 
@@ -142,6 +153,10 @@ execute "highlight! GitGutterAdd guifg=" .. signcolumn_add
 execute "highlight! GitGutterChange guifg=" .. signcolumn_change
 execute "highlight! GitGutterChangeDelete guifg=" .. signcolumn_delete
 execute "highlight! GitGutterDelete guifg=" .. signcolumn_delete
+" cursor line highlighting customization
+set cursorlineopt=number
+let normal_bg = synIDattr(synIDtrans(highlightID("Normal")), "bg", "gui")
+execute "highlight! CursorLineNr guibg=" .. normal_bg
 
 set nowrap
 let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extends:\u27eb"], ',')
@@ -348,7 +363,7 @@ endfunction
 function! s:git_branch()
   let branch = pathshorten(FugitiveHead(8))
   if !empty(branch)
-    return '@(' .. branch .. ') '
+    return branch .. ' '
   endif
   return ''
 endfunction
