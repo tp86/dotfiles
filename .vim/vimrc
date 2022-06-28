@@ -10,6 +10,7 @@ set smartindent
 set number relativenumber numberwidth=5 signcolumn=yes
 set laststatus=2
 set noequalalways
+set splitbelow splitright
 
 let g:netrw_liststyle = 3
 
@@ -62,10 +63,11 @@ let g:pear_tree_smart_closers = 1
 let g:pear_tree_smart_backspace = 1
 augroup scheme_pear_tree
   autocmd!
-  autocmd FileType scheme,racket let b:pear_tree_pairs = {
+  autocmd FileType scheme,racket,clojure let b:pear_tree_pairs = {
         \ '(': {'closer': ')'},
         \ '[': {'closer': ']'},
         \ '"': {'closer': '"'},
+        \ '{': {'closer': '}'},
         \}
 augroup end
 Plug 'justinmk/vim-sneak'
@@ -81,7 +83,7 @@ let g:rainbow_conf = {
 augroup rainbow_activation
   autocmd!
   " autocmd FileType clojure,scheme RainbowParentheses
-  autocmd FileType scheme,racket RainbowToggleOn
+  autocmd FileType scheme,racket,clojure RainbowToggleOn
 augroup end
 
 Plug 'morhetz/gruvbox'
@@ -91,6 +93,7 @@ Plug 'axvr/zepl.vim'
 let g:repl_config = {
       \ 'racket': { 'cmd': 'racket' },
       \ 'python': { 'cmd': 'ipython' },
+      \ 'clojure': { 'cmd': 'clj' },
       \}
 augroup zepl_mappings
   autocmd!
@@ -100,7 +103,7 @@ augroup zepl_mappings
 augroup end
 
 Plug 'bhurlow/vim-parinfer'
-let g:vim_parinfer_filetypes = ['scheme', 'racket']
+let g:vim_parinfer_filetypes = ['scheme', 'racket', 'clojure']
 
 Plug 'benknoble/vim-racket'
 
@@ -130,9 +133,7 @@ set sessionoptions-=help
 set sessionoptions-=buffers
 set sessionoptions+=resize
 set sessionoptions+=winpos
-let g:session_autoload = "yes"
 let g:session_autosave = "yes"
-let g:session_default_to_last = v:true
 command! SessionName :echo xolox#session#find_current_session()
 
 call plug#end()
