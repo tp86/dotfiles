@@ -134,6 +134,7 @@ set sessionoptions-=buffers
 set sessionoptions+=resize
 set sessionoptions+=winpos
 let g:session_autosave = "yes"
+let g:session_autoload = "no"
 command! SessionName :echo xolox#session#find_current_session()
 
 call plug#end()
