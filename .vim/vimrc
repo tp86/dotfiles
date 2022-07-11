@@ -138,6 +138,10 @@ let g:session_autoload = "no"
 command! SessionName :echo xolox#session#find_current_session()
 
 Plug 'tpope/vim-fireplace'
+augroup complete_preview
+  autocmd!
+  autocmd CompleteDone * if pumvisible() == 0 | pclose | endif
+augroup end
 
 call plug#end()
 
