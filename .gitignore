@@ -4,3 +4,4 @@
 *.swo
 .vim/sessions/
 .vim/tmp/
+.clojure/.cpcache

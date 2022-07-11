@@ -137,6 +137,8 @@ let g:session_autosave = "yes"
 let g:session_autoload = "no"
 command! SessionName :echo xolox#session#find_current_session()
 
+Plug 'tpope/vim-fireplace'
+
 call plug#end()
 
 set hidden
