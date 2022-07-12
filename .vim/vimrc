@@ -143,6 +143,23 @@ augroup complete_preview
   autocmd CompleteDone * if pumvisible() == 0 | pclose | endif
 augroup end
 
+Plug 'junegunn/fzf'
+" let g:fzf_layout = { 'window': 'botright 12 split enew' }
+" let g:fzf_action = {
+"       \ 'ctrl-t': 'tab split',
+"       \ 'ctrl-s': 'split',
+"       \ 'ctrl-v': 'vsplit',
+"       \}
+" let g:fzf_colors = {
+"       \ 'fg': ['fg', 'Normal'],
+"       \ 'fg+': ['fg', 'ErrorMsg'],
+"       \ 'bg+': ['bg', 'Normal'],
+"       \ 'hl': ['fg', 'Directory'],
+"       \ 'hl+': ['fg', 'Directory'],
+"       \}
+Plug 'junegunn/fzf.vim'
+nnoremap <c-p> :Files<cr>
+
 call plug#end()
 
 set hidden
@@ -200,7 +217,7 @@ augroup quickfix_window
   autocmd FileType qf wincmd J
 augroup end
 
-tnoremap <esc> <c-\><c-n>
+tnoremap <expr> <esc> &filetype =~# 'fzf' ? "\<esc>" : "\<c-\>\<c-n>"
 augroup terminal_settings
   autocmd!
   autocmd TerminalWinOpen * setlocal nonumber norelativenumber termwinscroll=100000 signcolumn=no
@@ -223,8 +240,39 @@ augroup terminal_startup
       endif
     endif
   endfunction
-  autocmd TerminalOpen * call <SID>terminal_startup()
+  autocmd TerminalOpen *[^{FZF$}] call <SID>terminal_startup()
 augroup end
+
+" searching and switching to git branches
+function! s:execute_git(git_dir, command)
+  let git_dir = a:git_dir
+  if fnamemodify(git_dir, ":t") =~# '\v\.git$'
+    let git_dir = fnamemodify(git_dir, ":h")
+  endif
+  if empty(git_dir)
+    return[]
+  endif
+  let git_command = printf("git --git-dir=%s --work-tree=%s %s",
+        \ expand(git_dir .. "/.git"),
+        \ git_dir,
+        \ a:command
+        \)
+  return map(systemlist(git_command), {_, l -> trim(l)})
+endfunction
+function! GitBranches()
+  let dict = {
+        \ "source": filter(s:execute_git(FugitiveGitDir(), "branch -a"),
+        \           {_, b -> !empty(b) && b !~# '\v^\s*remotes/.{-}/HEAD\s+-\>\s+'})
+        \}
+  function! dict.sink(lines)
+    if a:lines !~# '\v^\s*\*'
+      let branch = matchstr(a:lines, '\v^(\s*remotes/.{-}/)?\zs.*\ze$')
+      execute "Git checkout " .. branch
+    endif
+  endfunction
+  call fzf#run(fzf#wrap(dict))
+endfunction
+command! GitBranches call GitBranches()
 
 if !has("gui_running")
   execute "set <a-h>=\eh"
@@ -371,7 +419,7 @@ endfunction
 function! s:git_branch()
   let branch = pathshorten(FugitiveHead(8))
   if !empty(branch)
-    return branch .. ' '
+    return '(' .. branch .. ') '
   endif
   return ''
 endfunction
