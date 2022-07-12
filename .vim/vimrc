@@ -159,6 +159,7 @@ Plug 'junegunn/fzf'
 "       \}
 Plug 'junegunn/fzf.vim'
 nnoremap <c-p> :Files<cr>
+nnoremap <c-s-p> :Commands<cr>
 
 call plug#end()
 
