@@ -160,6 +160,7 @@ Plug 'junegunn/fzf'
 "       \}
 Plug 'junegunn/fzf.vim'
 nnoremap <c-p>f :Files<cr>
+nnoremap <c-p>g :GitFiles<cr>
 nnoremap <c-p>b :Buffers<cr>
 nnoremap <c-s-p> :Commands<cr>
 
