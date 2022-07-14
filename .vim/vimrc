@@ -10,7 +10,7 @@ set smartindent
 set number relativenumber numberwidth=5 signcolumn=yes
 set laststatus=2
 set noequalalways
-set splitbelow splitright
+set splitright
 
 let g:netrw_liststyle = 3
 
@@ -458,5 +458,3 @@ function! s:stl()
 endfunction
 
 let &statusline = '%!' .. expand("<SID>") .. 'stl()'
-
-set completeopt+=popup
