@@ -139,10 +139,6 @@ let g:session_autoload = "no"
 command! SessionName :echo xolox#session#find_current_session()
 
 Plug 'tpope/vim-fireplace'
-augroup preview_close
-  autocmd!
-  autocmd InsertLeave * pclose
-augroup end
 
 Plug 'junegunn/fzf'
 " let g:fzf_layout = { 'window': 'botright 12 split enew' }
@@ -462,3 +458,5 @@ function! s:stl()
 endfunction
 
 let &statusline = '%!' .. expand("<SID>") .. 'stl()'
+
+set completeopt+=popup
