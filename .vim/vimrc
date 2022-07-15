@@ -123,6 +123,7 @@ augroup python_jedi_completion
   autocmd!
   autocmd FileType python if exists("$VIRTUAL_ENV") | let b:jedi_environment_path = expand("$VIRTUAL_ENV") | endif
 augroup end
+let g:jedi#show_call_signatures = 0
 
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-session'
@@ -320,7 +321,6 @@ function! s:insert_put()
   return keys
 endfunction
 inoremap <expr> <a-v> <sid>insert_put()
-tnoremap <c-v> <c-\><c-n>"+pa
 
 function! s:empty_lines(count, above)
   let current_position = getcurpos()

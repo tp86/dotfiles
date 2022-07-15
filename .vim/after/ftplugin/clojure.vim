@@ -4,6 +4,8 @@
 
 command! -buffer StartRepl term ++hidden clj -M:cider-clj
 
+let g:clojure_align_subforms = 1
+
 setlocal noshiftround
 
 if !exists("b:undo_ftplugin")
