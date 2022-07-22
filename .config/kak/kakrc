@@ -1,0 +1,32 @@
+colorscheme gruvbox-dark
+set global scrolloff 2,4
+set global indentwidth 2
+
+map global normal = '|fmt -w $kak_opt_autowrap_column<ret>'
+
+# Clipboard interaction (via xclip)
+map global normal <c-y> '<a-|>xclip -selection clipboard<ret>'
+map global normal <c-v> '!xclip -out -selection clipboard<ret>'
+
+add-highlighter -override global/ number-lines -relative -hlcursor
+
+hook global InsertCompletionShow .* %{
+  map window insert <ret> <c-n>
+  map window insert <c-k> <c-p>
+}
+
+hook global InsertCompletionHide .* %{
+  unmap window insert <ret> <c-n>
+  unmap window insert <c-k> <c-p>
+}
+
+hook global InsertChar \t %{
+  try %{
+    execute-keys -draft "h<a-h><a-k>\A\h+\z<ret><a-;>;%opt{indentwidth}@"
+  }
+}
+hook global InsertDelete ' ' %{
+  try %{
+    execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
+  }
+}

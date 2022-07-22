@@ -5,3 +5,4 @@
 .vim/sessions/
 .vim/tmp/
 .clojure/.cpcache
+.config/kak/autoload/rc
