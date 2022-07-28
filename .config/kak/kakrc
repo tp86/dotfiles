@@ -1,6 +1,7 @@
 colorscheme gruvbox-dark
 set global scrolloff 2,4
 set global indentwidth 2
+set global tabstop 4
 
 map global normal = '|fmt -w $kak_opt_autowrap_column<ret>'
 
@@ -11,15 +12,21 @@ map global normal <c-v> '!xclip -out -selection clipboard<ret>'
 # Line numbers
 add-highlighter -override global/ number-lines -relative -hlcursor
 
+# Matching characters
+add-highlighter -override global/ show-matching
+
+# Color column
+add-highlighter -override global/ column 150 MenuBackground
+
 # <c-j> and <c-k> for selecting completion candidate
-hook global InsertCompletionShow .* %{
-  map window insert <ret> <c-n>
-  map window insert <c-k> <c-p>
-}
-hook global InsertCompletionHide .* %{
-  unmap window insert <ret> <c-n>
-  unmap window insert <c-k> <c-p>
-}
+#hook global InsertCompletionShow .* %{
+#  map window insert <ret> <c-n>
+#  map window insert <c-k> <c-p>
+#}
+#hook global InsertCompletionHide .* %{
+#  unmap window insert <ret> <c-n>
+#  unmap window insert <c-k> <c-p>
+#}
 
 # expand tab with proper number of spaces, no softtabstop
 hook global InsertChar \t %{
@@ -34,9 +41,133 @@ hook global InsertDelete ' ' %{
 }
 
 # use ripgrep for grepping
-set global grepcmd 'rg -n'
+set global grepcmd 'rg -nH'
 
+# python settings
+# define-command -override jedi-goto-definition \
+#   -docstring "Open file with definition of symbol under cursor" %{
+#   evaluate-commands %sh{
+#     dir=$(mktemp -d "${TMPDIR:-/tmp}"/kak-jedi.XXXXXXXX)
+#     mkfifo ${dir}/fifo
+#     printf %s\\n "set-option buffer jedi_tmp_dir ${dir}"
+#     printf %s\\n "evaluate-commands -no-hooks write -sync ${dir}/buf"
+#   }
+#   evaluate-commands %sh{
+#     dir=${kak_opt_jedi_tmp_dir}
+#     printf %s\\n "evaluate-commands -draft %{ edit! -fifo ${dir}/fifo *jedi-output* }"
+#     ((
+#       cd $(dirname ${kak_buffile})
+
+#       export PYTHONPATH="$kak_opt_jedi_python_path:$PYTHONPATH"
+#       python 2> "${dir}/fifo" -c 'if 1:
+#           import os
+#           dir = os.environ["kak_opt_jedi_tmp_dir"]
+#           buffile = os.environ["kak_buffile"]
+#           line = int(os.environ["kak_cursor_line"])
+#           column = int(os.environ["kak_cursor_column"])
+#           client = os.environ["kak_client"]
+#           def quote(s):
+#               c = chr(39) # single quote
+#               return c + s.replace(c, c+c) + c
+#           import jedi
+#           script = jedi.Script(code=open(dir + "/buf", "r").read(), path=buffile)
+#           if definitions := script.infer(line=line, column=column):
+#               definition = definitions[0]
+#               file = str(definition.module_path)
+#               pos = definition.get_definition_start_position()
+#               l = pos[0]
+#               c = pos[1]
+#               cmd = f"edit {quote(file)} {l} {c}"
+#           else:
+#               cmd = "echo definition not found"
+#           print("evaluate-commands -client", quote(client), quote(cmd))
+#       ' | kak -p "${kak_session}"
+#       rm -r ${dir}
+#     ) & ) > /dev/null 2>&1 < /dev/null
+#   }
+# }
 remove-hooks global python
-hook global WinSetOption filetype=python %{
-    set-option window lintcmd %{ run() { pylint --msg-template='{path}:{line}:{column}: {category}: {msg_id}: {msg} ({symbol})' "$1" | awk -F: 'BEGIN { OFS=":" } { if (NF == 6) { $3 += 1; print } }'; } && run }
+hook -group python global WinSetOption filetype=python %{
+  set-option window indentwidth 4
+  set-option window lintcmd %{ run() { pylint --msg-template='{path}:{line}:{column}: {category}: {msg_id}: {msg} ({symbol})' "$1" | awk -F: 'BEGIN { OFS=":" } { if (NF == 6) { $3 += 1; print } }'; } && run }
+  set-option window formatcmd %{ autopep8 --max-line-length 150 --experimental - }
+  hook -group python window BufWritePre '.*\.py' %{ format }
+  # hook -group python window BufWritePost '.*\.py' %{ format ; eval -no-hooks write }
+  # jedi-enable-autocomplete
+  # map window normal <c-g> ':jedi-goto-definition<ret>'
+}
+
+# rust settings
+remove-hooks global rust
+hook -group rust global WinSetOption filetype=rust %{
+  set-option window indentwidth 4
+  set-option window formatcmd %{ rustfmt }
+  set-option window extra_word_chars !
+}
+
+# browse with broot + kak editor combination
+define-command -override -params 0 -docstring %{
+  browse: split window and browse current directory with broot
+  No checking if used commands and tools exist is currently performed
+} browse %{ evaluate-commands %{
+  terminal %sh{ echo "kak_session=$kak_session broot" }
+}}
+alias global br browse
+
+# REPL settings - works best in tmux
+map global normal <a-ret> ":repl-send-text<ret>"
+
+# plugins
+# manager
+evaluate-commands %sh{
+  plugins="$kak_config/plugins"
+  mkdir -p "$plugins"
+  [ ! -e "$plugins/plug.kak" ] && \
+    git clone -q https://github.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+  printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
+}
+plug "andreyorst/plug.kak" noload
+
+# kak-lsp
+plug "kak-lsp/kak-lsp" do %{
+  cargo install --locked --force --path .
+  mkdir -p ~/.config/kak-lsp
+  cp -n kak-lsp.toml ~/.config/kak-lsp/
+} config %{
+  set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+  define-command -override -hidden lsp-show-error -params 1 -docstring "Render error" %{
+    echo -debug "kak-lsp:" %arg{1}
+  }
+  map global user l %{: enter-user-mode lsp<ret>} -docstring "LSP mode"
+
+  # for python language server configuration
+  set-option global lsp_config %{
+    [language.python.settings._]
+  }
+
+  hook global WinSetOption filetype=(rust|python) %{
+    echo -debug "Enabling LSP for filetype %opt{filetype}"
+    lsp-enable-window
+  }
+
+  hook global WinSetOption filetype=(rust) %{
+    hook window BufWritePre .* %{
+      lsp-formatting-sync
+    }
+  }
+
+  hook global KakEnd .* lsp-exit
+}
+
+# auto-pairs
+# TODO: patch
+plug "alexherbo2/auto-pairs.kak" config %{
+  hook global WinSetOption filetype=rust %{
+    set-option window auto_pairs ( ) { } [ ] < > '"' '"' '|' '|'
+    enable-auto-pairs
+  }
+  hook global WinSetOption filetype=python %{
+    set-option window auto_pairs ( ) [ ] { } '"' '"' "'" "'"
+    enable-auto-pairs
+  }
 }
