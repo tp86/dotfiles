@@ -6,3 +6,4 @@
 .vim/tmp/
 .clojure/.cpcache
 .config/kak/autoload/rc
+.config/kak/plugins
