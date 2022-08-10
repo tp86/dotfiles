@@ -106,7 +106,7 @@ remove-hooks global rust
 hook -group rust global WinSetOption filetype=rust %{
   set-option window indentwidth 4
   set-option window formatcmd %{ rustfmt }
-  set-option window extra_word_chars !
+  set-option window extra_word_chars ! _
 }
 
 # browse with broot + kak editor combination
@@ -140,10 +140,15 @@ plug "kak-lsp/kak-lsp" do %{
   cp -n kak-lsp.toml ~/.config/kak-lsp/
 } config %{
   set-option global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+  set-option global lsp_code_lens_sign ''
   define-command -override -hidden lsp-show-error -params 1 -docstring "Render error" %{
     echo -debug "kak-lsp:" %arg{1}
   }
   map global user l %{: enter-user-mode lsp<ret>} -docstring "LSP mode"
+  define-command -override lsp-restart -params 0 -docstring "Restart lsp server" %{
+    lsp-stop
+    lsp-start
+  }
 
   evaluate-commands %sh{
     printf "set-option global lsp_inlay_diagnostic_gap '%$(expr ${kak_opt_tabstop} \* 3)s'\n" ' '
@@ -157,6 +162,12 @@ plug "kak-lsp/kak-lsp" do %{
     echo -debug "Enabling LSP for filetype %opt{filetype}"
     lsp-enable-window
     lsp-inlay-diagnostics-enable window
+  }
+
+  hook global WinSetOption filetype=(clojure) %{
+    hook window BufWritePre .* %{
+      lsp-formatting-sync
+    }
   }
 
   hook global WinSetOption filetype=(rust) %{
@@ -189,6 +200,7 @@ plug "alexherbo2/auto-pairs.kak" do %{
   }
   hook global WinSetOption filetype=(clojure) %{
     set-option window auto_pairs ( ) [ ] { } '"' '"'
+    enable-auto-pairs
   }
 }
 
@@ -196,7 +208,7 @@ plug "eraserhd/parinfer-rust" do %{
   cargo install --force --path .
 } config %{
   hook global WinSetOption filetype=(clojure) %{
-    parinfer-enable-window -smart
+    parinfer-enable-window -paren
   }
 }
 
