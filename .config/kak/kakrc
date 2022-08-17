@@ -134,7 +134,7 @@ plug "andreyorst/plug.kak" noload
 
 # kak-lsp
 plug "kak-lsp/kak-lsp" do %{
-  sed -i -E 's/(title=\$1; shift)$/\1; title=$(echo "$title" | tr -d '"'"'\\n'"'"')/'
+  sed -i -E 's/(title=\$1; shift)$/\1; title=$(echo "$title" | tr -d '"'"'\\n'"'"')/' rc/lsp.kak
   cargo install --locked --force --path .
   mkdir -p ~/.config/kak-lsp
   cp -n kak-lsp.toml ~/.config/kak-lsp/
@@ -212,9 +212,19 @@ plug "eraserhd/parinfer-rust" do %{
   }
 }
 
+plug "h-youhei/kakoune-surround" config %{
+  declare-user-mode surround
+  map global surround s ':surround<ret>' -docstring 'insert surrounding characters'
+  map global surround c ':change-surround<ret>' -docstring 'change surrounding characters'
+  map global surround d ':delete-surround<ret>' -docstring 'delete surrounding characters'
+  map global user s %{:enter-user-mode surround<ret>} -docstring "Surround mode"
+}
+
 plug "crizan/kak-rainbower" do %{
   cd rc
+  sed -i -E 's/(const char \*color = "rgb):003300(.*)/\1:141414\2/' rainbower.cpp
   g++ rainbower.cpp -O2 -o rainbower
+  git restore .
 } config %{
   hook global WinSetOption filetype=(clojure) %{
     rainbow-enable-window
