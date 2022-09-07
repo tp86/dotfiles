@@ -109,6 +109,12 @@ hook -group rust global WinSetOption filetype=rust %{
   set-option window extra_word_chars ! _
 }
 
+# julia settings
+remove-hooks global julia
+hook -group julia global WinSetOption filetype=julia %{
+  set-option window indentwidth 4
+}
+
 # browse with broot + kak editor combination
 define-command -override -params 0 -docstring %{
   browse: split window and browse current directory with broot
@@ -158,7 +164,7 @@ plug "kak-lsp/kak-lsp" do %{
     [language.python.settings._]
   }
 
-  hook global WinSetOption filetype=(rust|python|clojure) %{
+  hook global WinSetOption filetype=(rust|python|clojure|julia) %{
     echo -debug "Enabling LSP for filetype %opt{filetype}"
     lsp-enable-window
     lsp-inlay-diagnostics-enable window
@@ -170,7 +176,7 @@ plug "kak-lsp/kak-lsp" do %{
     }
   }
 
-  hook global WinSetOption filetype=(rust) %{
+  hook global WinSetOption filetype=(rust|julia) %{
     hook window BufWritePre .* %{
       lsp-formatting-sync
     }
