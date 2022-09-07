@@ -1,1 +1,11 @@
+theme = "gruvbox"
 
+[editor]
+line-number = "relative"
+rulers = [120]
+color-modes = true
+scrolloff = 3
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
