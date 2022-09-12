@@ -269,10 +269,10 @@ args = [
 # # See https://github.com/sumneko/vscode-lua/blob/master/setting/schema.json
 # # diagnostics.enable = true
 
-# [language.nim]
-# filetypes = ["nim"]
-# roots = ["*.nimble", ".git", ".hg"]
-# command = "nimlsp"
+[language.nim]
+filetypes = ["nim"]
+roots = ["*.nimble", ".git", ".hg"]
+command = "nimlsp"
 
 # [language.nix]
 # filetypes = ["nix"]

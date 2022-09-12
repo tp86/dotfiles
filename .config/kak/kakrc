@@ -186,7 +186,7 @@ plug "kak-lsp/kak-lsp" do %{
     [language.python.settings._]
   }
 
-  hook global WinSetOption filetype=(rust|python|clojure|julia) %{
+  hook global WinSetOption filetype=(rust|python|clojure|julia|nim) %{
     echo -debug "Enabling LSP for filetype %opt{filetype}"
     lsp-enable-window
     lsp-inlay-diagnostics-enable window
