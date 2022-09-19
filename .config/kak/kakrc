@@ -230,6 +230,9 @@ plug "alexherbo2/auto-pairs.kak" do %{
     set-option window auto_pairs ( ) [ ] { } '"' '"'
     enable-auto-pairs
   }
+  hook global WinSetOption filetype=(nim) %{
+    enable-auto-pairs
+  }
 }
 
 plug "eraserhd/parinfer-rust" do %{
