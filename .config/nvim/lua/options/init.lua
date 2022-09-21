@@ -39,3 +39,7 @@ opt.splitbelow = true
 opt.splitright = true
 
 opt.showmode = false
+
+opt.grepprg = 'rg -nH' --[[ require ripgrep installed ]]
+
+-- TODO easier grepping - open results window

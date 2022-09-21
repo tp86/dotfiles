@@ -171,3 +171,12 @@ autocmds_group("ClearCmdline", {
   }
 })
 
+autocmds_group("QuickfixWindow", {
+  {
+    { "FileType" },
+    {
+      pattern = 'qf',
+      command = 'wincmd L'
+    }
+  }
+})

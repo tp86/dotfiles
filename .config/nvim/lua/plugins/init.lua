@@ -51,8 +51,27 @@ require('packer').startup(function(use)
         requires = { 'kyazdani42/nvim-web-devicons' --[[ requires patched font ]] },
         config = function()
           require('lualine').setup {
+            -- TODO custom configuration
+            -- - git dirty status (not detailed diff)
+            -- - git branch shorter
+            -- - filename with short path
+            -- - right side rearrangement
           }
         end
+  }
+  use 'neovim/nvim-lspconfig'
+  use { 'nvim-treesitter/nvim-treesitter',
+        run = function() require('nvim-treesitter.install').update{ with_sync = true} end,
+        config = function()
+          require('nvim-treesitter.configs').setup {
+            ensure_installed = { 'python', 'lua' },
+            sync_install = false,
+            auto_install = true,
+            highlight = {
+              enable = true
+            }
+          }
+        end,
   }
   -- PLUGINS END
 
