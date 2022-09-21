@@ -1,4 +1,7 @@
 -- Common settings
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 local opt = vim.opt
 
 opt.expandtab = true
@@ -32,6 +35,7 @@ opt.sidescrolloff = 10
 opt.ignorecase = true
 opt.smartcase = true
 
-require'reload'('settings/autocmds')
+opt.splitbelow = true
+opt.splitright = true
 
-vim.api.nvim_command('colorscheme desert')
+opt.showmode = false
