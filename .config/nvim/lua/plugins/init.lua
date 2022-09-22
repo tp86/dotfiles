@@ -41,8 +41,13 @@ require('packer').startup(function(use)
               }
             },
             view = {
-              side = 'right'
-            }
+              side = 'right',
+              width = 40
+            },
+            filters = {
+              custom = { '__pycache__' }
+            },
+            sync_root_with_cwd = true
           }
           vim.keymap.set('n', '<leader>t', function() vim.cmd 'NvimTreeOpen' end)
         end
@@ -75,6 +80,55 @@ require('packer').startup(function(use)
           vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
           vim.opt.foldenable = false
         end,
+  }
+  use 'hrsh7th/cmp-nvim-lsp'
+  use { 'hrsh7th/nvim-cmp',
+        config = function()
+          vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+          local cmp = require('cmp')
+          cmp.setup {
+            sources = cmp.config.sources(
+              {
+                { name = 'nvim_lsp' }
+              }
+            ),
+            mapping = cmp.mapping.preset.insert {
+              ['<c-j>'] = cmp.mapping.select_next_item(),
+              ['<c-k>'] = cmp.mapping.select_prev_item()
+            }
+          }
+        end
+  }
+  use { 'nvim-telescope/telescope.nvim',
+        branch = '0.1.x',
+        requires = { 'nvim-lua/plenary.nvim',
+                     { 'nvim-telescope/telescope-fzf-native.nvim',
+                       -- requires cmake, make, gcc/clang
+                       run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && \z
+                              cmake --build build --config Release && \z
+                              cmake --install build --prefix build'
+                     }
+        },
+        config = function()
+          local telescope = require('telescope')
+
+          telescope.setup {
+            defaults = {
+              file_ignore_patterns = { '.git/' }
+            }
+          }
+
+          local builtin = require('telescope.builtin')
+          local function map(keys, action)
+            vim.keymap.set('n', keys, action, { noremap = true })
+          end
+          map('<leader>ff', function() builtin.find_files { hidden = true } end)
+          map('<leader>fg', builtin.live_grep)
+          map('<leader>fb', builtin.buffers)
+
+          telescope.load_extension('fzf')
+        end
+
   }
   -- PLUGINS END
 

@@ -1,7 +1,4 @@
 -- Common settings
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 local opt = vim.opt
 
 opt.expandtab = true

@@ -112,7 +112,7 @@ autocmds_group("TerminalSettings", {
     }
   },
   {
-    { "TermOpen", "WinEnter" },
+    { "TermOpen", "BufWinEnter", "WinEnter" },
     {
       pattern = 'term://*',
       command = 'startinsert'

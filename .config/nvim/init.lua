@@ -1,3 +1,4 @@
+require'reload'('setup')
 require'reload'('options')
 require'reload'('autocmds')
 require'reload'('mappings')

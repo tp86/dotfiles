@@ -71,8 +71,8 @@ local function emptylines(count, above)
   vim.fn.append(linetoinsert, lines)
   vim.fn.cursor(newposition)
 end
-nmap('[ ', function() emptylines(vim.v.count1, true) end)
-nmap('] ', function() emptylines(vim.v.count1) end)
+nmap('[<cr>', function() emptylines(vim.v.count1, true) end)
+nmap(']<cr>', function() emptylines(vim.v.count1) end)
 
 tmap('<esc>', '<c-\\><c-n>')
 

@@ -18,7 +18,7 @@ end
 -- LSP mappings
 local on_attach = function(client, bufnr)
   -- enable manually-triggered autocompletion
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+  --vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   local bufopts = { noremap = true, silent = true, buffer=bufnr }
   local map = function(keys, command)
@@ -35,11 +35,14 @@ local on_attach = function(client, bufnr)
   map('<localleader>l=', lsp.formatting)
 end
 
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
 lsp.pyls.setup {
   settings = {
     pyls = {
       configurationSources = { "flake8" }
     }
   },
+  capabilities = capabilities,
   on_attach = on_attach
 }
