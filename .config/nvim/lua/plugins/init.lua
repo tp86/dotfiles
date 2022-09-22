@@ -103,10 +103,8 @@ require('packer').startup(function(use)
         branch = '0.1.x',
         requires = { 'nvim-lua/plenary.nvim',
                      { 'nvim-telescope/telescope-fzf-native.nvim',
-                       -- requires cmake, make, gcc/clang
-                       run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && \z
-                              cmake --build build --config Release && \z
-                              cmake --install build --prefix build'
+                       -- requires make, gcc/clang
+                       run = 'make'
                      }
         },
         config = function()
