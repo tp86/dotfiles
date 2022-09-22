@@ -37,12 +37,20 @@ end
 
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-lsp.pyls.setup {
-  settings = {
-    pyls = {
-      configurationSources = { "flake8" }
+local lspsetups = {
+  pyls = {
+    settings = {
+      pyls = {
+        configurationSources = { "flake8" }
+      }
     }
-  },
-  capabilities = capabilities,
-  on_attach = on_attach
+  }
 }
+for server, setup in pairs(lspsetups) do
+  lspsetups[server].capabilities = capabilities
+  lspsetups[server].on_attach = on_attach
+end
+
+for server, setup in pairs(lspsetups) do
+  lsp[server].setup(setup)
+end
