@@ -24,18 +24,21 @@ local on_attach = function(client, bufnr)
   local map = function(keys, command)
     vim.keymap.set('n', keys, command, bufopts)
   end
-  local lsp = vim.lsp.buf
+  local lspbuf = vim.lsp.buf
 
-  map('gd', lsp.definition)
-  map('K', lsp.hover)
-  map('gi', lsp.implementation)
-  map('gr', lsp.references)
-  map('<localleader>la', lsp.code_action)
-  map('<localleader>lr', lsp.rename)
-  map('<localleader>l=', lsp.formatting)
+  map('gd', lspbuf.definition)
+  map('K', lspbuf.hover)
+  map('gi', lspbuf.implementation)
+  map('gr', lspbuf.references)
+  map('<localleader>la', lspbuf.code_action)
+  map('<localleader>lr', lspbuf.rename)
+  map('<localleader>l=', lspbuf.formatting)
 end
 
+-- integrations
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+-- server setups
 
 local lspsetups = {
   pyls = {
@@ -44,13 +47,31 @@ local lspsetups = {
         configurationSources = { "flake8" }
       }
     }
+  },
+  sumneko_lua = {
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT'
+        },
+        diagnostics = {
+          globals = { 'vim' },
+        },
+        workspace = {
+          library = vim.api.nvim_get_runtime_file("", true),
+        },
+        telemetry = {
+          enable = false
+        },
+      },
+    }
   }
 }
+
+-- automation
 for server, setup in pairs(lspsetups) do
   lspsetups[server].capabilities = capabilities
   lspsetups[server].on_attach = on_attach
-end
 
-for server, setup in pairs(lspsetups) do
   lsp[server].setup(setup)
 end

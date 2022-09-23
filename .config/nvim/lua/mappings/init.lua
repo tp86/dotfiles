@@ -71,8 +71,8 @@ local function emptylines(count, above)
   vim.fn.append(linetoinsert, lines)
   vim.fn.cursor(newposition)
 end
-nmap('[<cr>', function() emptylines(vim.v.count1, true) end)
-nmap(']<cr>', function() emptylines(vim.v.count1) end)
+nmap('<a-O>', function() emptylines(vim.v.count1, true) end)
+nmap('<a-o>', function() emptylines(vim.v.count1) end)
 
 tmap('<esc>', '<c-\\><c-n>')
 
@@ -80,3 +80,21 @@ vmap('/', 'y/<c-r>"<cr>')
 vmap('?', 'y?<c-r>"<cr>')
 vmap('g/', '/')
 vmap('g?', '?')
+
+local function iput()
+  local keys = '<esc>g'
+  local col = vim.fn.col('.')
+  if col == 1 then
+    keys = keys .. 'P'
+  else
+    keys = keys .. 'p'
+  end
+  if col == vim.fn.col('$') then
+    keys = keys .. 'a'
+  else
+    keys = keys .. 'i'
+  end
+  return keys
+end
+imap('<a-v>', iput, { expr = true })
+tmap('<a-v>', '<c-\\><c-n>"+pa')

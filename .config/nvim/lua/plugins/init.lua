@@ -55,12 +55,99 @@ require('packer').startup(function(use)
   use { 'nvim-lualine/lualine.nvim',
         requires = { 'kyazdani42/nvim-web-devicons' --[[ requires patched font ]] },
         config = function()
+          local function disableforfts(fts)
+            return function()
+              return not vim.tbl_contains(fts, vim.opt_local.filetype:get())
+            end
+          end
           require('lualine').setup {
-            -- TODO custom configuration
-            -- - git dirty status (not detailed diff)
-            -- - git branch shorter
-            -- - filename with short path
-            -- - right side rearrangement
+            sections = {
+              lualine_a = {
+                function()
+                  return vim.fn.pathshorten(vim.fn.fnamemodify(vim.fn.getcwd(), ':~'))
+                end
+              },
+              lualine_b = {
+                {
+                  'branch',
+                  fmt = function(s)
+                    local name = s
+                    if #name > 8 then
+                      name = string.sub(name, 1, 8) .. '…'
+                    end
+                    local status = vim.fn.system(
+                      [[git -C ]] .. vim.fn.fnamemodify(vim.fn.bufname(), ':p:h') .. [[ status --porcelain 2>/dev/null]]
+                    )
+                    if #status > 0 then
+                      name = name .. '*'
+                    end
+                    return name
+                  end,
+                },
+              },
+              lualine_c = {
+                {
+                  function()
+                    local bufname = vim.fn.bufname()
+                    local bufnamefull = vim.fn.fnamemodify(bufname, ':p')
+                    if string.find(bufnamefull, '^term://') then
+                      local splittedtermuri = vim.fn.split(bufnamefull, ':')
+                      local shellpid = vim.fn.fnamemodify(splittedtermuri[2], ':t')
+                      local shellexec = vim.fn.fnamemodify(splittedtermuri[#splittedtermuri], ':t')
+                      return table.concat({ splittedtermuri[1], shellpid, shellexec }, ':')
+                    end
+                    local cwdfull = vim.fn.fnamemodify(vim.fn.getcwd(), ':p')
+                    local relativepath = vim.fn.matchstr(bufnamefull, [[\v^]] .. cwdfull .. [[\zs.*$]])
+                    if #relativepath == 0 then
+                      relativepath = bufnamefull
+                    end
+                    local filename = vim.fn.fnamemodify(bufname, ':t')
+                    if #filename == 0 then
+                      return '[No Name]'
+                    end
+                    local relativedir = vim.fn.fnamemodify(relativepath, ':h')
+                    if relativedir == '.' then
+                      return filename
+                    else
+                      return vim.fn.expand(vim.fn.pathshorten(relativedir) .. '/' .. filename)
+                    end
+                  end,
+                  separator = {},
+                  cond = disableforfts { 'NvimTree', 'DiffviewFiles' },
+                },
+                {
+                  function()
+                    if vim.opt_local.readonly:get() or not vim.opt_local.modifiable:get() then
+                      return '[-]'
+                    elseif vim.opt_local.modified:get() then
+                      return '[+]'
+                    else
+                      return ''
+                    end
+                  end,
+                  cond = disableforfts { 'NvimTree', 'DiffviewFiles' },
+                }
+              },
+              lualine_x = {
+                {
+                  'filetype',
+                  cond = disableforfts { 'NvimTree', 'DiffviewFiles' },
+                },
+                {
+                  function()
+                    local lspclients = {}
+                    for _, client in pairs(vim.lsp.buf_get_clients()) do
+                      lspclients[#lspclients + 1] = client.config.name
+                    end
+                    return table.concat(lspclients, ', ')
+                  end,
+                },
+              },
+              lualine_y = {
+                'diagnostics'
+              },
+              lualine_z = {}
+            },
           }
         end
   }
@@ -127,6 +214,35 @@ require('packer').startup(function(use)
           telescope.load_extension('fzf')
         end
 
+  }
+  use { 'lewis6991/gitsigns.nvim',
+        config = function()
+          require('gitsigns').setup {
+            signs = {
+              changedelete = { text = '┻' }
+            },
+            on_attach = function(bufnr)
+              local gs = require('gitsigns')
+
+              local function map(keys, action)
+                vim.keymap.set('n', keys, action, { noremap = true, buffer = bufnr })
+              end
+
+              map('<leader>hp', gs.preview_hunk)
+            end
+          }
+        end
+  }
+  use { 'sindrets/diffview.nvim',
+        requires = 'nvim-lua/plenary.nvim',
+  }
+  use { 'TimUntersberger/neogit',
+        requires = 'nvim-lua/plenary.nvim',
+        config = function()
+          require('neogit').setup {
+            disable_commit_confirmation = true
+          }
+        end
   }
   -- PLUGINS END
 

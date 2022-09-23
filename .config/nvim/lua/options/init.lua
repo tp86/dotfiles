@@ -39,4 +39,6 @@ opt.showmode = false
 
 opt.grepprg = 'rg -nH' --[[ require ripgrep installed ]]
 
+opt.clipboard:append 'unnamedplus'
+
 -- TODO easier grepping - open results window

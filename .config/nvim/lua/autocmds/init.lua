@@ -159,17 +159,17 @@ autocmds_group("AutoRemoveTrailingSpace", {
   },
 })
 
-autocmds_group("ClearCmdline", {
-  {
-    { "CmdlineLeave" },
-    {
-      pattern = ':',
-      callback = function()
-        vim.fn.timer_start(10000, function() vim.cmd('echon', '') end)
-      end
-    }
-  }
-})
+--autocmds_group("ClearCmdline", {
+  --{
+  --  { "CmdlineLeave" },
+  --  {
+  --    pattern = ':',
+  --    callback = function()
+  --      vim.fn.timer_start(10000, function() vim.cmd('echon', '') end)
+  --    end
+  --  }
+  --}
+--})
 
 autocmds_group("QuickfixWindow", {
   {
