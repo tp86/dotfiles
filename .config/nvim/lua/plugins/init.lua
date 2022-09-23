@@ -60,6 +60,14 @@ require('packer').startup(function(use)
               return not vim.tbl_contains(fts, vim.opt_local.filetype:get())
             end
           end
+          local function all(fns)
+            return function()
+              for _, fn in ipairs(fns) do
+                if not fn() then return false end
+              end
+              return true
+            end
+          end
           require('lualine').setup {
             sections = {
               lualine_a = {
@@ -125,7 +133,10 @@ require('packer').startup(function(use)
                       return ''
                     end
                   end,
-                  cond = disableforfts { 'NvimTree', 'DiffviewFiles', 'NeogitStatus' },
+                  cond = all {
+                    disableforfts { 'NvimTree', 'DiffviewFiles', 'NeogitStatus' },
+                    function() return vim.opt_local.buftype:get() ~= 'terminal' end,
+                  },
                 }
               },
               lualine_x = {
