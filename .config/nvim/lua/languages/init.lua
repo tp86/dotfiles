@@ -1,9 +1,12 @@
-local lsp = require('lspconfig')
+local lspcfg = require('lspconfig')
 local configs = require('lspconfig.configs')
 local util = require('lspconfig.util')
+local mapkey = vim.keymap.set
+local lsp = vim.lsp
+local lspbuf = lsp.buf
+local api = vim.api
 
 -- custom servers
-
 if not configs.pyls then
   configs.pyls = {
     default_config = {
@@ -16,15 +19,13 @@ if not configs.pyls then
 end
 
 -- LSP mappings
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
   -- enable manually-triggered autocompletion
   --vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-  local bufopts = { noremap = true, silent = true, buffer=bufnr }
   local map = function(keys, command)
-    vim.keymap.set('n', keys, command, bufopts)
+    mapkey('n', keys, command, { noremap = true, silent = true, buffer = bufnr })
   end
-  local lspbuf = vim.lsp.buf
 
   map('gd', lspbuf.definition)
   map('K', lspbuf.hover)
@@ -36,10 +37,9 @@ local on_attach = function(client, bufnr)
 end
 
 -- integrations
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').update_capabilities(lsp.protocol.make_client_capabilities())
 
 -- server setups
-
 local lspsetups = {
   pyls = {
     settings = {
@@ -58,7 +58,7 @@ local lspsetups = {
           globals = { 'vim' },
         },
         workspace = {
-          library = vim.api.nvim_get_runtime_file("", true),
+          library = api.nvim_get_runtime_file("", true),
         },
         telemetry = {
           enable = false
@@ -73,5 +73,5 @@ for server, setup in pairs(lspsetups) do
   lspsetups[server].capabilities = capabilities
   lspsetups[server].on_attach = on_attach
 
-  lsp[server].setup(setup)
+  lspcfg[server].setup(setup)
 end

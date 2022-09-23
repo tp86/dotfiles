@@ -1,8 +1,8 @@
 local function ensurepacker()
   local fn = vim.fn
-  local installpath = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  local installpath = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
   if fn.empty(fn.glob(installpath)) > 0 then
-    fn.system {'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', installpath}
+    fn.system { 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', installpath }
     vim.cmd 'packadd packer.nvim'
     return true
   end
@@ -49,6 +49,7 @@ require('packer').startup(function(use)
             },
             sync_root_with_cwd = true
           }
+          local vim = vim
           vim.keymap.set('n', '<leader>t', function() vim.cmd 'NvimTreeOpen' end)
         end
   }
@@ -56,23 +57,30 @@ require('packer').startup(function(use)
         requires = { 'kyazdani42/nvim-web-devicons' --[[ requires patched font ]] },
         config = function()
           local function disableforfts(fts)
+            local contains = vim.tbl_contains
+            local optlocal = vim.opt_local
             return function()
-              return not vim.tbl_contains(fts, vim.opt_local.filetype:get())
+              return not contains(fts, optlocal.filetype:get())
             end
           end
           local function all(fns)
             return function()
-              for _, fn in ipairs(fns) do
-                if not fn() then return false end
+              for _, func in ipairs(fns) do
+                if not func() then return false end
               end
               return true
             end
           end
+          local fn = vim.fn
+          local str = string
+          local tbl = table
+          local optlocal = vim.opt_local
+          local lsp = vim.lsp
           require('lualine').setup {
             sections = {
               lualine_a = {
                 function()
-                  return vim.fn.pathshorten(vim.fn.fnamemodify(vim.fn.getcwd(), ':~'))
+                  return fn.pathshorten(fn.fnamemodify(fn.getcwd(), ':~'))
                 end
               },
               lualine_b = {
@@ -81,10 +89,10 @@ require('packer').startup(function(use)
                   fmt = function(s)
                     local name = s
                     if #name > 8 then
-                      name = string.sub(name, 1, 8) .. '…'
+                      name = str.sub(name, 1, 8) .. '…'
                     end
-                    local status = vim.fn.system(
-                      [[git -C ]] .. vim.fn.fnamemodify(vim.fn.bufname(), ':p:h') .. [[ status --porcelain 2>/dev/null]]
+                    local status = fn.system(
+                      [[git -C ]] .. fn.fnamemodify(fn.bufname(), ':p:h') .. [[ status --porcelain 2>/dev/null]]
                     )
                     if #status > 0 then
                       name = name .. '*'
@@ -96,28 +104,28 @@ require('packer').startup(function(use)
               lualine_c = {
                 {
                   function()
-                    local bufname = vim.fn.bufname()
-                    local bufnamefull = vim.fn.fnamemodify(bufname, ':p')
-                    if string.find(bufnamefull, '^term://') then
-                      local splittedtermuri = vim.fn.split(bufnamefull, ':')
-                      local shellpid = vim.fn.fnamemodify(splittedtermuri[2], ':t')
-                      local shellexec = vim.fn.fnamemodify(splittedtermuri[#splittedtermuri], ':t')
-                      return table.concat({ splittedtermuri[1], shellpid, shellexec }, ':')
+                    local bufname = fn.bufname()
+                    local bufnamefull = fn.fnamemodify(bufname, ':p')
+                    if str.find(bufnamefull, '^term://') then
+                      local splittedtermuri = fn.split(bufnamefull, ':')
+                      local shellpid = fn.fnamemodify(splittedtermuri[2], ':t')
+                      local shellexec = fn.fnamemodify(splittedtermuri[#splittedtermuri], ':t')
+                      return tbl.concat({ splittedtermuri[1], shellpid, shellexec }, ':')
                     end
-                    local cwdfull = vim.fn.fnamemodify(vim.fn.getcwd(), ':p')
-                    local relativepath = vim.fn.matchstr(bufnamefull, [[\v^]] .. cwdfull .. [[\zs.*$]])
+                    local cwdfull = fn.fnamemodify(fn.getcwd(), ':p')
+                    local relativepath = fn.matchstr(bufnamefull, [[\v^]] .. cwdfull .. [[\zs.*$]])
                     if #relativepath == 0 then
                       relativepath = bufnamefull
                     end
-                    local filename = vim.fn.fnamemodify(bufname, ':t')
+                    local filename = fn.fnamemodify(bufname, ':t')
                     if #filename == 0 then
                       return '[No Name]'
                     end
-                    local relativedir = vim.fn.fnamemodify(relativepath, ':h')
+                    local relativedir = fn.fnamemodify(relativepath, ':h')
                     if relativedir == '.' then
                       return filename
                     else
-                      return vim.fn.expand(vim.fn.pathshorten(relativedir) .. '/' .. filename)
+                      return fn.pathshorten(relativedir) .. '/' .. filename
                     end
                   end,
                   separator = {},
@@ -125,9 +133,9 @@ require('packer').startup(function(use)
                 },
                 {
                   function()
-                    if vim.opt_local.readonly:get() or not vim.opt_local.modifiable:get() then
+                    if optlocal.readonly:get() or not optlocal.modifiable:get() then
                       return '[-]'
-                    elseif vim.opt_local.modified:get() then
+                    elseif optlocal.modified:get() then
                       return '[+]'
                     else
                       return ''
@@ -135,7 +143,7 @@ require('packer').startup(function(use)
                   end,
                   cond = all {
                     disableforfts { 'NvimTree', 'DiffviewFiles', 'NeogitStatus' },
-                    function() return vim.opt_local.buftype:get() ~= 'terminal' end,
+                    function() return optlocal.buftype:get() ~= 'terminal' end,
                   },
                 }
               },
@@ -146,11 +154,11 @@ require('packer').startup(function(use)
                 },
                 {
                   function()
-                    local lspclients = {}
-                    for _, client in pairs(vim.lsp.buf_get_clients()) do
-                      lspclients[#lspclients + 1] = client.config.name
+                    local clientnames = {}
+                    for _, client in pairs(lsp.buf_get_clients()) do
+                      clientnames[#clientnames + 1] = client.config.name
                     end
-                    return table.concat(lspclients, ', ')
+                    return tbl.concat(clientnames, ', ')
                   end,
                 },
               },
@@ -164,8 +172,9 @@ require('packer').startup(function(use)
   }
   use 'neovim/nvim-lspconfig'
   use { 'nvim-treesitter/nvim-treesitter',
-        run = function() require('nvim-treesitter.install').update{ with_sync = true} end,
+        run = function() require('nvim-treesitter.install').update { with_sync = true } end,
         config = function()
+          local opt = vim.opt
           require('nvim-treesitter.configs').setup {
             ensure_installed = { 'python', 'lua' },
             sync_install = false,
@@ -174,15 +183,16 @@ require('packer').startup(function(use)
               enable = true
             },
           }
-          vim.opt.foldmethod = 'expr'
-          vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
-          vim.opt.foldenable = false
+          opt.foldmethod = 'expr'
+          opt.foldexpr = 'nvim_treesitter#foldexpr()'
+          opt.foldenable = false
         end,
   }
   use 'hrsh7th/cmp-nvim-lsp'
   use { 'hrsh7th/nvim-cmp',
         config = function()
-          vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+          local opt = vim.opt
+          opt.completeopt = { 'menu', 'menuone', 'noselect' }
           local cmp = require('cmp')
           cmp.setup {
             sources = cmp.config.sources(
@@ -215,8 +225,9 @@ require('packer').startup(function(use)
           }
 
           local builtin = require('telescope.builtin')
+          local mapkey = vim.keymap.set
           local function map(keys, action)
-            vim.keymap.set('n', keys, action, { noremap = true })
+            mapkey('n', keys, action, { noremap = true })
           end
           map('<leader>ff', function() builtin.find_files { hidden = true } end)
           map('<leader>fg', builtin.live_grep)
@@ -230,13 +241,14 @@ require('packer').startup(function(use)
         config = function()
           require('gitsigns').setup {
             signs = {
-              changedelete = { text = '┻' }
+              changedelete = { text = '\u{254B}' }
             },
             on_attach = function(bufnr)
               local gs = require('gitsigns')
 
+              local mapkey = vim.keymap.set
               local function map(keys, action)
-                vim.keymap.set('n', keys, action, { noremap = true, buffer = bufnr })
+                mapkey('n', keys, action, { noremap = true, buffer = bufnr })
               end
 
               map('<leader>hp', gs.preview_hunk)

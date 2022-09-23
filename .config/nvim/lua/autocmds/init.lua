@@ -1,30 +1,41 @@
-local function autocmds_group(group_name, autocmds)
-  local group = vim.api.nvim_create_augroup(group_name, { clear = true })
+local api = vim.api
+local tblextend = vim.tbl_extend
+local contains = vim.tbl_contains
+local tbl = table
+local o = vim.o
+local v = vim.v
+local opt = vim.opt
+local optlocal = vim.opt_local
+local cmd = vim.cmd
+local fn = vim.fn
+
+local function autocmdsgroup(group_name, autocmds)
+  local group = api.nvim_create_augroup(group_name, { clear = true })
   for _, autocmd in ipairs(autocmds) do
     local events, opts = autocmd[1], autocmd[2]
-    opts = vim.tbl_extend("keep", { group = group }, opts)
-    vim.api.nvim_create_autocmd(events, opts)
+    opts = tblextend("keep", { group = group }, opts)
+    api.nvim_create_autocmd(events, opts)
   end
 end
 
-local columns = { 120, 150 }
-local inactive_nums = {}
+local activenums = { 120, 150 }
+local inactivenums = {}
 for i = 1,999 do
-  table.insert(inactive_nums, i)
+  tbl.insert(inactivenums, i)
 end
-local columns = table.concat(columns, ',')
-local inactive_columns = table.concat(inactive_nums, ',')
-local highlights_excluded_filetypes = { 'help' }
+local activecolumns = tbl.concat(activenums, ',')
+local inactivecolumns = tbl.concat(inactivenums, ',')
+local highlightsexcludedfiletypes = { 'help' }
 
-autocmds_group("ColorColumn", {
+autocmdsgroup("ColorColumn", {
   {
     { "BufNewFile", "BufRead", "BufWinEnter", "WinEnter" },
     {
       callback = function()
-        if not vim.tbl_contains(highlights_excluded_filetypes, vim.o.filetype) then
-          vim.opt_local.colorcolumn = columns
+        if not contains(highlightsexcludedfiletypes, o.filetype) then
+          optlocal.colorcolumn = activecolumns
         else
-          vim.opt_local.colorcolumn = ''
+          optlocal.colorcolumn = ''
         end
       end
     }
@@ -33,72 +44,73 @@ autocmds_group("ColorColumn", {
     { "WinLeave" },
     {
       callback = function()
-        vim.opt_local.colorcolumn = inactive_columns
+        optlocal.colorcolumn = inactivecolumns
       end
     }
   },
 })
 
-autocmds_group("CursorLine", {
+autocmdsgroup("CursorLine", {
   {
     { "BufNewFile", "BufRead", "BufWinEnter", "WinEnter" },
     {
       callback = function()
-        if vim.opt.diff:get()
-        or vim.tbl_contains(highlights_excluded_filetypes, vim.o.filetype) then
-          vim.opt_local.cursorline = false
+        if opt.diff:get()
+        or contains(highlightsexcludedfiletypes, o.filetype) then
+          optlocal.cursorline = false
         else
-          vim.opt_local.cursorline = true
+          optlocal.cursorline = true
         end
       end
     }
   },
   {
     { "WinLeave" },
-    { callback = function() vim.opt_local.cursorline = false end }
+    { callback = function() optlocal.cursorline = false end }
   },
   {
     { "OptionSet" },
     {
       pattern = "diff",
       callback = function()
-        if vim.v.option_new == "1" then
-          vim.opt_local.cursorline = false
-        elseif vim.v.option_new == "0" then
-          vim.opt_local.cursorline = true
+        local newvalue = v.option_new
+        if newvalue == "1" then
+          optlocal.cursorline = false
+        elseif newvalue == "0" then
+          optlocal.cursorline = true
         end
       end
     }
   },
 })
 
-vim.opt.hlsearch = false
-autocmds_group("SearchHl", {
+opt.hlsearch = false
+autocmdsgroup("SearchHl", {
   {
     { "CmdlineEnter" },
     {
       pattern = { "/", "?" },
-      callback = function() vim.opt.hlsearch = true end
+      callback = function() opt.hlsearch = true end
     }
   },
   {
     { "CmdlineLeave" },
     {
       pattern = { "/", "?" },
-      callback = function() vim.opt.hlsearch = false end
+      callback = function() opt.hlsearch = false end
     }
   },
 })
 
-autocmds_group("TerminalSettings", {
+autocmdsgroup("TerminalSettings", {
   {
     { "TermOpen" },
     {
       callback = function()
-        vim.opt_local.number = false
-        vim.opt_local.relativenumber = false
-        vim.opt_local.signcolumn = 'no'
-        vim.opt_local.scrollback = 100000
+        optlocal.number = false
+        optlocal.relativenumber = false
+        optlocal.signcolumn = 'no'
+        optlocal.scrollback = 100000
       end
     }
   },
@@ -107,7 +119,7 @@ autocmds_group("TerminalSettings", {
     {
       pattern = 'term://*',
       callback = function()
-        vim.opt_local.sidescrolloff = 0
+        optlocal.sidescrolloff = 0
       end
     }
   },
@@ -129,13 +141,13 @@ autocmds_group("TerminalSettings", {
 
 local autoretab = true
 -- TODO command toggle
-autocmds_group("AutoRetab", {
+autocmdsgroup("AutoRetab", {
   {
     { "BufWrite" },
     {
       callback = function()
         if autoretab then
-          vim.cmd('retab')
+          cmd('retab')
         end
       end
     }
@@ -144,34 +156,22 @@ autocmds_group("AutoRetab", {
 
 local autoremovetrailingspaces = true
 -- TODO command toggle
-autocmds_group("AutoRemoveTrailingSpace", {
+autocmdsgroup("AutoRemoveTrailingSpace", {
   {
     { "BufWrite" },
     {
       callback = function()
         if autoremovetrailingspaces then
-          local winview = vim.fn.winsaveview()
-          pcall(vim.cmd, '%s/\\v\\s+$//')
-          vim.fn.winrestview(winview)
+          local winview = fn.winsaveview()
+          pcall(cmd, [[%s/\v\s+$//]])
+          fn.winrestview(winview)
         end
       end
     }
   },
 })
 
---autocmds_group("ClearCmdline", {
-  --{
-  --  { "CmdlineLeave" },
-  --  {
-  --    pattern = ':',
-  --    callback = function()
-  --      vim.fn.timer_start(10000, function() vim.cmd('echon', '') end)
-  --    end
-  --  }
-  --}
---})
-
-autocmds_group("QuickfixWindow", {
+autocmdsgroup("QuickfixWindow", {
   {
     { "FileType" },
     {

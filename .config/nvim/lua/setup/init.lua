@@ -1,9 +1,10 @@
 local fn = vim.fn
+local g = vim.g
 
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+g.mapleader = ' '
+g.maplocalleader = ' '
 
-local nvimconfigdir = vim.fn.stdpath('config')
+local nvimconfigdir = fn.stdpath('config')
 local pynvimdir = nvimconfigdir .. '/pynvim'
 local pypath = pynvimdir .. '/bin/python'
 
@@ -13,4 +14,4 @@ if fn.empty(fn.glob(pynvimdir)) > 0 then
   fn.system([[source ]] .. pynvimdir .. '/bin/activate' .. [[ && python -m pip install pynvim]])
 end
 
-vim.g.python3_host_prog = pypath
+g.python3_host_prog = pypath
