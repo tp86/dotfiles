@@ -240,7 +240,10 @@ require('packer').startup(function(use)
         requires = 'nvim-lua/plenary.nvim',
         config = function()
           require('neogit').setup {
-            disable_commit_confirmation = true
+            disable_commit_confirmation = true,
+            integrations = {
+              diffview = true,
+            },
           }
         end
   }
