@@ -125,13 +125,13 @@ require('packer').startup(function(use)
                       return ''
                     end
                   end,
-                  cond = disableforfts { 'NvimTree', 'DiffviewFiles' },
+                  cond = disableforfts { 'NvimTree', 'DiffviewFiles', 'NeogitStatus' },
                 }
               },
               lualine_x = {
                 {
                   'filetype',
-                  cond = disableforfts { 'NvimTree', 'DiffviewFiles' },
+                  cond = disableforfts { 'NvimTree', 'DiffviewFiles', 'NeogitStatus' },
                 },
                 {
                   function()
