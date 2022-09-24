@@ -33,7 +33,7 @@ local on_attach = function(_, bufnr)
   map('gr', lspbuf.references)
   map('<localleader>la', lspbuf.code_action)
   map('<localleader>lr', lspbuf.rename)
-  map('<localleader>l=', lspbuf.formatting)
+  map('<localleader>l=', function() lspbuf.format { async = true } end)
 end
 
 -- integrations

@@ -91,14 +91,21 @@ require('packer').startup(function(use)
                     if #name > 8 then
                       name = str.sub(name, 1, 8) .. '…'
                     end
-                    local status = fn.system(
-                      [[git -C ]] .. fn.fnamemodify(fn.bufname(), ':p:h') .. [[ status --porcelain 2>/dev/null]]
-                    )
-                    if #status > 0 then
-                      name = name .. '*'
-                    end
                     return name
                   end,
+                  padding = { right = 0, left = 1 },
+                  separator = { right = nil },
+                },
+                {
+                  'diff',
+                  fmt = function(s)
+                    if #s > 0 then
+                      return '*'
+                    else
+                      return ''
+                    end
+                  end,
+                  padding = { left = 0, right = 1 },
                 },
               },
               lualine_c = {
