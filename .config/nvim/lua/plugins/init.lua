@@ -189,21 +189,69 @@ require('packer').startup(function(use)
           opt.foldenable = false
         end,
   }
-  use 'hrsh7th/cmp-nvim-lsp'
   use { 'hrsh7th/nvim-cmp',
+        requires = {
+          'hrsh7th/cmp-buffer',
+          'hrsh7th/cmp-nvim-lsp',
+          'saadparwaiz1/cmp_luasnip',
+          { 'L3MON4D3/LuaSnip',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
+        },
         config = function()
           local opt = vim.opt
           opt.completeopt = { 'menu', 'menuone', 'noselect' }
           local cmp = require('cmp')
+          local luasnip = require('luasnip')
           cmp.setup {
+            snippet = {
+              expand = function(args)
+                luasnip.lsp_expand(args.body)
+              end,
+            },
             sources = cmp.config.sources(
               {
-                { name = 'nvim_lsp' }
+                { name = 'nvim_lsp', keyword_length = 3 },
+                { name = 'buffer', keyword_length = 3 },
+                { name = 'luasnip', keyword_length = 2 },
               }
             ),
             mapping = cmp.mapping.preset.insert {
-              ['<c-j>'] = cmp.mapping.select_next_item(),
-              ['<c-k>'] = cmp.mapping.select_prev_item()
+              ['<c-j>'] = cmp.mapping(function()
+                if cmp.visible() then
+                  cmp.select_next_item()
+                else
+                  cmp.complete()
+                end
+              end, { 'i', 's' }),
+              ['<c-k>'] = cmp.mapping(function()
+                if cmp.visible() then
+                  cmp.select_next_item()
+                else
+                  cmp.complete()
+                end
+              end, { 'i', 's' }),
+              ['<c-u>'] = cmp.mapping.scroll_docs(-4),
+              ['<c-d>'] = cmp.mapping.scroll_docs(4),
+              ['<c-e>'] = cmp.mapping.abort(),
+              ['<c-l>'] = cmp.mapping(function(fallback)
+                if cmp.visible() then
+                  cmp.confirm { select = true }
+                elseif luasnip.expand_or_jumpable() then
+                  luasnip.expand_or_jump()
+                else
+                  fallback()
+                end
+              end, { 'i', 's' }),
+              ['<c-h>'] = cmp.mapping(function(fallback)
+                if luasnip.jumpable(-1) then
+                  luasnip.jump(-1)
+                else
+                  fallback()
+                end
+              end, { 'i', 's' }),
             }
           }
         end
@@ -236,7 +284,6 @@ require('packer').startup(function(use)
 
           telescope.load_extension('fzf')
         end
-
   }
   use { 'lewis6991/gitsigns.nvim',
         config = function()
