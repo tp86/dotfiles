@@ -290,7 +290,7 @@ require('packer').startup(function(use)
         config = function()
           require('gitsigns').setup {
             signs = {
-              changedelete = { text = '\u{254B}' }
+              changedelete = { hl = 'GitSignsDelete', text = '┃' }
             },
             on_attach = function(bufnr)
               local gs = require('gitsigns')
