@@ -26,7 +26,7 @@ opt.listchars = {
   extends = '\226\159\171',
 }
 
-opt.scrolloff = 3
+opt.scrolloff = 2
 opt.sidescrolloff = 10
 
 opt.ignorecase = true
