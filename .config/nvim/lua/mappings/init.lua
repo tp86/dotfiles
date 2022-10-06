@@ -103,3 +103,6 @@ local function iput()
 end
 imap('<a-v>', iput, { expr = true })
 tmap('<a-v>', [[<c-\><c-n>"+pa]])
+
+nmap('[t', '<cmd>tabprevious<cr>')
+nmap(']t', '<cmd>tabnext<cr>')

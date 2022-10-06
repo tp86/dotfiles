@@ -100,12 +100,21 @@ require('packer').startup(function(use)
                     end
                     return name
                   end,
+                  cond = function() return optlocal.buftype:get() ~= 'terminal' end
                 },
               },
               lualine_c = {
                 {
                   function()
                     local bufname = fn.bufname()
+                    local filename = fn.fnamemodify(bufname, ':t')
+                    if #filename == 0 then
+                      return '[No Name]'
+                    end
+                    local filetype = optlocal.filetype:get()
+                    if filetype == 'help' then
+                      return filename
+                    end
                     local bufnamefull = fn.fnamemodify(bufname, ':p')
                     if str.find(bufnamefull, '^term://') then
                       local splittedtermuri = fn.split(bufnamefull, ':')
@@ -117,10 +126,6 @@ require('packer').startup(function(use)
                     local relativepath = fn.matchstr(bufnamefull, [[\v^]] .. cwdfull .. [[\zs.*$]])
                     if #relativepath == 0 then
                       relativepath = bufnamefull
-                    end
-                    local filename = fn.fnamemodify(bufname, ':t')
-                    if #filename == 0 then
-                      return '[No Name]'
                     end
                     local relativedir = fn.fnamemodify(relativepath, ':h')
                     if relativedir == '.' then
@@ -155,6 +160,18 @@ require('packer').startup(function(use)
                 },
                 {
                   function()
+                    local venv = os.getenv('VIRTUAL_ENV')
+                    if venv then
+                      return '(' .. fn.fnamemodify(venv, ':t') .. ')'
+                    end
+                    return ''
+                  end,
+                  cond = function()
+                    return optlocal.filetype:get() == 'python'
+                  end,
+                },
+                {
+                  function()
                     local clientnames = {}
                     for _, client in pairs(lsp.buf_get_clients()) do
                       clientnames[#clientnames + 1] = client.config.name
@@ -167,6 +184,11 @@ require('packer').startup(function(use)
                 'diagnostics'
               },
               lualine_z = {}
+            },
+            tabline = {
+              lualine_a = {
+                'tabs',
+              }
             },
           }
         end
@@ -229,7 +251,7 @@ require('packer').startup(function(use)
               end, { 'i', 's' }),
               ['<c-k>'] = cmp.mapping(function()
                 if cmp.visible() then
-                  cmp.select_next_item()
+                  cmp.select_prev_item()
                 else
                   cmp.complete()
                 end
@@ -307,6 +329,16 @@ require('packer').startup(function(use)
   }
   use { 'sindrets/diffview.nvim',
         requires = 'nvim-lua/plenary.nvim',
+        config = function()
+          require('diffview').setup {
+            view = {
+              merge_tool = {
+                layout = 'diff3_mixed',
+                disable_diagnostics = true,
+              },
+            },
+          }
+        end,
   }
   use { 'TimUntersberger/neogit',
         requires = 'nvim-lua/plenary.nvim',

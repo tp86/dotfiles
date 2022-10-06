@@ -123,13 +123,13 @@ autocmdsgroup("TerminalSettings", {
       end
     }
   },
-  {
-    { "TermOpen", "BufWinEnter", "WinEnter" },
-    {
-      pattern = 'term://*',
-      command = 'startinsert'
-    }
-  },
+  --{
+  --  { "TermOpen", "BufWinEnter", "WinEnter" },
+  --  {
+  --    pattern = 'term://*',
+  --    command = 'startinsert'
+  --  }
+  --},
   {
     { "TermLeave", "BufLeave", "WinLeave" },
     {
