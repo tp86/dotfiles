@@ -22,7 +22,7 @@ opt.list = true
 opt.listchars = {
   tab = '\194\187 ',
   trail = '\194\183',
-  precedes = '\226\159\171',
+  precedes = '\226\159\170',
   extends = '\226\159\171',
 }
 
