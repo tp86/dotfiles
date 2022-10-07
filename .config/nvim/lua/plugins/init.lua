@@ -100,7 +100,7 @@ require('packer').startup(function(use)
                     end
                     return name
                   end,
-                  cond = function() return optlocal.buftype:get() ~= 'terminal' end
+                  cond = function() return optlocal.buftype:get() ~= 'terminal' end,
                 },
               },
               lualine_c = {
@@ -304,6 +304,7 @@ require('packer').startup(function(use)
           map('<leader>ff', function() builtin.find_files { hidden = true } end)
           map('<leader>fg', builtin.live_grep)
           map('<leader>fb', builtin.buffers)
+          map('<leader>gb', builtin.git_branches)
 
           telescope.load_extension('fzf')
         end
