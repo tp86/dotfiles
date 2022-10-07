@@ -191,6 +191,8 @@ require('packer').startup(function(use)
               }
             },
           }
+          local opt = vim.opt
+          opt.showtabline = 1
         end
   }
   use 'neovim/nvim-lspconfig'
