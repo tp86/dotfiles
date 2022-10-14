@@ -45,7 +45,7 @@ require('packer').startup(function(use)
               width = 40
             },
             filters = {
-              custom = { '__pycache__' }
+              custom = { '__pycache__', '.git' }
             },
             sync_root_with_cwd = true
           }
@@ -353,6 +353,12 @@ require('packer').startup(function(use)
             },
           }
         end
+  }
+  use { 'jmcantrell/vim-virtualenv',
+        config = function()
+          local g = vim.g
+          g.virtualenv_directory = os.getenv('HOME') .. '/.venv'
+        end,
   }
   -- PLUGINS END
 
