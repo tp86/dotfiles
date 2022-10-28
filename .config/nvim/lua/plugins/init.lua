@@ -113,6 +113,12 @@ require('packer').startup(function(use)
                 return name
               end,
               cond = function() return optlocal.buftype:get() ~= 'terminal' end,
+              on_click = function()
+                local telescope = require('telescope.builtin')
+                if telescope then
+                  telescope.git_branches()
+                end
+              end,
             },
           },
           lualine_c = {
