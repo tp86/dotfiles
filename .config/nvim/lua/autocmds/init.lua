@@ -172,6 +172,7 @@ autocmdsgroup("AutoRemoveTrailingSpace", {
 })
 
 autocmdsgroup("QuickfixWindow", {
+  --[[
   {
     { "FileType" },
     {
@@ -179,4 +180,5 @@ autocmdsgroup("QuickfixWindow", {
       command = 'wincmd L'
     }
   }
+  --]]
 })
