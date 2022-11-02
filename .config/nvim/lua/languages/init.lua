@@ -4,7 +4,6 @@ local util = require('lspconfig.util')
 local mapkey = vim.keymap.set
 local lsp = vim.lsp
 local lspbuf = lsp.buf
-local api = vim.api
 
 -- custom servers
 if not configs.pyls then
@@ -33,11 +32,11 @@ local on_attach = function(_, bufnr)
   map('gr', lspbuf.references)
   map('<localleader>la', lspbuf.code_action)
   map('<localleader>lr', lspbuf.rename)
-  map('<localleader>l=', function() lspbuf.formatting { async = true } end)
+  map('<localleader>l=', function() lspbuf.format { async = true } end)
 end
 
 -- integrations
-local capabilities = require('cmp_nvim_lsp').update_capabilities(lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities(lsp.protocol.make_client_capabilities())
 
 -- server setups
 local lspsetups = {

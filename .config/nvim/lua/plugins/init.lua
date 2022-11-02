@@ -258,6 +258,7 @@ require('packer').startup(function(use)
         },
         sources = cmp.config.sources(
           {
+            { name = 'conjure', keyword_length = 2 },
             { name = 'nvim_lsp', keyword_length = 2 },
             { name = 'buffer', keyword_length = 3 },
             { name = 'luasnip', keyword_length = 2 },
@@ -325,10 +326,10 @@ require('packer').startup(function(use)
         mapkey('n', keys, action, { noremap = true })
       end
 
-      map('<leader>ff', function() builtin.find_files { hidden = true } end)
-      map('<leader>fg', builtin.live_grep)
-      map('<leader>fb', builtin.buffers)
-      map('<leader>gb', builtin.git_branches)
+      map('sf', function() builtin.find_files { hidden = true } end)
+      map('sg', builtin.live_grep)
+      map('sb', builtin.buffers)
+      map('sgb', builtin.git_branches)
 
       telescope.load_extension('fzf')
     end
@@ -348,7 +349,7 @@ require('packer').startup(function(use)
             mapkey('n', keys, action, { noremap = true, buffer = bufnr })
           end
 
-          map('<leader>hp', gs.preview_hunk)
+          map('ghp', gs.preview_hunk)
         end,
         current_line_blame = true,
       }
@@ -387,6 +388,20 @@ require('packer').startup(function(use)
       g.virtualenv_directory = os.getenv('HOME') .. '/.venv'
     end,
   }
+  use {
+    'mtikekar/nvim-send-to-term',
+    disable = true,
+  }
+  use {
+    'Olical/conjure',
+    ft = { 'janet', 'fennel' },
+  }
+  use {
+    'PaterJason/cmp-conjure',
+    after = 'conjure',
+  }
+  use 'bakpakin/janet.vim'
+  use 'jaawerth/fennel.vim'
   -- PLUGINS END
 
   if packerbootstrap then

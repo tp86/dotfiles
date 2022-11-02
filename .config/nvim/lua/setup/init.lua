@@ -1,8 +1,8 @@
 local fn = vim.fn
 local g = vim.g
 
-g.mapleader = ' '
-g.maplocalleader = ' '
+g.mapleader = ','
+g.maplocalleader = ','
 
 local nvimconfigdir = fn.stdpath('config')
 local pynvimdir = nvimconfigdir .. '/pynvim'

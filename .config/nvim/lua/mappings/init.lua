@@ -1,5 +1,4 @@
-local mapkey = vim.keymap.set
-local extend = vim.tbl_extend
+local mapkey = vim.keymap.set local extend = vim.tbl_extend
 local fn = vim.fn
 local tbl = table
 local v = vim.v
@@ -41,6 +40,9 @@ imap('<c-k>', '<c-p>')
 
 map('H', '^')
 map('L', '$')
+
+nmap('j', 'gj')
+nmap('k', 'gk')
 
 local function cwildmap(key, alt)
   cmap(key, function()
