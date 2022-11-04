@@ -414,7 +414,10 @@ require('packer').startup(function(use)
   use {
     'windwp/nvim-autopairs',
     config = function()
-      require("nvim-autopairs").setup {}
+      local npairs = require('nvim-autopairs')
+      npairs.setup {}
+      local squoterule = npairs.get_rule("'")[1]
+      table.insert(squoterule.not_filetypes, 'fennel')
     end,
   }
   use {

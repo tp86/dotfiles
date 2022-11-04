@@ -1,0 +1,19 @@
+(local lua-version "5.4")
+(let [dirs ["src"
+            (.. ".luarocks/share/lua/" lua-version)
+            (.. (os.getenv "HOME") "/.luarocks/share/lua/" lua-version)]
+      paths []]
+  (each [_ dir (ipairs dirs)]
+    (tset paths (+ (length paths) 1) (.. dir "/?.lua"))
+    (tset paths (+ (length paths) 1) (.. dir "/?/init.lua")))
+  (let [path (table.concat paths ";")]
+    (set package.path (.. path ";" package.path))))
+(let [dirs [(.. ".luarocks/lib/lua/" lua-version)
+            (.. (os.getenv "HOME") "/.luarocks/lib/lua/" lua-version)]
+      paths []]
+  (each [_ dir (ipairs dirs)]
+    (tset paths (+ (length paths) 1) (.. dir "/?.so")))
+  (let [path (table.concat paths ";")]
+    (set package.cpath (.. path ";" package.cpath))))
+
+; vim:ft=fennel
