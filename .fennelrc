@@ -1,19 +1,31 @@
 (local lua-version "5.4")
-(let [dirs ["src"
-            (.. ".luarocks/share/lua/" lua-version)
-            (.. (os.getenv "HOME") "/.luarocks/share/lua/" lua-version)]
-      paths []]
-  (each [_ dir (ipairs dirs)]
-    (tset paths (+ (length paths) 1) (.. dir "/?.lua"))
-    (tset paths (+ (length paths) 1) (.. dir "/?/init.lua")))
-  (let [path (table.concat paths ";")]
-    (set package.path (.. path ";" package.path))))
-(let [dirs [(.. ".luarocks/lib/lua/" lua-version)
-            (.. (os.getenv "HOME") "/.luarocks/lib/lua/" lua-version)]
-      paths []]
-  (each [_ dir (ipairs dirs)]
-    (tset paths (+ (length paths) 1) (.. dir "/?.so")))
-  (let [path (table.concat paths ";")]
-    (set package.cpath (.. path ";" package.cpath))))
+(local path-patterns {:path ["/?.lua" "/?/init.lua"]
+                      :cpath ["/?.so"]})
+(local path-luarocks-dirs {:path ".luarocks/share/lua"
+                           :cpath ".luarocks/lib/lua"})
+
+(fn luarocks-paths
+  [path-name]
+  (let [paths []
+        path (. path-luarocks-dirs path-name)]
+    (each [_ prefix (ipairs ["" (.. (os.getenv "HOME") "/")])]
+      (table.insert paths (.. prefix  path "/" lua-version)))
+    paths))
+
+(fn add-to-path
+  [path-name dirs]
+  (let [paths []
+        luarocks-dirs (luarocks-paths path-name)
+        dirs (or dirs [])]
+    (each [_ dir-tbl (ipairs [dirs luarocks-dirs])]
+      (each [_ dir (ipairs dir-tbl)]
+        (each [_ patt (ipairs (. path-patterns path-name))]
+          (table.insert paths (.. dir patt)))))
+    (let [paths (table.concat paths ";")
+          path-var (. package path-name)]
+      (tset package path-name (.. paths ";" path-var)))))
+
+(add-to-path :path ["src"])
+(add-to-path :cpath)
 
 ; vim:ft=fennel

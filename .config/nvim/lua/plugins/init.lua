@@ -238,75 +238,6 @@ require('packer').startup(function(use)
     end,
   }
   use {
-    'hrsh7th/nvim-cmp',
-    requires = {
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-nvim-lsp',
-      'saadparwaiz1/cmp_luasnip',
-      { 'L3MON4D3/LuaSnip',
-        config = function()
-          require('luasnip.loaders.from_vscode').lazy_load()
-        end,
-      },
-    },
-    config = function()
-      local opt = vim.opt
-      opt.completeopt = { 'menu', 'menuone', 'noselect' }
-      local cmp = require('cmp')
-      local luasnip = require('luasnip')
-      cmp.setup {
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        sources = cmp.config.sources(
-          {
-            { name = 'conjure', keyword_length = 2 },
-            { name = 'nvim_lsp', keyword_length = 2 },
-            { name = 'buffer', keyword_length = 3 },
-            { name = 'luasnip', keyword_length = 2 },
-          }
-        ),
-        mapping = cmp.mapping.preset.insert {
-          ['<c-j>'] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_next_item()
-            else
-              cmp.complete()
-            end
-          end, { 'i', 's' }),
-          ['<c-k>'] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_prev_item()
-            else
-              cmp.complete()
-            end
-          end, { 'i', 's' }),
-          ['<c-u>'] = cmp.mapping.scroll_docs(-4),
-          ['<c-d>'] = cmp.mapping.scroll_docs(4),
-          ['<c-e>'] = cmp.mapping.abort(),
-          ['<c-l>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.confirm { select = true }
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-          ['<c-h>'] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-        }
-      }
-    end
-  }
-  use {
     'nvim-telescope/telescope.nvim',
     branch = '0.1.x',
     requires = { 'nvim-lua/plenary.nvim',
@@ -398,16 +329,11 @@ require('packer').startup(function(use)
   --}
   use {
     'Olical/conjure',
-    ft = { 'janet', 'fennel' },
     config = function()
       local g = vim.g
       g['conjure#filetype#fennel'] = 'conjure.client.fennel.stdio'
       g['conjure#log#hud#border'] = 'none'
     end,
-  }
-  use {
-    'PaterJason/cmp-conjure',
-    after = 'conjure',
   }
   use 'bakpakin/janet.vim'
   use 'jaawerth/fennel.vim'
@@ -417,7 +343,7 @@ require('packer').startup(function(use)
       local npairs = require('nvim-autopairs')
       npairs.setup {}
       local squoterule = npairs.get_rule("'")[1]
-      table.insert(squoterule.not_filetypes, 'fennel')
+      squoterule.not_filetypes = vim.tbl_extend('keep', squoterule.not_filetypes, { 'fennel', 'janet' })
     end,
   }
   use {
@@ -427,8 +353,77 @@ require('packer').startup(function(use)
       require('nvim-surround').setup {}
     end
   }
+  use 'gpanders/nvim-parinfer'
+
   use {
-    'gpanders/nvim-parinfer'
+    'hrsh7th/nvim-cmp',
+    requires = {
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-nvim-lsp',
+      'saadparwaiz1/cmp_luasnip',
+      'PaterJason/cmp-conjure',
+      { 'L3MON4D3/LuaSnip',
+        config = function()
+          require('luasnip.loaders.from_vscode').lazy_load()
+        end,
+      },
+    },
+    config = function()
+      local opt = vim.opt
+      opt.completeopt = { 'menu', 'menuone', 'noselect' }
+      local cmp = require('cmp')
+      local luasnip = require('luasnip')
+      cmp.setup {
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        sources = cmp.config.sources(
+          {
+            { name = 'conjure', keyword_length = 2 },
+            { name = 'nvim_lsp', keyword_length = 2 },
+            { name = 'buffer', keyword_length = 3 },
+            { name = 'luasnip', keyword_length = 2 },
+          }
+        ),
+        mapping = cmp.mapping.preset.insert {
+          ['<c-j>'] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_next_item()
+            else
+              cmp.complete()
+            end
+          end, { 'i', 's' }),
+          ['<c-k>'] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_prev_item()
+            else
+              cmp.complete()
+            end
+          end, { 'i', 's' }),
+          ['<c-u>'] = cmp.mapping.scroll_docs(-4),
+          ['<c-d>'] = cmp.mapping.scroll_docs(4),
+          ['<c-e>'] = cmp.mapping.abort(),
+          ['<c-l>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.confirm { select = true }
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+          ['<c-h>'] = cmp.mapping(function(fallback)
+            if luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+        }
+      }
+    end
   }
   -- PLUGINS END
 
