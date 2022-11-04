@@ -216,6 +216,7 @@ require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use {
     'nvim-treesitter/nvim-treesitter',
+    requires = 'p00f/nvim-ts-rainbow',
     run = function() require('nvim-treesitter.install').update { with_sync = true } end,
     config = function()
       local opt = vim.opt
@@ -226,6 +227,9 @@ require('packer').startup(function(use)
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = true,
+        },
+        rainbow = {
+          enable = true,
         },
       }
       opt.foldmethod = 'expr'
@@ -326,10 +330,10 @@ require('packer').startup(function(use)
         mapkey('n', keys, action, { noremap = true })
       end
 
-      map('sf', function() builtin.find_files { hidden = true } end)
-      map('sg', builtin.live_grep)
-      map('sb', builtin.buffers)
-      map('sgb', builtin.git_branches)
+      map('ff', function() builtin.find_files { hidden = true } end)
+      map('fg', builtin.live_grep)
+      map('fb', builtin.buffers)
+      map('fgb', builtin.git_branches)
 
       telescope.load_extension('fzf')
     end
@@ -388,13 +392,18 @@ require('packer').startup(function(use)
       g.virtualenv_directory = os.getenv('HOME') .. '/.venv'
     end,
   }
-  use {
-    'mtikekar/nvim-send-to-term',
-    disable = true,
-  }
+  --use {
+  --  'mtikekar/nvim-send-to-term',
+  --  disable = true,
+  --}
   use {
     'Olical/conjure',
     ft = { 'janet', 'fennel' },
+    config = function()
+      local g = vim.g
+      g['conjure#filetype#fennel'] = 'conjure.client.fennel.stdio'
+      g['conjure#log#hud#border'] = 'none'
+    end,
   }
   use {
     'PaterJason/cmp-conjure',
@@ -402,6 +411,22 @@ require('packer').startup(function(use)
   }
   use 'bakpakin/janet.vim'
   use 'jaawerth/fennel.vim'
+  use {
+    'windwp/nvim-autopairs',
+    config = function()
+      require("nvim-autopairs").setup {}
+    end,
+  }
+  use {
+    'kylechui/nvim-surround',
+    tag = '*',
+    config = function()
+      require('nvim-surround').setup {}
+    end
+  }
+  use {
+    'gpanders/nvim-parinfer'
+  }
   -- PLUGINS END
 
   if packerbootstrap then
