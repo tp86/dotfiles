@@ -261,10 +261,10 @@ require('packer').startup(function(use)
         mapkey('n', keys, action, { noremap = true })
       end
 
-      map('ff', function() builtin.find_files { hidden = true } end)
-      map('fg', builtin.live_grep)
-      map('fb', builtin.buffers)
-      map('fgb', builtin.git_branches)
+      map('sf', function() builtin.find_files { hidden = true } end)
+      map('sg', builtin.live_grep)
+      map('sb', builtin.buffers)
+      map('sgb', builtin.git_branches)
 
       telescope.load_extension('fzf')
     end
@@ -323,10 +323,23 @@ require('packer').startup(function(use)
       g.virtualenv_directory = os.getenv('HOME') .. '/.venv'
     end,
   }
-  --use {
-  --  'mtikekar/nvim-send-to-term',
-  --  disable = true,
-  --}
+  use {
+    'mtikekar/nvim-send-to-term',
+    config = function()
+      local g = vim.g
+      g.send_disable_mapping = true
+      local mapkey = vim.keymap.set
+      local function nmap(keys, action)
+        mapkey('n', keys, action, { noremap = true })
+      end
+      local function vmap(keys, action)
+        mapkey('v', keys, action, { noremap = true })
+      end
+      nmap('xx', '<Plug>SendLine')
+      nmap('x', '<Plug>Send')
+      vmap('x', '<Plug>Send')
+    end
+  }
   use {
     'Olical/conjure',
     config = function()
@@ -426,6 +439,7 @@ require('packer').startup(function(use)
     end
   }
   -- PLUGINS END
+  -- TODO treesitter-based text objects
 
   if packerbootstrap then
     require('packer').sync()
