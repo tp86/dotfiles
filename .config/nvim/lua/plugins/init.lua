@@ -332,9 +332,11 @@ require('packer').startup(function(use)
       local function nmap(keys, action)
         mapkey('n', keys, action, { noremap = true })
       end
+
       local function vmap(keys, action)
         mapkey('v', keys, action, { noremap = true })
       end
+
       nmap('xx', '<Plug>SendLine')
       nmap('x', '<Plug>Send')
       vmap('x', '<Plug>Send')
@@ -344,8 +346,43 @@ require('packer').startup(function(use)
     'Olical/conjure',
     config = function()
       local g = vim.g
-      g['conjure#filetype#fennel'] = 'conjure.client.fennel.stdio'
+      local client = 'conjure.client.fennel.stdio'
+      g['conjure#filetype#fennel'] = client
       g['conjure#log#hud#border'] = 'none'
+      -- add completions for fennel stdio
+      -- TODO fix on load
+      local clientmodule = require(client)
+      if not clientmodule.oldstart then
+        clientmodule.oldstart = clientmodule['start']
+        clientmodule['start'] = function()
+          clientmodule.repl = clientmodule.oldstart().repl
+        end
+      end
+      clientmodule.completions = function(opts)
+        if clientmodule.repl then
+          clientmodule.repl.send(
+            ',complete ' .. opts.prefix .. '\n',
+            function(msgs)
+              local completions = {}
+              local out = msgs[1].out
+              print('out', out)
+              for word in string.gmatch(out, '[^%s]*') do
+                -- TODO fix split
+                if word ~= '' then
+                  table.insert(completions, word)
+                end
+              end
+              print('completions', vim.inspect(completions))
+              for i, word in ipairs(completions) do
+                completions[i] = { word = word }
+              end
+              return opts.cb(completions)
+            end,
+            { ['batch?'] = true })
+        else
+          opts.cb {}
+        end
+      end
     end,
   }
   use 'bakpakin/janet.vim'
@@ -440,6 +477,8 @@ require('packer').startup(function(use)
   }
   -- PLUGINS END
   -- TODO treesitter-based text objects
+  -- TODO hop
+  -- TODO commenter
 
   if packerbootstrap then
     require('packer').sync()
