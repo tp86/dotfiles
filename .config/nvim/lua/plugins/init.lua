@@ -344,9 +344,15 @@ require('packer').startup(function(use)
       g.send_multiline = {
         lua = {
           send = function(lines)
-            local padding, withoutlocal = string.match(lines[1], '^(%s*)local (.+)$')
-            if padding then
-              lines[1] = withoutlocal
+            local pattern = 'local (.+)$'
+            if #lines == 1 then
+              pattern = '%s*' .. pattern
+            end
+            for i, line in ipairs(lines) do
+              local withoutlocal = string.match(line, '^' .. pattern)
+              if withoutlocal then
+                lines[i] = withoutlocal
+              end
             end
             local payload = table.concat(lines, '\n') .. '\n'
             vim.fn.jobsend(vim.g.send_target.term_id, payload)
