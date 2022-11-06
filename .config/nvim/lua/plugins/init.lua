@@ -340,15 +340,30 @@ require('packer').startup(function(use)
       nmap('xx', '<Plug>SendLine')
       nmap('x', '<Plug>Send')
       vmap('x', '<Plug>Send')
+
+      g.send_multiline = {
+        lua = {
+          send = function(lines)
+            local padding, withoutlocal = string.match(lines[1], '^(%s*)local (.+)$')
+            if padding then
+              lines[1] = withoutlocal
+            end
+            local payload = table.concat(lines, '\n') .. '\n'
+            vim.fn.jobsend(vim.g.send_target.term_id, payload)
+          end,
+        }
+      }
     end
   }
   use {
     'Olical/conjure',
+    disable = true,
     config = function()
       local g = vim.g
       local client = 'conjure.client.fennel.stdio'
       g['conjure#filetype#fennel'] = client
       g['conjure#log#hud#border'] = 'none'
+      -- experimental
       -- add completions for fennel stdio
       -- TODO fix on load
       local clientmodule = require(client)
@@ -365,14 +380,14 @@ require('packer').startup(function(use)
             function(msgs)
               local completions = {}
               local out = msgs[1].out
-              print('out', out)
+              --print('out', out)
               for word in string.gmatch(out, '[^%s]*') do
                 -- TODO fix split
                 if word ~= '' then
                   table.insert(completions, word)
                 end
               end
-              print('completions', vim.inspect(completions))
+              --print('completions', vim.inspect(completions))
               for i, word in ipairs(completions) do
                 completions[i] = { word = word }
               end
@@ -411,7 +426,9 @@ require('packer').startup(function(use)
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-nvim-lsp',
       'saadparwaiz1/cmp_luasnip',
-      'PaterJason/cmp-conjure',
+      { 'PaterJason/cmp-conjure',
+        after = 'conjure',
+      },
       { 'L3MON4D3/LuaSnip',
         config = function()
           require('luasnip.loaders.from_vscode').lazy_load()
