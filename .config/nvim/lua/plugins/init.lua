@@ -408,6 +408,8 @@ require('packer').startup(function(use)
   }
   use 'bakpakin/janet.vim'
   use 'jaawerth/fennel.vim'
+  use 'stefanos82/nelua.vim'
+
   use {
     'windwp/nvim-autopairs',
     config = function()
