@@ -327,6 +327,7 @@ require('packer').startup(function(use)
     'mtikekar/nvim-send-to-term',
     config = function()
       local g = vim.g
+      local jobsend = vim.fn.jobsend
       g.send_disable_mapping = true
       local mapkey = vim.keymap.set
       local function nmap(keys, action)
@@ -355,9 +356,14 @@ require('packer').startup(function(use)
               end
             end
             local payload = table.concat(lines, '\n') .. '\n'
-            vim.fn.jobsend(vim.g.send_target.term_id, payload)
+            jobsend(vim.g.send_target.term_id, payload)
           end,
-        }
+        },
+        janet = {
+          send  = function(lines)
+            jobsend(g.send_target.term_id, table.concat(lines, '\r') .. '\r')
+          end,
+        },
       }
     end
   }
