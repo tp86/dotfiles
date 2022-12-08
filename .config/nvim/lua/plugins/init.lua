@@ -199,7 +199,12 @@ require('packer').startup(function(use)
             },
           },
           lualine_y = {
-            'diagnostics'
+            {
+              'diagnostics',
+              on_click = function()
+                vim.diagnostic.setloclist()
+              end
+            }
           },
           lualine_z = {}
         },
