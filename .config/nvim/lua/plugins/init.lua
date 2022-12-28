@@ -267,7 +267,7 @@ require('packer').startup(function(use)
       end
 
       map('sf', function() builtin.find_files { hidden = true } end)
-      map('sg', builtin.live_grep)
+      map('ss', builtin.live_grep)
       map('sb', builtin.buffers)
       map('sgb', builtin.git_branches)
 
@@ -346,26 +346,33 @@ require('packer').startup(function(use)
       nmap('xx', '<Plug>SendLine')
       nmap('x', '<Plug>Send')
       vmap('x', '<Plug>Send')
+      local function luasend(cr)
+        cr = cr or ''
+        return function(lines)
+          local pattern = 'local (.+)$'
+          if #lines == 1 then
+            pattern = '%s*' .. pattern
+          end
+          for i, line in ipairs(lines) do
+            local withoutlocal = string.match(line, '^' .. pattern)
+            if withoutlocal then
+              lines[i] = withoutlocal
+            end
+          end
+          local payload = table.concat(lines, '\n') .. cr .. '\n'
+          jobsend(vim.g.send_target.term_id, payload)
+        end
+      end
 
       g.send_multiline = {
         lua = {
-          send = function(lines)
-            local pattern = 'local (.+)$'
-            if #lines == 1 then
-              pattern = '%s*' .. pattern
-            end
-            for i, line in ipairs(lines) do
-              local withoutlocal = string.match(line, '^' .. pattern)
-              if withoutlocal then
-                lines[i] = withoutlocal
-              end
-            end
-            local payload = table.concat(lines, '\n') .. '\n'
-            jobsend(vim.g.send_target.term_id, payload)
-          end,
+          send = luasend(),
+        },
+        terra = {
+          send = luasend('\r'),
         },
         janet = {
-          send  = function(lines)
+          send = function(lines)
             jobsend(g.send_target.term_id, table.concat(lines, '\r') .. '\r')
           end,
         },
@@ -420,6 +427,21 @@ require('packer').startup(function(use)
   use 'bakpakin/janet.vim'
   use 'jaawerth/fennel.vim'
   use 'stefanos82/nelua.vim'
+  use {
+    'jakwings/vim-terra',
+    config = function()
+      local aucmds = vim.api.nvim_get_autocmds { event = { "BufReadPost", "BufNewFile" }, pattern = "*.t" }
+      for _, aucmd in ipairs(aucmds) do
+        local event = aucmd.event
+        local opts = {
+          pattern = aucmd.pattern,
+          command = "set filetype=terra",
+          group = aucmd.group,
+        }
+        vim.api.nvim_create_autocmd(event, opts)
+      end
+    end,
+  }
 
   use {
     'windwp/nvim-autopairs',

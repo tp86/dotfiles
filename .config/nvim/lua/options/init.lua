@@ -41,4 +41,6 @@ opt.grepprg = 'rg -nH' --[[ require ripgrep installed ]]
 
 opt.clipboard:append 'unnamedplus'
 
+opt.laststatus = 3
+
 -- TODO easier grepping - open results window
