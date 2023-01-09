@@ -1,11 +1,13 @@
-theme = "gruvbox"
+theme = "onedark"
 
 [editor]
 line-number = "relative"
-rulers = [120]
+rulers = [80, 120, 150]
 color-modes = true
 scrolloff = 3
+cursorline = true
+cursorcolumn = true
 
 [editor.cursor-shape]
+normal = "underline"
 insert = "bar"
-normal = "block"
