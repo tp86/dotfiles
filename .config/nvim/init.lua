@@ -1,7 +1,8 @@
-require'reload'('setup')
-require'reload'('options')
-require'reload'('autocmds')
-require'reload'('mappings')
-require'reload'('plugins')
-require'reload'('languages')
-require'reload'('gui')
+local reload = require "utils".require.reload
+reload "setup"
+reload "options"
+reload "autocmds"
+reload "mappings"
+reload "plugins"
+reload "languages"
+reload "gui"
