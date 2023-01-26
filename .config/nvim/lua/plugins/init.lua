@@ -221,7 +221,7 @@ require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use {
     'nvim-treesitter/nvim-treesitter',
-    requires = 'p00f/nvim-ts-rainbow',
+    requires = { 'p00f/nvim-ts-rainbow', "nvim-treesitter/nvim-treesitter-textobjects", },
     run = function() require('nvim-treesitter.install').update { with_sync = true } end,
     config = function()
       local opt = vim.opt
@@ -235,6 +235,16 @@ require('packer').startup(function(use)
         },
         rainbow = {
           enable = true,
+        },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true,
+            keymaps = {
+              ["af"] = "@function.outer",
+              ["if"] = "@function.inner",
+            }
+          },
         },
       }
       opt.foldmethod = 'expr'
