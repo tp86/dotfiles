@@ -549,6 +549,12 @@ require('packer').startup(function(use)
       require('which-key').setup {}
     end
   }
+  use {
+    "folke/zen-mode.nvim",
+    config = function()
+      require("zen-mode").setup {}
+    end,
+  }
   -- PLUGINS END
   -- TODO treesitter-based text objects
   -- TODO hop
