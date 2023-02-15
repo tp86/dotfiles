@@ -50,6 +50,7 @@ autocmdsgroup("ColorColumn", {
   },
 })
 
+--[[
 autocmdsgroup("CursorLine", {
   {
     { "BufNewFile", "BufRead", "BufWinEnter", "WinEnter" },
@@ -83,6 +84,7 @@ autocmdsgroup("CursorLine", {
     }
   },
 })
+]]
 
 opt.hlsearch = false
 autocmdsgroup("SearchHl", {

@@ -39,18 +39,24 @@ require('packer').startup(function(use)
       require('nvim-tree').setup {
         actions = {
           open_file = {
-            quit_on_open = true
+            quit_on_open = false
           }
         },
         view = {
           side = 'right',
-          width = 40,
+          width = 50,
           preserve_window_proportions = true,
         },
         filters = {
-          custom = { '__pycache__', '.git' }
+          custom = { '__pycache__', '.git$' }
         },
-        sync_root_with_cwd = true
+        sync_root_with_cwd = true,
+        update_focused_file = {
+          enable = true,
+        },
+        renderer = {
+          highlight_opened_files = "name",
+        },
       }
       local vim = vim
       vim.keymap.set('n', '<a-e>', function() vim.cmd 'NvimTreeOpen' end)
@@ -243,6 +249,10 @@ require('packer').startup(function(use)
             keymaps = {
               ["af"] = "@function.outer",
               ["if"] = "@function.inner",
+              ["aa"] = "@parameter.outer",
+              ["ia"] = "@parameter.inner",
+              ["ac"] = "@call.outer",
+              ["ic"] = "@call.inner",
             }
           },
         },
