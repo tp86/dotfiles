@@ -184,3 +184,13 @@ autocmdsgroup("QuickfixWindow", {
   }
   --]]
 })
+
+autocmdsgroup("FennelMappings", {
+  {
+    { "FileType" },
+    {
+      pattern = 'fennel',
+      command = [[inoremap <buffer> <a-\> λ]]
+    }
+  }
+})

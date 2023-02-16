@@ -469,7 +469,9 @@ require('packer').startup(function(use)
       local npairs = require('nvim-autopairs')
       npairs.setup {}
       local squoterule = npairs.get_rule("'")[1]
-      squoterule.not_filetypes = vim.tbl_extend('keep', squoterule.not_filetypes, { 'fennel', 'janet' })
+      squoterule.not_filetypes = vim.tbl_extend('force', squoterule.not_filetypes, { 'rust', 'fennel', 'janet' })
+      squoterule = npairs.get_rule("`")
+      squoterule.not_filetypes = vim.tbl_extend('force', squoterule.not_filetypes or {}, { 'fennel' })
     end,
   }
   use {
@@ -566,7 +568,6 @@ require('packer').startup(function(use)
     end,
   }
   -- PLUGINS END
-  -- TODO treesitter-based text objects
   -- TODO hop
   -- TODO commenter
 
