@@ -47,7 +47,7 @@ local lspsetups = {
       }
     }
   },
-  sumneko_lua = {
+  lua_ls = {
     settings = {
     }
   }
