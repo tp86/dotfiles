@@ -253,6 +253,10 @@ require('packer').startup(function(use)
               ["ia"] = "@parameter.inner",
               ["ac"] = "@call.outer",
               ["ic"] = "@call.inner",
+              ["io"] = "@class.inner",
+              ["ao"] = "@class.outer",
+              ["il"] = "@loop.inner",
+              ["al"] = "@loop.outer",
             }
           },
         },
