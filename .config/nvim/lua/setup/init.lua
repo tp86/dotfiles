@@ -18,3 +18,5 @@ do -- setup python provider
   local pypath = pynvimdir .. "/bin/python"
   g.python3_host_prog = pypath
 end
+
+vim.cmd.syntax 'on'
