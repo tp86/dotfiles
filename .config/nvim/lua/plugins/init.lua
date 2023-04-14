@@ -571,6 +571,41 @@ require('packer').startup(function(use)
       require("zen-mode").setup {}
     end,
   }
+  use {
+    'mfussenegger/nvim-lint',
+    config = function()
+      local lint = require("lint")
+      lint.linters_by_ft = {
+        candran = { "cancheck", },
+      }
+      lint.linters.cancheck = {
+        cmd = 'cancheck',
+        stdin = true,
+        args = { '--formatter', 'plain', '--codes', '--ranges', '-', },
+        ignore_exitcode = true,
+        parser = require('lint.parser').from_pattern(
+          '[^:]+:(%d+):(%d+)-(%d+): %((%a)(%d+)%) (.*)',
+          { 'lnum', 'col', 'end_col', 'severity', 'code', 'message' },
+          {
+            W = vim.diagnostic.severity.WARN,
+            E = vim.diagnostic.severity.ERROR,
+          },
+          { source = 'cancheck' },
+          { end_col_offset = 0 }
+        )
+      }
+      local group = vim.api.nvim_create_augroup('Lint', { clear = true })
+      vim.api.nvim_create_autocmd(
+        { 'TextChanged', 'TextChangedI', 'TextChangedP' },
+        {
+          group = group,
+          callback = function()
+            require('lint').try_lint()
+          end,
+        }
+      )
+    end,
+  }
   -- PLUGINS END
   -- TODO hop
   -- TODO commenter
