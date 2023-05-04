@@ -1,13 +1,14 @@
-theme = "onedark"
+theme = "boo_berry"
 
 [editor]
 line-number = "relative"
-rulers = [80, 120, 150]
+rulers = [150]
 color-modes = true
 scrolloff = 3
 cursorline = true
-cursorcolumn = true
 
 [editor.cursor-shape]
-normal = "underline"
 insert = "bar"
+
+[editor.statusline]
+right = ["diagnostics", "position", "position-percentage"]

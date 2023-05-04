@@ -609,6 +609,14 @@ require('packer').startup(function(use)
   -- PLUGINS END
   -- TODO hop
   -- TODO commenter
+  use {
+    'terrortylor/nvim-comment',
+    config = function()
+      require('nvim_comment').setup {
+        comment_chunk_text_object = "i/"
+      }
+    end
+  }
 
   if packerbootstrap then
     require('packer').sync()
