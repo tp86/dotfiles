@@ -574,9 +574,6 @@ require('packer').startup(function(use)
   use {
     "erde-lang/vim-erde"
   }
-  -- PLUGINS END
-  -- TODO hop
-  -- TODO commenter
   use {
     'terrortylor/nvim-comment',
     config = function()
@@ -585,6 +582,29 @@ require('packer').startup(function(use)
       }
     end
   }
+  use {
+    'phaazon/hop.nvim',
+    branch = 'v2',
+    config = function()
+      local hop = require('hop')
+      hop.setup()
+      local dirs = require('hop.hint').HintDirection
+      local mapkey = vim.keymap.set
+      mapkey('', 'f', function()
+        hop.hint_char1 { direction = dirs.AFTER_CURSOR }
+      end, { remap = true })
+      mapkey('', 'F', function()
+        hop.hint_char1 { direction = dirs.BEFORE_CURSOR }
+      end, { remap = true })
+      mapkey('', 't', function()
+        hop.hint_char1 { direction = dirs.AFTER_CURSOR, hint_offset = -1 }
+      end, { remap = true })
+      mapkey('', 'T', function()
+        hop.hint_char1 { direction = dirs.BEFORE_CURSOR, hint_offset = 1 }
+      end, { remap = true })
+    end,
+  }
+  -- PLUGINS END
 
   if packerbootstrap then
     require('packer').sync()
