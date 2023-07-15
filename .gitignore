@@ -10,3 +10,8 @@
 .config/nvim/plugin/packer_compiled.lua
 .config/nvim/pynvim/
 .config/lite-xl/plugins
+.config/lite-xl/lixling
+.config/lite-xl/session.lua
+.config/lite-xl/ws
+.config/lite-xl/libraries
+.config/lite-xl/ltreesitter.so
