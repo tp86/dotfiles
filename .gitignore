@@ -9,3 +9,4 @@
 .config/kak/plugins
 .config/nvim/plugin/packer_compiled.lua
 .config/nvim/pynvim/
+.config/lite-xl/plugins
