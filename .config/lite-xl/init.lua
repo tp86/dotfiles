@@ -6,6 +6,7 @@ local core = require "core"
 local keymap = require "core.keymap"
 local config = require "core.config"
 local style = require "core.style"
+local command = require "core.command"
 
 ------------------------------ Themes ----------------------------------------
 
@@ -130,17 +131,19 @@ lixling.plugins {
     "mv autocomplete.lua " .. USERDIR .. "/plugins",
   },
   autocomplete = "",
-  navigate = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
-  nonicons = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua", -- requires nonicons.ttf from https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf in fonts directory
-  selectionhighlight = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/selectionhighlight.lua",
-  scm = "https://github.com/lite-xl/lite-xl-scm.git",
+  -- navigate = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
+  -- nonicons = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua", -- requires nonicons.ttf from https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf in fonts directory
+  -- selectionhighlight = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/selectionhighlight.lua",
+  -- scm = "https://github.com/lite-xl/lite-xl-scm.git",
   language_diff = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/language_diff.lua",
+
+  colorpreview = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
 }
 
 -- plugins configuration
 -- endwise
-require("plugins.endwise")
-config.plugins.endwise.enable("Lua")
+-- require("plugins.endwise")
+-- config.plugins.endwise.enable("Lua")
 -- fontconfig
 local fontconfig = require("plugins.fontconfig")
 fontconfig.use {
@@ -156,6 +159,10 @@ lspkind.setup {
   font_raw = renderer.font.load(USERDIR .. "/fonts/Hack Regular Nerd Font Complete Mono.ttf", 12 * SCALE),
 }
 
+-------------------------- Custom plugins (experimental) -----------------------
+
+require("monkey")
+
 ---------------------------- Miscellaneous -------------------------------------
 
 -- modify list of files to ignore when indexing the project:
@@ -169,4 +176,9 @@ lspkind.setup {
 --   "%.suo$",         "%.pdb$",       "%.idb$",        "%.class$", "%.psd$", "%.db$",
 --   "^desktop%.ini$", "^%.DS_Store$", "^%.directory$",
 -- }
+
+-------------------------- Startup actions -------------------------------------
+
+local treeview = require "plugins.treeview"
+treeview.visible = false
 
