@@ -131,10 +131,10 @@ lixling.plugins {
     "mv autocomplete.lua " .. USERDIR .. "/plugins",
   },
   autocomplete = "",
-  -- navigate = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
-  -- nonicons = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua", -- requires nonicons.ttf from https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf in fonts directory
-  -- selectionhighlight = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/selectionhighlight.lua",
-  -- scm = "https://github.com/lite-xl/lite-xl-scm.git",
+  navigate = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
+  nonicons = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua", -- requires nonicons.ttf from https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf in fonts directory
+  selectionhighlight = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/selectionhighlight.lua",
+  scm = "https://github.com/lite-xl/lite-xl-scm.git",
   language_diff = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/language_diff.lua",
 
   colorpreview = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",

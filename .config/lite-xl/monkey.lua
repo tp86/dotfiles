@@ -16,8 +16,7 @@ local function posrel(l1, c1, l2, c2)
   end
 end
 
-local function currentnode()
-  local doc = core.active_view.doc
+local function currentnode(doc)
   local line1, column1, line2, column2 = doc:get_selection(true)
   if doc.treesit then
     local root = doc.ts.tree:root()
@@ -48,19 +47,25 @@ local function currentnode()
     until not rangeinchild
     core.log("Current position: %d:%d-%d:%d", line1, column1, line2, column2)
     core.log("Current node: %s", root)
-    local selstartline = root:start_point().row + 1
-    local selstartcolumn = root:start_point().column + 1
-    local selendline = root:end_point().row + 1
-    local selendcolumn = root:end_point().column + 1
-    doc:set_selection(selstartline, selstartcolumn, selendline, selendcolumn)
+    return root
   end
 end
 
+local function selectcurrentnode()
+  local doc = core.active_view.doc
+  local node = currentnode(doc)
+  local selstartline = node:start_point().row + 1
+  local selstartcolumn = node:start_point().column + 1
+  local selendline = node:end_point().row + 1
+  local selendcolumn = node:end_point().column + 1
+  doc:set_selection(selstartline, selstartcolumn, selendline, selendcolumn)
+end
+
 command.add("core.docview", {
-  ["monkey:get-current-node"] = currentnode,
+  ["monkey:select-current-node"] = selectcurrentnode,
 })
 
 keymap.add {
-  ["ctrl+j"] = "monkey:get-current-node"
+  ["ctrl+i"] = "monkey:select-current-node"
 }
 
