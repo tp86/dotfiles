@@ -20,6 +20,7 @@ local function currentnode(doc)
   local line1, column1, line2, column2 = doc:get_selection(true)
   if doc.treesit then
     local root = doc.ts.tree:root()
+    local parent
     repeat
       local rangeinchild = false
       for node in root:children() do
@@ -38,6 +39,7 @@ local function currentnode(doc)
           endinchild = true
         end
         if startinchild and endinchild then
+          parent = root
           root = node
           rangeinchild = true
           goto continue
@@ -47,13 +49,11 @@ local function currentnode(doc)
     until not rangeinchild
     core.log("Current position: %d:%d-%d:%d", line1, column1, line2, column2)
     core.log("Current node: %s", root)
-    return root
+    return root, parent
   end
 end
 
-local function selectcurrentnode()
-  local doc = core.active_view.doc
-  local node = currentnode(doc)
+local function selectnode(doc, node)
   local selstartline = node:start_point().row + 1
   local selstartcolumn = node:start_point().column + 1
   local selendline = node:end_point().row + 1
@@ -61,11 +61,37 @@ local function selectcurrentnode()
   doc:set_selection(selstartline, selstartcolumn, selendline, selendcolumn)
 end
 
+local function selectcurrentnode()
+  local doc = core.active_view.doc
+  local node = currentnode(doc)
+  selectnode(doc, node)
+end
+
+local function selectnextsibling()
+  local doc = core.active_view.doc
+  local node = currentnode(doc)
+  local sibling = node:next_sibling()
+  if sibling then
+    selectnode(doc, sibling)
+  end
+end
+
+local function selectparent()
+  local doc = core.active_view.doc
+  local node, parent = currentnode(doc)
+  if parent then
+    selectnode(doc, parent)
+  end
+end
+
 command.add("core.docview", {
   ["monkey:select-current-node"] = selectcurrentnode,
+  ["monkey:select-next-sibling"] = selectnextsibling,
+  ["monkey:select-parent"] = selectparent,
 })
 
 keymap.add {
-  ["ctrl+i"] = "monkey:select-current-node"
+  ["ctrl+i"] = "monkey:select-current-node",
+  ["ctrl+l"] = "monkey:select-next-sibling",
 }
 
