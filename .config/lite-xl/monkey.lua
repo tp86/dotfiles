@@ -1,5 +1,5 @@
 local core = require "core"
-local command = require "core.command"
+-- local command = require "core.command"
 local keymap = require "core.keymap"
 
 local function posrel(l1, c1, l2, c2)
@@ -39,17 +39,23 @@ local function currentnode(doc)
           endinchild = true
         end
         if startinchild and endinchild then
-          parent = root
+          local rootstartpoint, rootendpoint = root:start_point(), root:end_point()
+          if not (rootstartpoint.row == startpoint.row and rootstartpoint.column == startpoint.column and
+                  rootendpoint.row == endpoint.row and rootendpoint.column == endpoint.column and
+                  node:child_count() ~= 0) then
+            parent = root
+          end
           root = node
           rangeinchild = true
-          goto continue
         end
       end
-      ::continue::
     until not rangeinchild
     core.log("Current position: %d:%d-%d:%d", line1, column1, line2, column2)
     core.log("Current node: %s", root)
+    core.log("Parent: %s", parent)
     return root, parent
+  else
+    core.log("no treesit for %s", doc.filename)
   end
 end
 
@@ -61,37 +67,49 @@ local function selectnode(doc, node)
   doc:set_selection(selstartline, selstartcolumn, selendline, selendcolumn)
 end
 
-local function selectcurrentnode()
-  local doc = core.active_view.doc
-  local node = currentnode(doc)
-  selectnode(doc, node)
+local function withcurrentnode(action)
+  return function()
+    local doc = core.active_view.doc
+    local node, parent = currentnode(doc)
+    action(doc, node, parent)
+  end
 end
 
-local function selectnextsibling()
-  local doc = core.active_view.doc
-  local node = currentnode(doc)
+local selectcurrentnode = withcurrentnode(selectnode)
+local selectnextsibling = withcurrentnode(function(doc, node)
   local sibling = node:next_sibling()
   if sibling then
     selectnode(doc, sibling)
   end
-end
+end)
 
-local function selectparent()
-  local doc = core.active_view.doc
-  local node, parent = currentnode(doc)
+local selectprevioussibling = withcurrentnode(function(doc, node)
+  local sibling = node:prev_sibling()
+  if sibling then
+    selectnode(doc, sibling)
+  end
+end)
+
+
+local selectparent = withcurrentnode(function(doc, _, parent) 
   if parent then
     selectnode(doc, parent)
   end
-end
+end)
 
-command.add("core.docview", {
-  ["monkey:select-current-node"] = selectcurrentnode,
-  ["monkey:select-next-sibling"] = selectnextsibling,
-  ["monkey:select-parent"] = selectparent,
-})
+local selectchild = withcurrentnode(function(doc, node)
+  local child = node:child(0)
+  if child then
+    selectnode(doc, child)
+  end
+end)
 
+---@diagnostic disable: assign-type-mismatch
 keymap.add {
-  ["ctrl+i"] = "monkey:select-current-node",
-  ["ctrl+l"] = "monkey:select-next-sibling",
+  ["ctrl+i"] = selectcurrentnode,
+  ["ctrl+l"] = selectnextsibling,
+  ["ctrl+h"] = selectprevioussibling,
+  ["ctrl+k"] = selectparent,
+  ["ctrl+j"] = selectchild,
 }
 
