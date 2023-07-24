@@ -45,7 +45,7 @@ local boundary = prototype:new {
 local function currentnode(doc)
   if doc.treesit then
     local root = doc.ts.tree:root()
-    local node, parent
+    local node, parent = root ---@diagnostic disable-line:unbalanced-assignments
     local currenttree = root
     local line1, column1, line2, column2 = doc:get_selection(true)
     local selectionboundary = boundary:new {
@@ -87,9 +87,6 @@ local function withcurrentnode(action)
   return function()
     local doc = core.active_view.doc
     local node, parent = currentnode(doc)
-    if not node then
-      node = doc.ts.tree:root()
-    end
     action(doc, node, parent)
   end
 end

@@ -15,3 +15,5 @@
 .config/lite-xl/ws
 .config/lite-xl/libraries
 .config/lite-xl/ltreesitter.so
+.config/lite-xl/fonts/
+.config/awesome/wallpaper
