@@ -88,7 +88,7 @@ lixling.plugins {
   autosaveonfocuslost = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autosaveonfocuslost.lua",
   bracketmatch = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
   console = "https://github.com/lite-xl/console.git",
-  endwise = "https://github.com/LolsonX/endwise-lite-xl.git",
+  --endwise = "https://github.com/LolsonX/endwise-lite-xl.git",
   eofnewline = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua", -- requires update of mod-version
   ephemeraltabs = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
   evergreen = {
