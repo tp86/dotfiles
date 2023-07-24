@@ -165,6 +165,9 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
+local cpu_widget = require("cpu-widget")
+local fs_widget = require("fs-widget")
+
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
@@ -223,6 +226,8 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             -- mykeyboardlayout,
             wibox.widget.systray(),
+            cpu_widget { step_spacing = 0 },
+            fs_widget { mounts = { "/home", "/" }, timeout = 61 },
             mytextclock,
             s.mylayoutbox,
         },
@@ -574,3 +579,4 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
