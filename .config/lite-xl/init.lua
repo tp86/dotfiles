@@ -3,10 +3,7 @@
 -- it will be automatically reloaded when saved
 
 local core = require "core"
-local keymap = require "core.keymap"
-local config = require "core.config"
 local style = require "core.style"
-local command = require "core.command"
 
 ------------------------------ Themes ----------------------------------------
 
@@ -109,7 +106,7 @@ lixling.plugins {
     }, " && ")
   },
   fontconfig = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
-  lfautoinsert = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
+  lfautoinsert = "https://raw.githubusercontent.com/tp86/lite-xl-plugins/main/lfautoinsert/init.lua",
   -- LSP with deps begin
   lintplus = "https://github.com/liquidev/lintplus.git",
   lsp = "https://github.com/lite-xl/lite-xl-lsp.git",
@@ -119,7 +116,7 @@ lixling.plugins {
     "https://github.com/lite-xl/lite-xl-widgets.git",
     "master",
     table.concat({
-      [[bash -c 'echo "-- mod-version:3\n$(cat init.lua)" > init.lua']],
+      [[bash -c 'echo -e "-- mod-version:3\n$(cat init.lua)" > init.lua']],
       "mkdir -p " .. USERDIR .. "/libraries",
       "ln -s " .. USERDIR .. "/plugins/widget " .. USERDIR .. "/libraries/",
     }, " && ")
@@ -138,6 +135,9 @@ lixling.plugins {
   language_diff = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/language_diff.lua",
 
   colorpreview = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
+
+  -- experimental
+  modal = "https://raw.githubusercontent.com/tp86/lite-xl-plugins/main/modal/init.lua",
 }
 
 -- plugins configuration
@@ -158,10 +158,9 @@ lspkind.setup {
   -- downloaded and unzipped from https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.3.3
   font_raw = renderer.font.load(USERDIR .. "/fonts/Hack Regular Nerd Font Complete Mono.ttf", 12 * SCALE),
 }
-
--------------------------- Custom plugins (experimental) -----------------------
-
-require("monkey")
+-- treeview
+local treeview = require "plugins.treeview"
+treeview.visible = false
 
 ---------------------------- Miscellaneous -------------------------------------
 
@@ -176,9 +175,4 @@ require("monkey")
 --   "%.suo$",         "%.pdb$",       "%.idb$",        "%.class$", "%.psd$", "%.db$",
 --   "^desktop%.ini$", "^%.DS_Store$", "^%.directory$",
 -- }
-
--------------------------- Startup actions -------------------------------------
-
-local treeview = require "plugins.treeview"
-treeview.visible = false
 
