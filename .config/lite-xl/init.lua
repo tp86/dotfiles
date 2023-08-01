@@ -62,38 +62,65 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 -- config.plugins.detectindent = false
 
 -- Install plugins
+-- Plugin installer inspired by lixling, but focused on installing and applying patches
+-- TODO Move to separate module and refactor
 local PLUGINSDIR = USERDIR .. PATHSEP .. "plugins"
+local PATCHESDIR = USERDIR .. PATHSEP .. "patches"
 local plugin = {}
 plugin.type = {
   raw = "raw",
   git = "git",
 }
+-- install all plugins if they don't exist yet in plugins directory
 function plugin.installall(plugins)
-  -- TODO
+  local crs = {}
+  for _, pluginspec in ipairs(plugins) do
+    if not plugin.exists(pluginspec) then
+      local key = plugin.install(pluginspec)
+      table.insert(crs, core.threads[key].cr)
+    end
+  end
+  if #crs > 0 then
+    core.add_thread(function()
+      local running = true
+      while running do
+        running = false
+        for _, cr in ipairs(crs) do
+          if coroutine.status(cr) ~= "dead" then
+            running = true
+            goto nextcheck
+          end
+        end
+        ::nextcheck::
+        coroutine.yield(0.1)
+      end
+      core.log("All plugins installed, you may want to reload configuration.")
+    end)
+  end
 end
-function plugin.makepath(spec)
+-- create a plugin file/directory based on plugin specification
+function plugin.path(spec)
   local path = PLUGINSDIR .. PATHSEP .. spec.name
   if spec.type == plugin.type.raw then
     path = path .. ".lua"
   end
   return path
 end
+-- install single plugin
 function plugin.install(spec)
   if spec.type == plugin.type.raw then
-    plugin.installraw(spec)
+    return plugin.installraw(spec)
+  elseif spec.type == plugin.type.git then
+    return plugin.installgit(spec)
   end
 end
-function plugin.installraw(spec)
-  core.add_thread(function()
-    local targetfilename = plugin.makepath(spec)
+function plugin.installwithcmd(spec, cmd)
+  return core.add_thread(function()
     local name = spec.name
 
     core.log("Plugin '%s' install process starting...", name)
 
-    local downloader = process.start {
-      "sh", "-c",
-      "curl --create-dirs -fLo " .. targetfilename .. " " .. spec.url
-    }
+    local downloader = process.start(cmd)
 
     while downloader:running() do
       coroutine.yield(0.1)
@@ -103,25 +130,155 @@ function plugin.installraw(spec)
     core.log("Plugin '%s' download process ended with result: %d", name, returncode)
 
     if returncode ~= 0 then
-      core.log("Error occurred during downloading '%s' plugin: %s", name, downloader:read_stdout())
+      core.log("Error occurred during downloading '%s' plugin: %s", name, downloader:read_stdout() or "")
+      return
+    end
+
+    if spec.patch then
+      plugin.patch(spec)
+    end
+
+    if spec.post then
+      plugin.post(spec)
     end
   end)
 end
+-- install raw plugin (download single plugin file directly)
+function plugin.installraw(spec)
+  local targetfilename = plugin.path(spec)
+  return plugin.installwithcmd(spec, {
+      "sh", "-c",
+      "curl --create-dirs -fLo " .. targetfilename .. " " .. spec.url
+    })
+end
+-- install git-based plugin
+function plugin.installgit(spec)
+  local targetfilename = plugin.path(spec)
+  local branch = spec.branch or "master"
+  return plugin.installwithcmd(spec, {
+    "sh", "-c",
+    "git clone -b " .. branch .. " " .. spec.url .. " " .. targetfilename
+  })
+end
+-- apply patch to plugin
+function plugin.patch(spec)  -- requires installed patch
+  core.log("Patching plugin '%s'", spec.name)
+  local plugindir = plugin.dir(spec)
+  local cmd = {
+    "sh", "-c",
+    "patch -ud " .. plugindir .. " -i " .. PATCHESDIR .. PATHSEP .. spec.patch
+  }
+  local patcher = process.start(cmd)
+
+  while patcher:running() do
+    coroutine.yield(0.02)
+  end
+
+  local returncode = patcher:returncode()
+  if returncode == 0 then
+    core.log("Patched plugin '%s'", spec.name)
+  else
+    core.log("Error occurred during patching plugin '%s': %s", spec.name, patcher:read_stderr() or "")
+  end
+end
+-- apply post-install action to plugin
+function plugin.post(spec)
+  core.log("Running post-install actions for plugin '%s'", spec.name)
+  local plugindir = plugin.dir(spec)
+  local cmd = {
+    "sh", "-c",
+    spec.post,
+  }
+  local options = {
+    cwd = plugindir,
+  }
+
+  local runner = process.start(cmd, options)
+
+  while runner:running() do
+    coroutine.yield(0.1)
+  end
+
+  local returncode = runner:returncode()
+  if returncode == 0 then
+    core.log("Post-install action for plugin '%s' applied successfully", spec.name)
+  else
+    core.log("Error occurred during running post-install actions for plugin '%s': %s",
+      spec.name, runner:read_stderr() or "")
+  end
+end
+-- get basedir of plugin
+function plugin.dir(spec)
+  if spec.type == plugin.type.raw then
+    return PLUGINSDIR
+  else
+    return plugin.path(spec)
+  end
+end
+-- check if plugin exists
 function plugin.exists(spec)
-  local targetfilename = plugin.makepath(spec)
+  local targetfilename = plugin.path(spec)
   return system.get_file_info(targetfilename) ~= nil
 end
 
+-- user configuration part (plugins specification)
+local luaversion = _VERSION:match("%d.%d")
 local plugins = {
+  {
+    name = "autoinsert",
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autoinsert.lua",
+  },
+  {
+    name = "autosaveonfocuslots",
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autosaveonfocuslost.lua",
+  },
+  {
+    name = "bracketmatch",
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
+  },
+  {
+    name = "console",
+    type = plugin.type.git,
+    url = "https://github.com/lite-xl/console.git",
+  },
+  {
+    name = "eofnewline",
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
+    patch = "eofnewline.patch"
+  },
+  {
+    name = "ephemeraltabs",
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
+  },
+  { -- requires luarocks (and setup), tree-sitter-devel, lua-devel
+    name = "evergreen",
+    type = plugin.type.git,
+    url = "https://github.com/TorchedSammy/Evergreen.lxl.git",
+    post = table.concat({
+      "plugindir=$(pwd)",
+      "tmpdir=$(mktemp --directory)",
+      "cd $tmpdir",
+      "luarocks --lua-version " .. luaversion .. " download --rockspec ltreesitter --dev",
+      [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
+      "luarocks --lua-version " .. luaversion .. " install --local ltreesitter-dev-1.rockspec",
+      "cd $plugindir",
+      "rm -rf $tmpdir",
+      "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. luaversion .. "/ltreesitter.so " .. USERDIR,
+    }, " && "),
+    patch = "evergreen.patch",
+  },
   {
     name = "fontconfig",
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
   },
 }
-if not plugin.exists(plugins[1]) then
-  plugin.install(plugins[1])
-end
+plugin.installall(plugins)
 
 ------------------------ Plugin configuration ----------------------------------
 

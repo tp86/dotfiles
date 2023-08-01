@@ -1,0 +1,8 @@
+--- plugins/eofnewline.lua	2023-08-01 21:12:15.671093985 +0200
++++ patches/eofnewline.lua	2023-08-01 21:19:12.777937943 +0200
+@@ -1,4 +1,4 @@
+--- mod-version:2 -- lite-xl 2.0
++-- mod-version:3
+ local core = require "core"
+ local command = require "core.command"
+ local Doc = require "core.doc"
