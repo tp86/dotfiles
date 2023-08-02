@@ -11,3 +11,16 @@ index db88e10..70f5931 100644
  	res.tokens = {}
  
  	local i = idx - 1
+diff --git a/queries/lua/highlights.scm b/queries/lua/highlights.scm
+index 1199fef..7084474 100644
+--- a/queries/lua/highlights.scm
++++ b/queries/lua/highlights.scm
+@@ -102,6 +102,7 @@
+   ">>"
+   "//"
+   ".."
++  "::"
+ ] @operator
+ 
+ ;; Punctuations
+

@@ -1,0 +1,50 @@
+--- plugins/lfautoinsert.lua	2023-08-02 22:37:44.302887076 +0200
++++ patches/lfautoinsert.lua	2023-07-31 21:00:53.289526806 +0200
+@@ -1,5 +1,4 @@
+ -- mod-version:3
+-local core = require "core"
+ local command = require "core.command"
+ local common = require "core.common"
+ local config = require "core.config"
+@@ -72,11 +71,10 @@
+     local indent_type, soft_size = doc:get_indent_info()
+     local indent_string = indent_type == "hard" and "\t" or string.rep(" ", soft_size)
+ 
+-    for idx, line, col, line2, col2 in doc:get_selections(true, true) do
++    for idx, line, col in doc:get_selections(true, true) do
+       -- We need to add `\n` to keep compatibility with the patterns
+       -- that expected a newline to be placed where the caret is.
+       local text = doc.lines[line]:sub(1, col - 1) .. '\n'
+-      local remainder = doc.lines[line]:sub(col, -1)
+       local current_indent = text:match("^[\t ]*")
+ 
+       local pre, post
+@@ -90,10 +88,20 @@
+           then
+             close = str and close:gsub("$TEXT", str) or close
+             -- Avoid inserting `close` if it's already present
+-            if remainder:find(close, 1, true) == 1 then
++            local next_non_blank_line
++            for l = line + 1, #doc.lines do
++              local docline = doc.lines[l]
++              if not docline:match("^%s*$") then
++                next_non_blank_line = docline
++                break
++              end
++            end
++            local newline = "\n"
++            if next_non_blank_line and next_non_blank_line:match("^%s*" .. close, 1) then
+               close = ""
++              newline = ""
+             end
+-            post = string.format("\n%s%s", current_indent, close)
++            post = string.format("%s%s%s", newline, current_indent, close)
+           elseif col < #doc.lines[line] then
+             post = string.format("\n%s", current_indent)
+           end
+@@ -136,3 +144,4 @@
+     )
+   end
+ }
++
+

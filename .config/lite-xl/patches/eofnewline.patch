@@ -6,3 +6,4 @@
  local core = require "core"
  local command = require "core.command"
  local Doc = require "core.doc"
+

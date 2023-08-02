@@ -64,6 +64,7 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 -- Install plugins
 -- Plugin installer inspired by lixling, but focused on installing and applying patches
 -- TODO Move to separate module and refactor
+-- TODO better error and misconfiguration handling
 local PLUGINSDIR = USERDIR .. PATHSEP .. "plugins"
 local PATCHESDIR = USERDIR .. PATHSEP .. "patches"
 local plugin = {}
@@ -74,11 +75,34 @@ plugin.type = {
 -- install all plugins if they don't exist yet in plugins directory
 function plugin.installall(plugins)
   local crs = {}
-  for _, pluginspec in ipairs(plugins) do
-    if not plugin.exists(pluginspec) then
-      local key = plugin.install(pluginspec)
+  for name, spec in pairs(plugins) do
+    spec.name = name
+    if not plugin.exists(spec) then
+      if spec.requires then
+        local missing = false
+        local requiredplugins = {}
+        for _, requiredname in ipairs(spec.requires) do
+          -- TODO handle nested requires correctly
+          local requiredspec = plugins[requiredname]
+          if not requiredspec then
+            core.log("Missing dependency '%s' for plugin '%s'", requiredname, name)
+            missing = true
+            goto nextrequired
+          end
+          requiredplugins[requiredname] = requiredspec
+          ::nextrequired::
+        end
+        if missing then
+          core.log("Plugin '%s' not installed due to missing dependencies", name)
+          goto nextplugin
+        end
+        plugin.installall(requiredplugins)
+      end
+      core.log("Installing plugin '%s'", name)
+      local key = plugin.install(spec)
       table.insert(crs, core.threads[key].cr)
     end
+    ::nextplugin::
   end
   if #crs > 0 then
     core.add_thread(function()
@@ -100,7 +124,11 @@ function plugin.installall(plugins)
 end
 -- create a plugin file/directory based on plugin specification
 function plugin.path(spec)
-  local path = PLUGINSDIR .. PATHSEP .. spec.name
+  local dir = PLUGINSDIR
+  if spec.targetdir then
+    dir = USERDIR .. PATHSEP .. spec.targetdir
+  end
+  local path = dir .. PATHSEP .. spec.name
   if spec.type == plugin.type.raw then
     path = path .. ".lua"
   end
@@ -166,7 +194,7 @@ function plugin.patch(spec)  -- requires installed patch
   local plugindir = plugin.dir(spec)
   local cmd = {
     "sh", "-c",
-    "patch -ud " .. plugindir .. " -i " .. PATCHESDIR .. PATHSEP .. spec.patch
+    "patch -p1 -ud " .. plugindir .. " -i " .. PATCHESDIR .. PATHSEP .. spec.patch
   }
   local patcher = process.start(cmd)
 
@@ -224,39 +252,36 @@ end
 -- user configuration part (plugins specification)
 local luaversion = _VERSION:match("%d.%d")
 local plugins = {
-  {
-    name = "autoinsert",
+  autoinsert = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autoinsert.lua",
   },
-  {
-    name = "autosaveonfocuslots",
+  autosaveonfocuslots = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autosaveonfocuslost.lua",
   },
-  {
-    name = "bracketmatch",
+  bracketmatch = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
   },
-  {
-    name = "console",
+  colorpreview = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
+  },
+  console = {
     type = plugin.type.git,
     url = "https://github.com/lite-xl/console.git",
   },
-  {
-    name = "eofnewline",
+  eofnewline = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
     patch = "eofnewline.patch"
   },
-  {
-    name = "ephemeraltabs",
+  ephemeraltabs = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
   },
-  { -- requires luarocks (and setup), tree-sitter-devel, lua-devel
-    name = "evergreen",
+  evergreen = { -- requires luarocks (and setup), tree-sitter-devel, lua-devel
     type = plugin.type.git,
     url = "https://github.com/TorchedSammy/Evergreen.lxl.git",
     post = table.concat({
@@ -272,10 +297,39 @@ local plugins = {
     }, " && "),
     patch = "evergreen.patch",
   },
-  {
-    name = "fontconfig",
+  fontconfig = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
+  },
+  lfautoinsert = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
+    patch = "lfautoinsert.patch",
+  },
+  lsp = {
+    type = plugin.type.git,
+    url = "https://github.com/lite-xl/lite-xl-lsp.git",
+    requires = {
+      "lintplus", "lsp_snippets", "snippets", "widget"
+    }
+  },
+  lintplus = {
+    type = plugin.type.git,
+    url = "https://github.com/liquidev/lintplus.git",
+    -- TODO patch
+  },
+  lsp_snippets = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
+  },
+  snippets = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
+  },
+  widget = {
+    type = plugin.type.git,
+    url = "https://github.com/lite-xl/lite-xl-widgets.git",
+    targetdir = "libraries",
   },
 }
 plugin.installall(plugins)
@@ -287,10 +341,14 @@ local treeview = require "plugins.treeview"
 treeview.visible = false
 
 -- fontconfig
-local fontconfig = require("plugins.fontconfig")
+local fontconfig = require "plugins.fontconfig"
 fontconfig.use {
   code_font = { name = "Hack", size = 12 * SCALE },
 }
+
+-- lsp
+local lspconfig = require "plugins.lsp.config"
+lspconfig.sumneko_lua.setup()
 
 ---------------------------- Miscellaneous -------------------------------------
 
