@@ -318,7 +318,7 @@ local plugins = {
   lintplus = {
     type = plugin.type.git,
     url = "https://github.com/liquidev/lintplus.git",
-    -- TODO patch
+    patch = "lintplus.patch",
   },
   lsp_snippets = {
     type = plugin.type.raw,
@@ -351,6 +351,9 @@ fontconfig.use {
 -- lsp
 local lspconfig = require "plugins.lsp.config"
 lspconfig.sumneko_lua.setup()
+
+-- lintplus
+config.lint.hide_inline = true
 
 ---------------------------- Miscellaneous -------------------------------------
 
