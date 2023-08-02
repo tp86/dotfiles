@@ -75,35 +75,37 @@ plugin.type = {
 -- install all plugins if they don't exist yet in plugins directory
 function plugin.installall(plugins)
   local crs = {}
-  for name, spec in pairs(plugins) do
-    spec.name = name
-    if not plugin.exists(spec) then
-      if spec.requires then
-        local missing = false
-        local requiredplugins = {}
-        for _, requiredname in ipairs(spec.requires) do
-          -- TODO handle nested requires correctly
-          local requiredspec = plugins[requiredname]
-          if not requiredspec then
-            core.log("Missing dependency '%s' for plugin '%s'", requiredname, name)
-            missing = true
-            goto nextrequired
+  local function install(specs)
+    for name, spec in pairs(specs) do
+      spec.name = name
+      if not plugin.exists(spec) then
+        if spec.requires then
+          local missing = false
+          local requiredplugins = {}
+          for _, requiredname in ipairs(spec.requires) do
+            local requiredspec = plugins[requiredname]
+            if not requiredspec then
+              core.log("Missing dependency '%s' for plugin '%s'", requiredname, name)
+              missing = true
+              goto nextrequired
+            end
+            requiredplugins[requiredname] = requiredspec
+            ::nextrequired::
           end
-          requiredplugins[requiredname] = requiredspec
-          ::nextrequired::
+          if missing then
+            core.log("Plugin '%s' not installed due to missing dependencies", name)
+            goto nextplugin
+          end
+          install(requiredplugins)
         end
-        if missing then
-          core.log("Plugin '%s' not installed due to missing dependencies", name)
-          goto nextplugin
-        end
-        plugin.installall(requiredplugins)
+        core.log("Installing plugin '%s'", name)
+        local key = plugin.install(spec)
+        table.insert(crs, core.threads[key].cr)
       end
-      core.log("Installing plugin '%s'", name)
-      local key = plugin.install(spec)
-      table.insert(crs, core.threads[key].cr)
+      ::nextplugin::
     end
-    ::nextplugin::
   end
+  install(plugins)
   if #crs > 0 then
     core.add_thread(function()
       local running = true
