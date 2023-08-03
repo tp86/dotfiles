@@ -62,11 +62,12 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 -- config.plugins.detectindent = false
 
 -- Install plugins
--- Plugin installer inspired by lixling, but focused on installing and applying patches
+-- Plugin installer inspired by lixling, but focused only on installing missing plugins on startup and easy applying patches
 -- TODO Move to separate module and refactor
 -- TODO better error and misconfiguration handling
 local PLUGINSDIR = USERDIR .. PATHSEP .. "plugins"
 local PATCHESDIR = USERDIR .. PATHSEP .. "patches"
+local FONTSDIR = USERDIR .. PATHSEP .. "fonts"
 local plugin = {}
 plugin.type = {
   raw = "raw",
@@ -100,7 +101,10 @@ function plugin.installall(plugins)
         end
         core.log("Installing plugin '%s'", name)
         local key = plugin.install(spec)
-        table.insert(crs, core.threads[key].cr)
+        local thread = core.threads[key]
+        if thread then
+          table.insert(crs, thread.cr)
+        end
       end
       ::nextplugin::
     end
@@ -250,6 +254,32 @@ function plugin.exists(spec)
   local targetfilename = plugin.path(spec)
   return system.get_file_info(targetfilename) ~= nil
 end
+function plugin.makecmd(...)
+  local cmds = {}
+  for _, arg in ipairs { ... } do
+    if type(arg) == "table" then
+      for _, cmd in ipairs(arg) do
+        table.insert(cmds, cmd)
+      end
+    else
+      table.insert(cmds, arg)
+    end
+  end
+  return table.concat(cmds, " && ")
+end
+function plugin.withtmpdir(...)
+  local cmds = {
+    "cwd=$(pwd)",
+    "tmpdir=$(mktemp --directory)",
+    "cd $tmpdir",
+  }
+  for _, arg in ipairs { ... } do
+    table.insert(cmds, arg)
+  end
+  table.insert(cmds, "cd $cwd")
+  table.insert(cmds, "rm -rf $tmpdir")
+  return cmds
+end
 
 -- user configuration part (plugins specification)
 local luaversion = _VERSION:match("%d.%d")
@@ -286,17 +316,14 @@ local plugins = {
   evergreen = { -- requires luarocks (and setup), tree-sitter-devel, lua-devel
     type = plugin.type.git,
     url = "https://github.com/TorchedSammy/Evergreen.lxl.git",
-    post = table.concat({
-      "plugindir=$(pwd)",
-      "tmpdir=$(mktemp --directory)",
-      "cd $tmpdir",
-      "luarocks --lua-version " .. luaversion .. " download --rockspec ltreesitter --dev",
-      [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
-      "luarocks --lua-version " .. luaversion .. " install --local ltreesitter-dev-1.rockspec",
-      "cd $plugindir",
-      "rm -rf $tmpdir",
-      "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. luaversion .. "/ltreesitter.so " .. USERDIR,
-    }, " && "),
+    post = plugin.makecmd(
+      plugin.withtmpdir(
+        "luarocks --lua-version " .. luaversion .. " download --rockspec ltreesitter --dev",
+        [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
+        "luarocks --lua-version " .. luaversion .. " install --local ltreesitter-dev-1.rockspec"
+      ),
+      "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. luaversion .. "/ltreesitter.so " .. USERDIR
+    ),
     patch = "evergreen.patch",
   },
   fontconfig = {
@@ -333,6 +360,32 @@ local plugins = {
     url = "https://github.com/lite-xl/lite-xl-widgets.git",
     targetdir = "libraries",
   },
+  lspkind = {
+    type = plugin.type.git,
+    url = "https://github.com/TorchedSammy/lite-xl-lspkind.git",
+    post = plugin.makecmd(
+      plugin.withtmpdir(
+        "curl -fLo Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Hack.zip",
+        "unzip Hack.zip",
+        "mkdir -p " .. FONTSDIR,
+        "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR
+      ),
+      "mv autocomplete.lua " .. PLUGINSDIR
+    ),
+  },
+  navigate = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
+  },
+  nonicons = {
+    type = plugin.type.raw,
+    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
+    post = "curl --create-dirs -fLo " .. FONTSDIR .. PATHSEP .. "nonicons.ttf https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf",
+  },
+  scm = {
+    type = plugin.type.git,
+    url = "https://github.com/lite-xl/lite-xl-scm.git",
+  }
 }
 plugin.installall(plugins)
 
@@ -354,6 +407,21 @@ lspconfig.sumneko_lua.setup()
 
 -- lintplus
 config.lint.hide_inline = true
+
+-- lspkind
+local lspkind = require "plugins.lspkind"
+lspkind.setup {
+  font_raw = renderer.font.load(FONTSDIR .. PATHSEP .. "Hack Regular Nerd Font Complete Mono.ttf", 12 * SCALE)
+}
+
+local command = require "core.command"
+local syntax = require "core.syntax"
+command.add("core.docview!", {
+  ["test:reset-highlight"] = function(dv)
+    core.log('syntax: %s', syntax.get(dv.doc.filename).name)
+    dv.doc.highlighter:reset()
+  end
+})
 
 ---------------------------- Miscellaneous -------------------------------------
 
