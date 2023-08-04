@@ -272,12 +272,12 @@ function plugin.withtmpdir(...)
     "cwd=$(pwd)",
     "tmpdir=$(mktemp --directory)",
     "cd $tmpdir",
+    "cd $cwd",
+    "rm -fr $tmpdir",
   }
   for _, arg in ipairs { ... } do
-    table.insert(cmds, arg)
+    table.insert(cmds, #cmds - 1, arg)
   end
-  table.insert(cmds, "cd $cwd")
-  table.insert(cmds, "rm -rf $tmpdir")
   return cmds
 end
 
