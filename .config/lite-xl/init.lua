@@ -414,14 +414,14 @@ lspkind.setup {
   font_raw = renderer.font.load(FONTSDIR .. PATHSEP .. "Hack Regular Nerd Font Complete Mono.ttf", 12 * SCALE)
 }
 
-local command = require "core.command"
-local syntax = require "core.syntax"
-command.add("core.docview!", {
-  ["test:reset-highlight"] = function(dv)
-    core.log('syntax: %s', syntax.get(dv.doc.filename).name)
-    dv.doc.highlighter:reset()
-  end
-})
+-- integrate evergreen and scm
+local highlights = require "plugins.evergreen.highlights"
+local readdoc = require "plugins.scm.readdoc"
+local readdoc_set_text = readdoc.set_text
+function readdoc:set_text(text)
+  readdoc_set_text(self, text)
+  highlights.init(self)
+end
 
 ---------------------------- Miscellaneous -------------------------------------
 
