@@ -7,6 +7,12 @@ local keymap = require "core.keymap"
 local config = require "core.config"
 local style = require "core.style"
 
+-------------------------- Global settings -----------------------------------
+
+SCALE = 1.5
+config.max_project_files = 10000
+config.blink_period = 1.2
+
 ------------------------- Additional globals ---------------------------------
 
 -- used by plugin installer
