@@ -1,0 +1,26 @@
+diff --git a/init.lua b/init.lua
+index db88e10..70f5931 100644
+--- a/init.lua
++++ b/init.lua
+@@ -148,7 +148,7 @@ function Highlight:tokenize_line(idx, state)
+ 	local res = {}
+ 	res.init_state = state
+ 	res.text = self.doc.lines[idx]
+-	res.state = 0
++	res.state = ""
+ 	res.tokens = {}
+ 
+ 	local i = idx - 1
+diff --git a/queries/lua/highlights.scm b/queries/lua/highlights.scm
+index 1199fef..7084474 100644
+--- a/queries/lua/highlights.scm
++++ b/queries/lua/highlights.scm
+@@ -102,6 +102,7 @@
+   ">>"
+   "//"
+   ".."
++  "::"
+ ] @operator
+ 
+ ;; Punctuations
+

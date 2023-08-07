@@ -1,0 +1,18 @@
+diff --git a/init.lua b/init.lua
+index 28620eb..b848b89 100644
+--- a/init.lua
++++ b/init.lua
+@@ -586,6 +586,8 @@ function DocView:draw_line_text(idx, x, y)
+   local lp = self.doc.__lintplus
+   if lp == nil then return end
+ 
++  if config.lint.hide_inline then return end
++
+   local yy = get_underline_y(self, idx)
+   local file_messages = lint.messages[core.project_absolute_path(self.doc.filename)]
+   if file_messages == nil then return end
+@@ -975,3 +977,4 @@ lint.config = config.lint
+ --- END ---
+ 
+ return lint
++

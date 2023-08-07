@@ -35,6 +35,7 @@ local palette = {
   fg0 = clr("#eae8ff"),
   fg1 = clr("#e0def4"),
   fg2 = clr("#cdcbe0"),
+  fg2_5 = clr("#9d9ab3"),
   fg3 = clr("#6e6a86"),
 
   sel0 = clr("#433c59"),
@@ -46,7 +47,7 @@ style.syntax = {}
 style.background = palette.bg1.base
 style.background2 = palette.bg0.base
 style.background3 = palette.bg0.base
-style.text = palette.fg1.base
+style.text = palette.fg2_5.base
 style.caret = palette.cyan.base
 style.accent = palette.fg0.base
 style.dim = palette.fg3.base
