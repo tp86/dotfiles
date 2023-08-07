@@ -7,9 +7,16 @@ local keymap = require "core.keymap"
 local config = require "core.config"
 local style = require "core.style"
 
+------------------------- Additional globals ---------------------------------
+
+-- used by plugin installer
+rawset(_G, "PLUGINSDIR", USERDIR .. PATHSEP .. "plugins")
+rawset(_G, "PATCHESDIR", USERDIR .. PATHSEP .. "patches")
+rawset(_G, "FONTSDIR", USERDIR .. PATHSEP .. "fonts")
+rawset(_G, "LUAVERSION", _VERSION:match("%d.%d"))
+
 ------------------------------ Themes ----------------------------------------
 
--- light theme:
 core.reload_module("colors.duskfox")
 
 --------------------------- Key bindings -------------------------------------
@@ -53,26 +60,22 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 
 ------------------------------ Plugins ----------------------------------------
 
--- enable or disable plugin loading setting config entries:
+-- built-in
+config.plugins.trimwhitespace = true
+config.plugins.lineguide.enabled = true
+-- config.plugins.lineguide.rulers = { 34, 80 }
+config.plugins.toolbarview = false
 
--- enable plugins.trimwhitespace, otherwise it is disabled by default:
--- config.plugins.trimwhitespace = true
---
--- disable detectindent, otherwise it is enabled by default
--- config.plugins.detectindent = false
+-- Third-party
+-- Install missing plugins on startup
 
--- Install plugins
--- Plugin installer inspired by lixling, but focused only on installing missing plugins on startup and easy applying patches
--- TODO Move to separate module and refactor
--- TODO better error and misconfiguration handling
-local PLUGINSDIR = USERDIR .. PATHSEP .. "plugins"
-local PATCHESDIR = USERDIR .. PATHSEP .. "patches"
-local FONTSDIR = USERDIR .. PATHSEP .. "fonts"
+
 local plugin = {}
 plugin.type = {
   raw = "raw",
   git = "git",
 }
+--[[
 -- install all plugins if they don't exist yet in plugins directory
 function plugin.installall(plugins)
   local crs = {}
@@ -254,6 +257,7 @@ function plugin.exists(spec)
   local targetfilename = plugin.path(spec)
   return system.get_file_info(targetfilename) ~= nil
 end
+--]]
 function plugin.makecmd(...)
   local cmds = {}
   for _, arg in ipairs { ... } do
@@ -267,6 +271,7 @@ function plugin.makecmd(...)
   end
   return table.concat(cmds, " && ")
 end
+
 function plugin.withtmpdir(...)
   local cmds = {
     "cwd=$(pwd)",
@@ -304,11 +309,11 @@ local plugins = {
     type = plugin.type.git,
     url = "https://github.com/lite-xl/console.git",
   },
-  eofnewline = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
-    patch = "eofnewline.patch"
-  },
+  -- eofnewline = {
+  --   type = plugin.type.raw,
+  --   url = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
+  --   patch = "eofnewline.patch"
+  -- },
   ephemeraltabs = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
@@ -380,14 +385,27 @@ local plugins = {
   nonicons = {
     type = plugin.type.raw,
     url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
-    post = "curl --create-dirs -fLo " .. FONTSDIR .. PATHSEP .. "nonicons.ttf https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf",
+    post = "curl --create-dirs -fLo " ..
+        FONTSDIR ..
+        PATHSEP ..
+        "nonicons.ttf https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf",
   },
   scm = {
     type = plugin.type.git,
     url = "https://github.com/lite-xl/lite-xl-scm.git",
   }
 }
-plugin.installall(plugins)
+-- plugin.installall(plugins)
+
+do
+  local plugininstaller = require "plugininstaller"
+  local raw, git = plugininstaller.type.raw, plugininstaller.type.git
+  local plugins = {
+    -- download single plugin file
+    fontconfig = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
+  }
+  plugininstaller.install(plugins)
+end
 
 ------------------------ Plugin configuration ----------------------------------
 
