@@ -20,6 +20,7 @@ local plugininstaller = {}
 local types = {
   raw = "raw",
   git = "git",
+  file = "file",
 }
 
 plugininstaller.type = setmetatable({}, {
@@ -48,14 +49,14 @@ local function gettargetpath(pluginspec)
     targetpath = USERDIR .. PATHSEP .. pluginspec.targetdir
   end
   targetpath = targetpath .. PATHSEP .. pluginspec.name
-  if pluginspec.type == types.raw then
+  if ({ [types.raw] = true, [types.file] = true })[pluginspec.type] then
     targetpath = targetpath .. ".lua"
   end
   return targetpath
 end
 
 local function getplugindir(pluginspec)
-  if pluginspec.type == types.raw then
+  if ({ [types.raw] = true, [types.file] = true })[pluginspec.type] then
     return PLUGINSDIR
   elseif pluginspec.type == types.git then
     return pluginspec.targetpath
@@ -71,6 +72,9 @@ local function makedownloadcommand(pluginspec)
   if pluginspec.type == types.raw then
     command = ("curl --create-dirs -fLo %s %s")
         :format(pluginspec.targetpath, pluginspec.url)
+  elseif pluginspec.type == types.file then
+    command = ("ln -s %s %s")
+        :format(pluginspec.url, pluginspec.targetpath)
   elseif pluginspec.type == types.git then
     command = ("git clone -b %s %s %s")
         :format(pluginspec.branch or "master", pluginspec.url, pluginspec.targetpath)
