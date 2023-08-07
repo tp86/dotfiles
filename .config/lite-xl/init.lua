@@ -67,348 +67,87 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 ------------------------------ Plugins ----------------------------------------
 
 -- built-in
-config.plugins.trimwhitespace = true
+config.plugins.trimwhitespace = { enabled = true }
 config.plugins.lineguide.enabled = true
 -- config.plugins.lineguide.rulers = { 34, 80 }
 config.plugins.toolbarview = false
 
 -- Third-party
 -- Install missing plugins on startup
-
-
-local plugin = {}
-plugin.type = {
-  raw = "raw",
-  git = "git",
-}
---[[
--- install all plugins if they don't exist yet in plugins directory
-function plugin.installall(plugins)
-  local crs = {}
-  local function install(specs)
-    for name, spec in pairs(specs) do
-      spec.name = name
-      if not plugin.exists(spec) then
-        if spec.requires then
-          local missing = false
-          local requiredplugins = {}
-          for _, requiredname in ipairs(spec.requires) do
-            local requiredspec = plugins[requiredname]
-            if not requiredspec then
-              core.log("Missing dependency '%s' for plugin '%s'", requiredname, name)
-              missing = true
-              goto nextrequired
-            end
-            requiredplugins[requiredname] = requiredspec
-            ::nextrequired::
-          end
-          if missing then
-            core.log("Plugin '%s' not installed due to missing dependencies", name)
-            goto nextplugin
-          end
-          install(requiredplugins)
-        end
-        core.log("Installing plugin '%s'", name)
-        local key = plugin.install(spec)
-        local thread = core.threads[key]
-        if thread then
-          table.insert(crs, thread.cr)
-        end
-      end
-      ::nextplugin::
-    end
-  end
-  install(plugins)
-  if #crs > 0 then
-    core.add_thread(function()
-      local running = true
-      while running do
-        running = false
-        for _, cr in ipairs(crs) do
-          if coroutine.status(cr) ~= "dead" then
-            running = true
-            goto nextcheck
-          end
-        end
-        ::nextcheck::
-        coroutine.yield(0.1)
-      end
-      core.log("All plugins installed, you may want to reload configuration.")
-    end)
-  end
-end
--- create a plugin file/directory based on plugin specification
-function plugin.path(spec)
-  local dir = PLUGINSDIR
-  if spec.targetdir then
-    dir = USERDIR .. PATHSEP .. spec.targetdir
-  end
-  local path = dir .. PATHSEP .. spec.name
-  if spec.type == plugin.type.raw then
-    path = path .. ".lua"
-  end
-  return path
-end
--- install single plugin
-function plugin.install(spec)
-  if spec.type == plugin.type.raw then
-    return plugin.installraw(spec)
-  elseif spec.type == plugin.type.git then
-    return plugin.installgit(spec)
-  end
-end
-function plugin.installwithcmd(spec, cmd)
-  return core.add_thread(function()
-    local name = spec.name
-
-    core.log("Plugin '%s' install process starting...", name)
-
-    local downloader = process.start(cmd)
-
-    while downloader:running() do
-      coroutine.yield(0.1)
-    end
-
-    local returncode = downloader:returncode()
-    core.log("Plugin '%s' download process ended with result: %d", name, returncode)
-
-    if returncode ~= 0 then
-      core.log("Error occurred during downloading '%s' plugin: %s", name, downloader:read_stdout() or "")
-      return
-    end
-
-    if spec.patch then
-      plugin.patch(spec)
-    end
-
-    if spec.post then
-      plugin.post(spec)
-    end
-  end)
-end
--- install raw plugin (download single plugin file directly)
-function plugin.installraw(spec)
-  local targetfilename = plugin.path(spec)
-  return plugin.installwithcmd(spec, {
-      "sh", "-c",
-      "curl --create-dirs -fLo " .. targetfilename .. " " .. spec.url
-    })
-end
--- install git-based plugin
-function plugin.installgit(spec)
-  local targetfilename = plugin.path(spec)
-  local branch = spec.branch or "master"
-  return plugin.installwithcmd(spec, {
-    "sh", "-c",
-    "git clone -b " .. branch .. " " .. spec.url .. " " .. targetfilename
-  })
-end
--- apply patch to plugin
-function plugin.patch(spec)  -- requires installed patch
-  core.log("Patching plugin '%s'", spec.name)
-  local plugindir = plugin.dir(spec)
-  local cmd = {
-    "sh", "-c",
-    "patch -p1 -ud " .. plugindir .. " -i " .. PATCHESDIR .. PATHSEP .. spec.patch
-  }
-  local patcher = process.start(cmd)
-
-  while patcher:running() do
-    coroutine.yield(0.02)
-  end
-
-  local returncode = patcher:returncode()
-  if returncode == 0 then
-    core.log("Patched plugin '%s'", spec.name)
-  else
-    core.log("Error occurred during patching plugin '%s': %s", spec.name, patcher:read_stderr() or "")
-  end
-end
--- apply post-install action to plugin
-function plugin.post(spec)
-  core.log("Running post-install actions for plugin '%s'", spec.name)
-  local plugindir = plugin.dir(spec)
-  local cmd = {
-    "sh", "-c",
-    spec.post,
-  }
-  local options = {
-    cwd = plugindir,
-  }
-
-  local runner = process.start(cmd, options)
-
-  while runner:running() do
-    coroutine.yield(0.1)
-  end
-
-  local returncode = runner:returncode()
-  if returncode == 0 then
-    core.log("Post-install action for plugin '%s' applied successfully", spec.name)
-  else
-    core.log("Error occurred during running post-install actions for plugin '%s': %s",
-      spec.name, runner:read_stderr() or "")
-  end
-end
--- get basedir of plugin
-function plugin.dir(spec)
-  if spec.type == plugin.type.raw then
-    return PLUGINSDIR
-  else
-    return plugin.path(spec)
-  end
-end
--- check if plugin exists
-function plugin.exists(spec)
-  local targetfilename = plugin.path(spec)
-  return system.get_file_info(targetfilename) ~= nil
-end
---]]
-function plugin.makecmd(...)
-  local cmds = {}
-  for _, arg in ipairs { ... } do
-    if type(arg) == "table" then
-      for _, cmd in ipairs(arg) do
-        table.insert(cmds, cmd)
-      end
-    else
-      table.insert(cmds, arg)
-    end
-  end
-  return table.concat(cmds, " && ")
-end
-
-function plugin.withtmpdir(...)
-  local cmds = {
-    "cwd=$(pwd)",
-    "tmpdir=$(mktemp --directory)",
-    "cd $tmpdir",
-    "cd $cwd",
-    "rm -fr $tmpdir",
-  }
-  for _, arg in ipairs { ... } do
-    table.insert(cmds, #cmds - 1, arg)
-  end
-  return cmds
-end
-
--- user configuration part (plugins specification)
-local luaversion = _VERSION:match("%d.%d")
-local plugins = {
-  autoinsert = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autoinsert.lua",
-  },
-  autosaveonfocuslots = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autosaveonfocuslost.lua",
-  },
-  bracketmatch = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
-  },
-  colorpreview = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
-  },
-  console = {
-    type = plugin.type.git,
-    url = "https://github.com/lite-xl/console.git",
-  },
-  -- eofnewline = {
-  --   type = plugin.type.raw,
-  --   url = "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
-  --   patch = "eofnewline.patch"
-  -- },
-  ephemeraltabs = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
-  },
-  evergreen = { -- requires luarocks (and setup), tree-sitter-devel, lua-devel
-    type = plugin.type.git,
-    url = "https://github.com/TorchedSammy/Evergreen.lxl.git",
-    post = plugin.makecmd(
-      plugin.withtmpdir(
-        "luarocks --lua-version " .. luaversion .. " download --rockspec ltreesitter --dev",
-        [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
-        "luarocks --lua-version " .. luaversion .. " install --local ltreesitter-dev-1.rockspec"
-      ),
-      "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. luaversion .. "/ltreesitter.so " .. USERDIR
-    ),
-    patch = "evergreen.patch",
-  },
-  fontconfig = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
-  },
-  lfautoinsert = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
-    patch = "lfautoinsert.patch",
-  },
-  lsp = {
-    type = plugin.type.git,
-    url = "https://github.com/lite-xl/lite-xl-lsp.git",
-    requires = {
-      "lintplus", "lsp_snippets", "snippets", "widget"
-    }
-  },
-  lintplus = {
-    type = plugin.type.git,
-    url = "https://github.com/liquidev/lintplus.git",
-    patch = "lintplus.patch",
-  },
-  lsp_snippets = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
-  },
-  snippets = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
-  },
-  widget = {
-    type = plugin.type.git,
-    url = "https://github.com/lite-xl/lite-xl-widgets.git",
-    targetdir = "libraries",
-  },
-  lspkind = {
-    type = plugin.type.git,
-    url = "https://github.com/TorchedSammy/lite-xl-lspkind.git",
-    post = plugin.makecmd(
-      plugin.withtmpdir(
-        "curl -fLo Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Hack.zip",
-        "unzip Hack.zip",
-        "mkdir -p " .. FONTSDIR,
-        "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR
-      ),
-      "mv autocomplete.lua " .. PLUGINSDIR
-    ),
-  },
-  navigate = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
-  },
-  nonicons = {
-    type = plugin.type.raw,
-    url = "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
-    post = "curl --create-dirs -fLo " ..
-        FONTSDIR ..
-        PATHSEP ..
-        "nonicons.ttf https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf",
-  },
-  scm = {
-    type = plugin.type.git,
-    url = "https://github.com/lite-xl/lite-xl-scm.git",
-  }
-}
--- plugin.installall(plugins)
-
 do
   local plugininstaller = require "plugininstaller"
   local raw, git = plugininstaller.type.raw, plugininstaller.type.git
+  local cmd, withtmpdir = plugininstaller.utils.makecmd, plugininstaller.utils.withtmpdir
   local plugins = {
     -- download single plugin file
+    autoinsert = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autoinsert.lua",
+    autosaveonfocuslots = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/autosaveonfocuslost.lua",
+    bracketmatch = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
+    colorpreview = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
+    -- download git repository plugin
+    console = git "https://github.com/lite-xl/console.git",
+    ephemeraltabs = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
+    -- single plugin file with patch
+    eofnewline = raw {
+      "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
+      patch = "eofnewline.patch",
+    },
+    evergreen = git {
+      "https://github.com/TorchedSammy/Evergreen.lxl.git",
+      patch = "evergreen.patch",
+      run = cmd(
+        withtmpdir(
+          "luarocks --lua-version " .. LUAVERSION .. " download --rockspec ltreesitter --dev",
+          [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
+          "luarocks --lua-version " .. LUAVERSION .. " install --local ltreesitter-dev-1.rockspec"
+        ),
+        "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. LUAVERSION .. "/ltreesitter.so " .. USERDIR
+      ),
+    },
     fontconfig = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
+    lfautoinsert = raw {
+      "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
+      patch = "lfautoinsert.patch",
+    },
+    lintplus = git {
+      "https://github.com/liquidev/lintplus.git",
+      patch = "lintplus.patch",
+    },
+    -- plugin with requirements
+    lsp = git {
+      "https://github.com/lite-xl/lite-xl-lsp.git",
+      requires = {
+        "lintplus", "lsp_snippets", "snippets", "widget"
+      },
+    },
+    -- with utils in post-install run action
+    lspkind = git {
+      "https://github.com/TorchedSammy/lite-xl-lspkind.git",
+      run = cmd(
+        withtmpdir(
+          "curl -fLo Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Hack.zip",
+          "unzip Hack.zip",
+          "mkdir -p " .. FONTSDIR,
+          "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR
+        ),
+        "mv autocomplete.lua " .. PLUGINSDIR
+      ),
+    },
+    lsp_snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
+    navigate = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
+    -- single plugin firl with post-install run action
+    nonicons = raw {
+      "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
+      run = ("curl --create-dirs -fLo %s %s")
+        :format(FONTSDIR .. PATHSEP .. "nonicons.ttf",
+        "https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf"),
+    },
+    scm = git "https://github.com/lite-xl/lite-xl-scm.git",
+    snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
+    widget = git {
+      "https://github.com/lite-xl/lite-xl-widgets.git",
+      targetdir = "libraries",
+    },
   }
   plugininstaller.install(plugins)
 end

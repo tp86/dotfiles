@@ -25,10 +25,18 @@ local types = {
 plugininstaller.type = setmetatable({}, {
   __index = function(_, k)
     if not types[k] then error("Unsupported plugin type " .. k) end
-    return function(url)
+    return function(config)
+      if type(config) == "string" then
+        config = { config }
+      end
       return {
         type = types[k],
-        url = url,
+        url = config[1],
+        patch = config.patch,
+        run = config.run,
+        requires = config.requires,
+        targetdir = config.targetdir,
+        branch = config.branch,
       }
     end
   end
@@ -36,6 +44,9 @@ plugininstaller.type = setmetatable({}, {
 
 local function gettargetpath(pluginspec)
   local targetpath = PLUGINSDIR
+  if pluginspec.targetdir then
+    targetpath = USERDIR .. PATHSEP .. pluginspec.targetdir
+  end
   targetpath = targetpath .. PATHSEP .. pluginspec.name
   if pluginspec.type == types.raw then
     targetpath = targetpath .. ".lua"
@@ -98,14 +109,11 @@ local function makecommands(pluginspec)
 end
 
 local function makepluginspec(name, options)
-  local spec = {
-    name = name,
-    type = options.type,
-    url = options.url,
-    patch = options.patch,
-    run = options.run,
-    branch = options.branch,
-  }
+  local spec = {}
+  for k, v in pairs(options) do
+    spec[k] = v
+  end
+  spec.name = name
   spec.targetpath = gettargetpath(spec)
   spec.commands = makecommands(spec)
   return spec
@@ -145,6 +153,9 @@ local function runprocess(processname, pluginspec)
 end
 
 local function install(pluginspec)
+  -- prevent double installation due to race condition
+  if pluginspec.handled then return end
+  pluginspec.handled = true
   core.log("Installing plugin '%s'", pluginspec.name)
   return core.add_thread(function()
     runprocess("download", pluginspec)
@@ -172,15 +183,21 @@ function plugininstaller.install(pluginsconfig)
           local requiredpluginspecs = {}
           for _, requiredname in ipairs(pluginspec.requires) do
             -- search for required plugin in all plugins, not only current subset
-            local requiredspec = pluginspecs[requiredname]
+            local requiredspec
+            for _, pluginspec in ipairs(pluginspecs) do
+              if pluginspec.name == requiredname then
+                requiredspec = pluginspec
+                break
+              end
+            end
             if requiredspec then
               table.insert(requiredpluginspecs, requiredspec)
             else
-              core.warn("Missing dependency '%s' for plugin '%s'", requiredname, name)
+              core.warn("Missing dependency '%s' for plugin '%s'", requiredname, pluginspec.name)
               missing = true
             end
             if missing then
-              core.warn("Plugin '%s' not installed due to missing dependencies", name)
+              core.warn("Plugin '%s' not installed due to missing dependencies", pluginspec.name)
               goto nextplugin
             end
           end
