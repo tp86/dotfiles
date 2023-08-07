@@ -22,19 +22,17 @@ local types = {
   git = "git",
 }
 
-plugininstaller.type = {}
-function plugininstaller.type.raw(url)
-  return {
-    type = types.raw,
-    url = url,
-  }
-end
-function plugininstaller.type.git(url)
-  return {
-    type = types.git,
-    url = url,
-  }
-end
+plugininstaller.type = setmetatable({}, {
+  __index = function(_, k)
+    if not types[k] then error("Unsupported plugin type " .. k) end
+    return function(url)
+      return {
+        type = types[k],
+        url = url,
+      }
+    end
+  end
+})
 
 local function gettargetpath(pluginspec)
   local targetpath = PLUGINSDIR
