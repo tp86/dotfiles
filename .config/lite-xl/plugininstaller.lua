@@ -7,6 +7,40 @@
 -- local plugins = {
 --   -- download single plugin file
 --   fontconfig = raw"https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
+--   -- download git repository plugin
+--   console = git "https://github.com/lite-xl/console.git",
+--   -- single plugin file with patch
+--   eofnewline = raw {
+--     "https://raw.githubusercontent.com/bokunodev/lite_modules/master/plugins/eofnewline-xl.lua",
+--     patch = "eofnewline.patch",
+--   },
+--   -- plugin with requirements
+--   lsp = git {
+--     "https://github.com/lite-xl/lite-xl-lsp.git",
+--     requires = {
+--       "lintplus", "lsp_snippets", "snippets", "widget"
+--     },
+--   },
+--   -- single plugin with post-install run action
+--   nonicons = raw {
+--     "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
+--     run = ("curl --create-dirs -fLo %s %s")
+--       :format(FONTSDIR .. PATHSEP .. "nonicons.ttf",
+--       "https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf"),
+--   },
+--   -- with utils in post-install run action
+--   lspkind = git {
+--     "https://github.com/TorchedSammy/lite-xl-lspkind.git",
+--     run = cmd(
+--       withtmpdir(
+--         "curl -fLo Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Hack.zip",
+--         "unzip Hack.zip",
+--         "mkdir -p " .. FONTSDIR,
+--         "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR
+--       ),
+--       "mv autocomplete.lua " .. PLUGINSDIR
+--     ),
+--   },
 -- }
 -- plugininstaller.install(plugins)
 

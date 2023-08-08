@@ -135,12 +135,12 @@ do
     },
     lsp_snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
     navigate = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
-    -- single plugin firl with post-install run action
+    -- single plugin with post-install run action
     nonicons = raw {
       "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/nonicons.lua",
       run = ("curl --create-dirs -fLo %s %s")
-        :format(FONTSDIR .. PATHSEP .. "nonicons.ttf",
-        "https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf"),
+          :format(FONTSDIR .. PATHSEP .. "nonicons.ttf",
+            "https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf"),
     },
     scm = git "https://github.com/lite-xl/lite-xl-scm.git",
     snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
@@ -185,6 +185,46 @@ function readdoc:set_text(text)
   readdoc_set_text(self, text)
   highlights.init(self)
 end
+
+-- Experimental
+-- modal keymaps
+local commonfallback = {
+  "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
+  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick" }
+local insertfallback = {
+  "backspace", "delete",
+  "return", "tab", "shift+tab", "space",
+  "up", "down", "left", "right" }
+for _, key in ipairs(commonfallback) do
+  table.insert(insertfallback, key)
+end
+for _, key in ipairs(insertfallback) do
+  insertfallback[key] = true
+end
+local normalfallback = { "ctrl+shift+p", "escape", "ctrl+s" }
+for _, key in ipairs(commonfallback) do
+  table.insert(normalfallback, key)
+end
+local modal = require "modal"
+modal.map {
+  default = "normal",
+  normal = {
+    ["i"] = modal.mode "insert",
+    ["h"] = "doc:move-to-previous-char",
+    ["j"] = "doc:move-to-next-line",
+    ["k"] = "doc:move-to-previous-line",
+    ["l"] = "doc:move-to-next-char",
+    fallback = normalfallback,
+    -- TODO support for action on mode activation (e.g. cursor style change, status bar update, etc.)
+    onenter = function() end,
+  },
+  insert = {
+    ["escape"] = modal.mode "normal",
+    fallback = function(key) return #key == 1 or key:match("^shift%+.$") or insertfallback[key] end,
+    onenter = function() end,
+  },
+}
+modal.activate()
 
 ---------------------------- Miscellaneous -------------------------------------
 
