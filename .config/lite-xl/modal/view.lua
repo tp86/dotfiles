@@ -1,5 +1,6 @@
 local core = require "core"
 local docview = require "core.docview"
+local commandview = require "core.commandview"
 
 local activated = false
 
@@ -11,6 +12,8 @@ local function activate(setfn, resetfn)
       set_active_view(view)
       if view:is(docview) then
         setfn()
+      elseif view:is(commandview) then
+        resetfn(true)
       else
         resetfn()
       end

@@ -188,26 +188,33 @@ end
 
 -- Experimental
 -- modal keymaps
+local function extend(tbl1, tbl2)
+  return tbl1
+end
 local commonfallback = {
   "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
-  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick" }
+  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
+}
 local insertfallback = {
   "backspace", "delete",
   "return", "tab", "shift+tab", "space",
-  "up", "down", "left", "right" }
+  "up", "down", "left", "right"
+}
 for _, key in ipairs(commonfallback) do
   table.insert(insertfallback, key)
 end
 for _, key in ipairs(insertfallback) do
   insertfallback[key] = true
 end
-local normalfallback = { "ctrl+shift+p", "escape", "ctrl+s" }
+local normalfallback = {
+  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "ctrl+alt+r", "escape", "ctrl+s",
+  "ctrl+tab"
+}
 for _, key in ipairs(commonfallback) do
   table.insert(normalfallback, key)
 end
 local modal = require "modal"
 modal.map {
-  default = "normal",
   normal = {
     ["i"] = modal.mode "insert",
     ["h"] = "doc:move-to-previous-char",
@@ -224,7 +231,7 @@ modal.map {
     onenter = function() end,
   },
 }
-modal.activate()
+modal.activate("normal")
 
 ---------------------------- Miscellaneous -------------------------------------
 
