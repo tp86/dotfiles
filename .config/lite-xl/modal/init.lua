@@ -51,32 +51,40 @@ local modal = {}
 
 function modal.map(modemaps)
   for name, modemap in pairs(modemaps) do
+    local mode = {}
     local keys, mt = {}, {}
     for key, actions in pairs(modemap) do
       if key == "fallback" then
         setupfallback(mt, actions)
+      elseif key == "onenter" then
+        mode.onenter = actions
       else
         keys[key] = actions
       end
     end
     local map, reversemap = createmaps(keys, mt)
-    modes[name] = {
-      map = map,
-      reversemap = reversemap,
-    }
+    mode.map = map
+    mode.reversemap = reversemap
+    modes[name] = mode
   end
 end
 
 function modal.mode(modename)
   return function()
+    local mode = modes[modename]
     --core.log("activating mode %s", modename)
-    keymap.map = modes[modename].map
-    keymap.reverse_map = modes[modename].reversemap
+    keymap.map = mode.map
+    keymap.reverse_map = mode.reversemap
+    if type(mode.onenter) == "function" then
+      mode.onenter()
+    end
   end
 end
 
 function modal.activate(modename)
-  viewmodifier.activate(modal.mode(modename), restore)
+  local modefn = modal.mode(modename)
+  viewmodifier.activate(modefn, restore)
+  -- modefn()
   -- keymap.add = nop
   -- keymap.add_direct = nop
 end

@@ -3,7 +3,6 @@
 -- it will be automatically reloaded when saved
 
 local core = require "core"
-local keymap = require "core.keymap"
 local config = require "core.config"
 local style = require "core.style"
 
@@ -188,50 +187,7 @@ end
 
 -- Experimental
 -- modal keymaps
-local function extend(tbl1, tbl2)
-  return tbl1
-end
-local commonfallback = {
-  "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
-  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
-}
-local insertfallback = {
-  "backspace", "delete",
-  "return", "tab", "shift+tab", "space",
-  "up", "down", "left", "right"
-}
-for _, key in ipairs(commonfallback) do
-  table.insert(insertfallback, key)
-end
-for _, key in ipairs(insertfallback) do
-  insertfallback[key] = true
-end
-local normalfallback = {
-  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "ctrl+alt+r", "escape", "ctrl+s",
-  "ctrl+tab"
-}
-for _, key in ipairs(commonfallback) do
-  table.insert(normalfallback, key)
-end
-local modal = require "modal"
-modal.map {
-  normal = {
-    ["i"] = modal.mode "insert",
-    ["h"] = "doc:move-to-previous-char",
-    ["j"] = "doc:move-to-next-line",
-    ["k"] = "doc:move-to-previous-line",
-    ["l"] = "doc:move-to-next-char",
-    fallback = normalfallback,
-    -- TODO support for action on mode activation (e.g. cursor style change, status bar update, etc.)
-    onenter = function() end,
-  },
-  insert = {
-    ["escape"] = modal.mode "normal",
-    fallback = function(key) return #key == 1 or key:match("^shift%+.$") or insertfallback[key] end,
-    onenter = function() end,
-  },
-}
-modal.activate("normal")
+require "keymap-modal"
 
 ---------------------------- Miscellaneous -------------------------------------
 
