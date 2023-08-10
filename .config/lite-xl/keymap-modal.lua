@@ -10,6 +10,7 @@ local function extend(tbl1, tbl2)
   end
   return tbl1
 end
+
 local function toset(tbl)
   local set = {}
   for _, value in ipairs(tbl) do
@@ -17,6 +18,7 @@ local function toset(tbl)
   end
   return set
 end
+
 local commonfallback = {
   "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
   "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
@@ -29,7 +31,7 @@ local insertfallback = {
 extend(insertfallback, commonfallback)
 insertfallback = toset(insertfallback)
 local normalfallback = {
-  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "ctrl+alt+r", "escape", "ctrl+s",
+  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s",
   "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
   "ctrl+x", "ctrl+c", "ctrl+v",
   "ctrl+shift+k", "ctrl+/",
@@ -39,13 +41,22 @@ local caret = {
   style = style.caret,
   blink = not config.disable_blink,
 }
+local function doall(actions)
+  return function()
+    for _, action in ipairs(actions) do
+      if type(action) == "function" then
+        action()
+      else
+        command.perform(action)
+      end
+    end
+  end
+end
+
 modal.map {
   normal = {
     ["i"] = modal.mode "insert",
-    ["shift+i"] = function()
-      command.perform "doc:select-none"
-      modal.mode "insert" ()
-    end,
+    ["shift+i"] = doall { "doc:select-none", modal.mode "insert" },
     ["h"] = "doc:move-to-previous-char",
     ["j"] = "doc:move-to-next-line",
     ["k"] = "doc:move-to-previous-line",
@@ -58,19 +69,13 @@ modal.map {
     ["shift+u"] = "doc:redo",
     ["o"] = "doc:newline-below",
     ["shift+o"] = "doc:newline-above",
-    ["w"] = function()
-      command.perform "doc:select-none"
-      command.perform "doc:select-to-previous-word-start"
-    end,
+    ["w"] = doall { "doc:select-none", "doc:select-to-previous-word-start" },
     ["shift+w"] = "doc:select-to-previous-word-start",
-    ["e"] = function()
-      command.perform "doc:select-none"
-      command.perform "doc:select-to-next-word-end"
-    end,
+    ["e"] = doall { "doc:select-none", "doc:select-to-next-word-end" },
     ["shift+e"] = "doc:select-to-next-word-end",
     fallback = normalfallback,
     onenter = function()
-      style.caret = { color"#ff0000" }
+      style.caret = { color "#ff0000" }
       config.disable_blink = true
     end,
   },

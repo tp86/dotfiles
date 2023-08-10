@@ -11,6 +11,7 @@ local style = require "core.style"
 SCALE = 1.5
 config.max_project_files = 10000
 config.blink_period = 1.2
+config.line_limit = 120
 
 ------------------------- Additional globals ---------------------------------
 
@@ -68,7 +69,6 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 -- built-in
 config.plugins.trimwhitespace = { enabled = true }
 config.plugins.lineguide.enabled = true
--- config.plugins.lineguide.rulers = { 34, 80 }
 config.plugins.toolbarview = false
 
 -- Third-party
@@ -94,14 +94,15 @@ do
     evergreen = git {
       "https://github.com/TorchedSammy/Evergreen.lxl.git",
       patch = "evergreen.patch",
-      run = cmd(
-        withtmpdir(
+      -- TODO update installation of custom ltreesitter as described in https://github.com/TorchedSammy/Evergreen.lxl#ltreesitter-installation
+      run = cmd {
+        withtmpdir {
           "luarocks --lua-version " .. LUAVERSION .. " download --rockspec ltreesitter --dev",
           [[sed -i -E 's/^(.*sources.*)$/\1\n"csrc\/types.c",/' ltreesitter-dev-1.rockspec]],
-          "luarocks --lua-version " .. LUAVERSION .. " install --local ltreesitter-dev-1.rockspec"
-        ),
-        "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. LUAVERSION .. "/ltreesitter.so " .. USERDIR
-      ),
+          "luarocks --lua-version " .. LUAVERSION .. " install --local ltreesitter-dev-1.rockspec",
+        },
+        "ln -sf " .. os.getenv("HOME") .. "/.luarocks/lib/lua/" .. LUAVERSION .. "/ltreesitter.so " .. USERDIR,
+      },
     },
     fontconfig = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
     lfautoinsert = raw {
@@ -122,15 +123,16 @@ do
     -- with utils in post-install run action
     lspkind = git {
       "https://github.com/TorchedSammy/lite-xl-lspkind.git",
-      run = cmd(
-        withtmpdir(
+      patch = "lspkind.patch",
+      run = cmd {
+        withtmpdir {
           "curl -fLo Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Hack.zip",
           "unzip Hack.zip",
           "mkdir -p " .. FONTSDIR,
-          "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR
-        ),
-        "mv autocomplete.lua " .. PLUGINSDIR
-      ),
+          "cp 'Hack Regular Nerd Font Complete Mono.ttf' " .. FONTSDIR,
+        },
+        "mv autocomplete.lua " .. PLUGINSDIR,
+      },
     },
     lsp_snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
     navigate = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
@@ -187,7 +189,7 @@ end
 
 -- Experimental
 -- modal keymaps
-require "keymap-modal"
+core.reload_module("keymap-modal")
 
 ---------------------------- Miscellaneous -------------------------------------
 

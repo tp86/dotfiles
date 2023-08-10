@@ -278,15 +278,15 @@ end
 plugininstaller.utils = {}
 
 -- helper function for making single command from (possibly nested) list of commands
-function plugininstaller.utils.makecmd(...)
+function plugininstaller.utils.makecmd(commands)
   local cmds = {}
-  for _, arg in ipairs { ... } do
-    if type(arg) == "table" then
-      for _, cmd in ipairs(arg) do
+  for _, command in ipairs(commands) do
+    if type(command) == "table" then
+      for _, cmd in ipairs(command) do
         table.insert(cmds, cmd)
       end
     else
-      table.insert(cmds, arg)
+      table.insert(cmds, command)
     end
   end
   return table.concat(cmds, " && ")
@@ -295,7 +295,7 @@ end
 -- helper function for making command running inside temporary directory
 -- current working directory is restored at end
 -- does not support nesting
-function plugininstaller.utils.withtmpdir(...)
+function plugininstaller.utils.withtmpdir(commands)
   local cmds = {
     "cwd=$(pwd)",
     "tmpdir=$(mktemp --directory)",
@@ -303,8 +303,8 @@ function plugininstaller.utils.withtmpdir(...)
     "cd $cwd",
     "rm -fr $tmpdir",
   }
-  for _, arg in ipairs { ... } do
-    table.insert(cmds, #cmds - 1, arg)
+  for _, command in ipairs(commands) do
+    table.insert(cmds, #cmds - 1, command)
   end
   return cmds
 end
