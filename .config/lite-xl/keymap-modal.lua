@@ -58,8 +58,8 @@ modal.map {
     ["i"] = modal.mode "insert",
     ["shift+i"] = doall { "doc:select-none", modal.mode "insert" },
     ["h"] = "doc:move-to-previous-char",
-    ["j"] = "doc:move-to-next-line",
-    ["k"] = "doc:move-to-previous-line",
+    ["j"] = { "listbox:next", "doc:move-to-next-line", },
+    ["k"] = { "listbox:previous", "doc:move-to-previous-line", },
     ["l"] = "doc:move-to-next-char",
     ["shift+h"] = "doc:select-to-previous-char",
     ["shift+j"] = "doc:select-to-next-line",
@@ -73,6 +73,9 @@ modal.map {
     ["shift+w"] = "doc:select-to-previous-word-start",
     ["e"] = doall { "doc:select-none", "doc:select-to-next-word-end" },
     ["shift+e"] = "doc:select-to-next-word-end",
+    ["return"] = "listbox:select",
+    ["shift+,"] = "navigate:previous",
+    ["shift+."] = "navigate:next",
     fallback = normalfallback,
     onenter = function()
       style.caret = { color "#ff0000" }

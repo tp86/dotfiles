@@ -70,6 +70,7 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 config.plugins.trimwhitespace = { enabled = true }
 config.plugins.lineguide.enabled = true
 config.plugins.toolbarview = false
+-- TODO use settings plugin from master to configure built-in plugins and disable afterwards
 
 -- Third-party
 -- Install missing plugins on startup

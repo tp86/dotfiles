@@ -18,6 +18,10 @@ local function activate(setfn, resetfn)
         resetfn()
       end
     end
+  else
+    if core.active_view:is(docview) then
+      setfn()
+    end
   end
 end
 
