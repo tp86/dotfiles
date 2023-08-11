@@ -141,6 +141,7 @@ do
           :format(FONTSDIR .. PATHSEP .. "nonicons.ttf",
             "https://github.com/yamatsum/nonicons/raw/6a2faf4fbdfbe353c5ae6a496740ac4bfb6d0e74/dist/nonicons.ttf"),
     },
+    regexreplacepreview = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/regexreplacepreview.lua",
     scm = git "https://github.com/lite-xl/lite-xl-scm.git",
     snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
     widget = git {

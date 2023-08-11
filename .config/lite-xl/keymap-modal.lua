@@ -64,8 +64,10 @@ local caret = {
 
 modal.map {
   normal = {
+    -- mode switching
     ["i"] = modal.mode "insert",
     ["shift+i"] = doall { "doc:select-none", modal.mode "insert" },
+    -- basic movements
     ["h"] = "doc:move-to-previous-char",
     ["j"] = { "listbox:next", "doc:move-to-next-line", },
     ["k"] = { "listbox:previous", "doc:move-to-previous-line", },
@@ -74,21 +76,31 @@ modal.map {
     ["shift+j"] = "doc:select-to-next-line",
     ["shift+k"] = "doc:select-to-previous-line",
     ["shift+l"] = "doc:select-to-next-char",
-    ["u"] = "doc:undo",
-    ["shift+u"] = "doc:redo",
-    ["o"] = "doc:newline-below",
-    ["shift+o"] = "doc:newline-above",
     ["w"] = doall { "doc:select-none", "doc:select-to-previous-word-start" },
     ["shift+w"] = "doc:select-to-previous-word-start",
     ["e"] = doall { "doc:select-none", "doc:select-to-next-word-end" },
     ["shift+e"] = "doc:select-to-next-word-end",
+    -- undo/redo
+    ["u"] = "doc:undo",
+    ["shift+u"] = "doc:redo",
+    -- editing
+    ["o"] = "doc:newline-below",
+    ["shift+o"] = "doc:newline-above",
+    -- miscellaneous
+    -- needed for interaction with LSP plugin (multiple definitions to go to)
     ["return"] = "listbox:select",
+    -- moving around
     ["shift+,"] = "navigate:previous",
-    ["shift+."] = "navigate:next",
+    ["shift+x"] = "navigate:next",
     ["alt+h"] = "root:switch-to-left",
     ["alt+j"] = "root:switch-to-down",
     ["alt+k"] = "root:switch-to-up",
     ["alt+l"] = "root:switch-to-right",
+    -- searching & replacing
+    ["/"] = "find-replace:find",
+    ["n"] = "find-replace:repeat-find",
+    ["shift+n"] = "find-replace:previous-find",
+    ["shift+/"] = "regex-replace-preview:find-replace-regex",
     fallback = normalfallback,
     onenter = function()
       style.caret = { color "#ff0000" }
@@ -96,7 +108,8 @@ modal.map {
     end,
   },
   insert = {
-    ["escape"] = { "autocomplete:cancel", modal.mode "normal", },
+    ["escape"] = modal.mode "normal",
+    -- easier and faster completions
     ["ctrl+j"] = "autocomplete:next",
     ["ctrl+k"] = "autocomplete:previous",
     ["ctrl+l"] = "autocomplete:complete",
