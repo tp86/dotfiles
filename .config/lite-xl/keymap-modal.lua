@@ -32,6 +32,18 @@ local function doall(actions)
   end
 end
 
+local function intreeview(cmd)
+  return function()
+    local core = require "core"
+    local treeview = require "plugins.treeview"
+    if core.active_view == treeview then
+      command.perform(cmd)
+    else
+      return false
+    end
+  end
+end
+
 keymap.add {
   ["ctrl+\\"] = function()
     local core = require "core"
@@ -41,6 +53,8 @@ keymap.add {
     end
     command.perform "treeview:toggle"
   end,
+  ["j"] = intreeview("treeview:next"),
+  ["k"] = intreeview("treeview:previous"),
 }
 
 local commonfallback = {
