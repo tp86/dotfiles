@@ -2,7 +2,7 @@ local config = require "core.config"
 local style = require "core.style"
 local color = require "core.common".color
 local command = require "core.command"
-local modal = require "modal"
+local modal = require "plugins.modal"
 local keymap = require "core.keymap"
 
 local function extend(tbl1, tbl2)
@@ -33,7 +33,14 @@ local function doall(actions)
 end
 
 keymap.add {
-  ["ctrl+\\"] = doall { "treeview:toggle-focus", "treeview:toggle", },
+  ["ctrl+\\"] = function()
+    local core = require "core"
+    local treeview = require "plugins.treeview"
+    if not treeview.visible or core.active_view == treeview then
+      command.perform "treeview:toggle-focus"
+    end
+    command.perform "treeview:toggle"
+  end,
 }
 
 local commonfallback = {
@@ -91,7 +98,7 @@ modal.map {
     ["return"] = "listbox:select",
     -- moving around
     ["shift+,"] = "navigate:previous",
-    ["shift+x"] = "navigate:next",
+    ["shift+."] = "navigate:next",
     ["alt+h"] = "root:switch-to-left",
     ["alt+j"] = "root:switch-to-down",
     ["alt+k"] = "root:switch-to-up",

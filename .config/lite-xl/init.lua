@@ -133,6 +133,10 @@ do
       },
     },
     lsp_snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/lsp_snippets.lua",
+    modal = git {
+      "https://github.com/tp86/modal.lxl",
+      branch = "main",
+    },
     navigate = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
     -- single plugin with post-install run action
     nonicons = raw {
@@ -201,9 +205,10 @@ function readdoc:set_text(text)
   highlights.init(self)
 end
 
--- Experimental
 -- load modal keymaps from different module (for code organization)
 core.reload_module("keymap-modal")
+
+-- Experimental
 
 ---------------------------- Miscellaneous -------------------------------------
 
