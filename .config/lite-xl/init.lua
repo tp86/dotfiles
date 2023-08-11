@@ -189,7 +189,7 @@ function readdoc:set_text(text)
 end
 
 -- Experimental
--- modal keymaps
+-- load modal keymaps from different module (for code organization)
 core.reload_module("keymap-modal")
 
 ---------------------------- Miscellaneous -------------------------------------

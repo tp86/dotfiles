@@ -3,6 +3,7 @@ local style = require "core.style"
 local color = require "core.common".color
 local command = require "core.command"
 local modal = require "modal"
+local keymap = require "core.keymap"
 
 local function extend(tbl1, tbl2)
   for _, value in ipairs(tbl2) do
@@ -19,28 +20,6 @@ local function toset(tbl)
   return set
 end
 
-local commonfallback = {
-  "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
-  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
-}
-local insertfallback = {
-  "backspace", "delete",
-  "return", "tab", "shift+tab", "space",
-  "up", "down", "left", "right"
-}
-extend(insertfallback, commonfallback)
-insertfallback = toset(insertfallback)
-local normalfallback = {
-  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s",
-  "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
-  "ctrl+x", "ctrl+c", "ctrl+v",
-  "ctrl+shift+k", "ctrl+/",
-}
-extend(normalfallback, commonfallback)
-local caret = {
-  style = style.caret,
-  blink = not config.disable_blink,
-}
 local function doall(actions)
   return function()
     for _, action in ipairs(actions) do
@@ -52,6 +31,36 @@ local function doall(actions)
     end
   end
 end
+
+keymap.add {
+  ["ctrl+\\"] = doall { "treeview:toggle-focus", "treeview:toggle", },
+}
+
+local commonfallback = {
+  "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
+  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
+}
+
+local insertfallback = {
+  "backspace", "delete",
+  "return", "tab", "shift+tab", "space",
+  "up", "down", "left", "right", "home", "end",
+}
+extend(insertfallback, commonfallback)
+insertfallback = toset(insertfallback)
+
+local normalfallback = {
+  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s",
+  "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
+  "ctrl+x", "ctrl+c", "ctrl+v",
+  "ctrl+shift+k", "ctrl+/",
+}
+extend(normalfallback, commonfallback)
+
+local caret = {
+  style = style.caret,
+  blink = not config.disable_blink,
+}
 
 modal.map {
   normal = {
