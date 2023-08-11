@@ -122,6 +122,7 @@ style.syntax["type.definition"] = palette.yellow.base
 style.syntax["type.qualifier"] = palette.yellow.base
 style.syntax["variable"] = palette.white.base
 style.syntax["variable.builtin"] = palette.red.base
+style.syntax["whitespace"] = palette.fg3.base
 
 -- lint diagnostics styles
 style.lint = {}

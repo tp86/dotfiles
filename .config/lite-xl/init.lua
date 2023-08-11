@@ -9,9 +9,6 @@ local style = require "core.style"
 -------------------------- Global settings -----------------------------------
 
 SCALE = 1.5
-config.max_project_files = 10000
-config.blink_period = 1.2
-config.line_limit = 120
 
 ------------------------- Additional globals ---------------------------------
 
@@ -20,6 +17,13 @@ rawset(_G, "PLUGINSDIR", USERDIR .. PATHSEP .. "plugins")
 rawset(_G, "PATCHESDIR", USERDIR .. PATHSEP .. "patches")
 rawset(_G, "FONTSDIR", USERDIR .. PATHSEP .. "fonts")
 rawset(_G, "LUAVERSION", _VERSION:match("%d.%d"))
+
+--------------------------- Configuration ------------------------------------
+
+config.max_project_files = 10000
+config.blink_period = 1.2
+config.line_limit = 120
+config.undo_merge_timeout = 1.0
 
 ------------------------------ Themes ----------------------------------------
 
@@ -66,13 +70,6 @@ style.font = renderer.font.load(DATADIR .. "/fonts/FiraSans-Regular.ttf", 12 * S
 
 ------------------------------ Plugins ----------------------------------------
 
--- built-in
-config.plugins.trimwhitespace = { enabled = true }
-config.plugins.lineguide.enabled = true
-config.plugins.toolbarview = false
--- TODO use settings plugin from master to configure built-in plugins and disable afterwards
-
--- Third-party
 -- Install missing plugins on startup
 do
   local plugininstaller = require "plugininstaller"
@@ -155,6 +152,21 @@ do
 end
 
 ------------------------ Plugin configuration ----------------------------------
+
+-- built-in
+config.plugins.autocomplete.min_len = 2
+config.plugins.bracketmatch.color_char = true
+config.plugins.drawwhitespace = {
+  enabled = true,
+  show_leading = false,
+  show_middle = true,
+  show_middle_min = 2,
+  trailing_color = style.error,
+}
+config.plugins.trimwhitespace.enabled = true
+config.plugins.lineguide.enabled = true
+config.plugins.toolbarview = false
+config.plugins.treeview.size = 250 * SCALE
 
 -- treeview
 local treeview = require "plugins.treeview"

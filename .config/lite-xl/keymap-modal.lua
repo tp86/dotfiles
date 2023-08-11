@@ -38,7 +38,8 @@ keymap.add {
 
 local commonfallback = {
   "wheel", "hwheel", "shift+wheel", "shift+wheelup", "shift+wheeldown", "wheelup", "wheeldown",
-  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick"
+  "shift+1lclick", "ctrl+1lclick", "1lclick", "2lclick", "3lclick",
+  "ctrl+x", "ctrl+c", "ctrl+v",
 }
 
 local insertfallback = {
@@ -52,7 +53,6 @@ insertfallback = toset(insertfallback)
 local normalfallback = {
   "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s",
   "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
-  "ctrl+x", "ctrl+c", "ctrl+v",
   "ctrl+shift+k", "ctrl+/",
 }
 extend(normalfallback, commonfallback)
@@ -85,6 +85,10 @@ modal.map {
     ["return"] = "listbox:select",
     ["shift+,"] = "navigate:previous",
     ["shift+."] = "navigate:next",
+    ["alt+h"] = "root:switch-to-left",
+    ["alt+j"] = "root:switch-to-down",
+    ["alt+k"] = "root:switch-to-up",
+    ["alt+l"] = "root:switch-to-right",
     fallback = normalfallback,
     onenter = function()
       style.caret = { color "#ff0000" }
@@ -92,7 +96,10 @@ modal.map {
     end,
   },
   insert = {
-    ["escape"] = modal.mode "normal",
+    ["escape"] = { "autocomplete:cancel", modal.mode "normal", },
+    ["ctrl+j"] = "autocomplete:next",
+    ["ctrl+k"] = "autocomplete:previous",
+    ["ctrl+l"] = "autocomplete:complete",
     fallback = function(key) return #key == 1 or key:match("^shift%+.$") or insertfallback[key] end,
     onenter = function()
       style.caret = caret.style
