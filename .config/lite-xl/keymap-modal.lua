@@ -122,6 +122,10 @@ modal.map {
     -- needed for interaction with LSP plugin (multiple definitions to go to)
     ["return"] = "listbox:select",
     -- moving around
+    ["["] = "doc:move-to-previous-page",
+    ["]"] = "doc:move-to-next-page",
+    ["shift+["] = "doc:select-to-previous-page",
+    ["shift+]"] = "doc:select-to-next-page",
     ["shift+,"] = "navigate:previous",
     ["shift+."] = "navigate:next",
     ["alt+h"] = "root:switch-to-left",
@@ -130,6 +134,7 @@ modal.map {
     ["alt+l"] = "root:switch-to-right",
     ["g"] = modal.submap {
       ["d"] = "lsp:goto-definition",
+      ["r"] = "lsp:find-references",
     },
     -- searching & replacing
     ["/"] = "find-replace:find",
