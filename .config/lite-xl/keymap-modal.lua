@@ -1,3 +1,4 @@
+local core = require "core"
 local config = require "core.config"
 local style = require "core.style"
 local color = require "core.common".color
@@ -101,12 +102,22 @@ modal.map {
     ["shift+w"] = "doc:select-to-previous-word-start",
     ["e"] = doall { "doc:select-none", "doc:select-to-next-word-end" },
     ["shift+e"] = "doc:select-to-next-word-end",
+    -- selections
+    ["x"] = "doc:select-lines",
+    ["ctrl+up"] = "doc:create-cursor-previous-line",
+    ["ctrl+down"] = "doc:create-cursor-next-line",
     -- undo/redo
     ["u"] = "doc:undo",
     ["shift+u"] = "doc:redo",
     -- editing
     ["o"] = "doc:newline-below",
     ["shift+o"] = "doc:newline-above",
+    ["d"] = function()
+      local doc = core.active_view.doc
+      if doc:has_selection() then
+        command.perform "doc:delete"
+      end
+    end,
     -- miscellaneous
     -- needed for interaction with LSP plugin (multiple definitions to go to)
     ["return"] = "listbox:select",
@@ -117,6 +128,9 @@ modal.map {
     ["alt+j"] = "root:switch-to-down",
     ["alt+k"] = "root:switch-to-up",
     ["alt+l"] = "root:switch-to-right",
+    ["g"] = modal.submap {
+      ["d"] = "lsp:goto-definition",
+    },
     -- searching & replacing
     ["/"] = "find-replace:find",
     ["n"] = "find-replace:repeat-find",
