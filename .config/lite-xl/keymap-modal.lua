@@ -33,6 +33,7 @@ local function doall(actions)
   end
 end
 
+-- XXX is it needed?
 local function intreeview(cmd)
   return function()
     local core = require "core"
@@ -56,6 +57,10 @@ keymap.add {
   end,
   ["j"] = intreeview("treeview:next"),
   ["k"] = intreeview("treeview:previous"),
+  ["o"] = intreeview("treeview:open"),
+  ["a"] = intreeview("treeview:new-file"),
+  ["shift+a"] = intreeview("treeview:new-folder"),
+  ["d"] = intreeview("treeview:delete"),
 }
 
 local commonfallback = {
