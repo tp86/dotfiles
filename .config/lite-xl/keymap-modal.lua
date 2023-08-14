@@ -37,7 +37,7 @@ local function doall(actions)
 end
 
 keymap.add {
-  ["ctrl+\\"] = function()
+  ["ctrl+\\"] = function() ---@diagnostic disable-line:assign-type-mismatch
     local treeview = require "plugins.treeview"
     if not treeview.visible or core.active_view == treeview then
       command.perform "treeview:toggle-focus"
@@ -111,12 +111,13 @@ modal.map {
     -- editing
     ["o"] = "doc:newline-below",
     ["shift+o"] = "doc:newline-above",
-    ["d"] = function()
+    ["ctrl+z"] = function()
       local doc = core.active_view.doc
       if doc:has_selection() then
         command.perform "doc:delete"
       end
     end,
+    ["d"] = "doc:duplicate-lines",
     -- miscellaneous
     -- needed for interaction with LSP plugin (multiple definitions to go to)
     ["return"] = "listbox:select",
@@ -132,6 +133,10 @@ modal.map {
     ["alt+k"] = "root:switch-to-up",
     ["alt+l"] = "root:switch-to-right",
     ["g"] = modal.submap {
+      ["h"] = "doc:move-to-start-of-line",
+      ["l"] = "doc:move-to-end-of-line",
+      ["j"] = "doc:move-to-end-of-doc",
+      ["k"] = "doc:move-to-start-of-doc",
       ["d"] = "lsp:goto-definition",
       ["r"] = "lsp:find-references",
     },
