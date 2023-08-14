@@ -137,6 +137,10 @@ do
       "https://github.com/tp86/modal.lxl",
       branch = "main",
     },
+    monkey = git {
+      "https://github.com/tp86/monkey.lxl",
+      branch = "main",
+    },
     navigate = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/navigate.lua",
     -- single plugin with post-install run action
     nonicons = raw {

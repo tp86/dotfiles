@@ -33,34 +33,20 @@ local function doall(actions)
   end
 end
 
--- XXX is it needed?
-local function intreeview(cmd)
-  return function()
-    local core = require "core"
-    local treeview = require "plugins.treeview"
-    if core.active_view == treeview then
-      command.perform(cmd)
-    else
-      return false
-    end
-  end
-end
-
 keymap.add {
   ["ctrl+\\"] = function()
-    local core = require "core"
     local treeview = require "plugins.treeview"
     if not treeview.visible or core.active_view == treeview then
       command.perform "treeview:toggle-focus"
     end
     command.perform "treeview:toggle"
   end,
-  ["j"] = intreeview("treeview:next"),
-  ["k"] = intreeview("treeview:previous"),
-  ["o"] = intreeview("treeview:open"),
-  ["a"] = intreeview("treeview:new-file"),
-  ["shift+a"] = intreeview("treeview:new-folder"),
-  ["d"] = intreeview("treeview:delete"),
+  ["j"] = "treeview:next",
+  ["k"] = "treeview:previous",
+  ["o"] = "treeview:open",
+  ["a"] = "treeview:new-file",
+  ["shift+a"] = "treeview:new-folder",
+  ["d"] = "treeview:delete",
 }
 
 local commonfallback = {
@@ -107,6 +93,8 @@ modal.map {
     ["shift+w"] = "doc:select-to-previous-word-start",
     ["e"] = doall { "doc:select-none", "doc:select-to-next-word-end" },
     ["shift+e"] = "doc:select-to-next-word-end",
+    ["ctrl+i"] = doall { "monkey:select-current-node", "doc:scroll-to-target", },
+    ["ctrl+k"] = doall { "monkey:select-parent-node", "doc:scroll-to-target", },
     -- selections
     ["x"] = "doc:select-lines",
     ["ctrl+up"] = "doc:create-cursor-previous-line",
