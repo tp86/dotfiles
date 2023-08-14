@@ -147,6 +147,10 @@ do
     },
     regexreplacepreview = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/regexreplacepreview.lua",
     scm = git "https://github.com/lite-xl/lite-xl-scm.git",
+    scroll_to_target = git {
+      "https://github.com/tp86/scroll-to-target.lxl",
+      branch = "main",
+    },
     snippets = raw "https://raw.githubusercontent.com/vqns/lite-xl-snippets/main/snippets.lua",
     widget = git {
       "https://github.com/lite-xl/lite-xl-widgets.git",
