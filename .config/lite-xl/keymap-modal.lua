@@ -95,6 +95,9 @@ modal.map {
     ["shift+e"] = "doc:select-to-next-word-end",
     ["ctrl+i"] = doall { "monkey:select-current-node", "doc:scroll-to-target", },
     ["ctrl+k"] = doall { "monkey:select-parent-node", "doc:scroll-to-target", },
+    ["ctrl+j"] = doall { "monkey:select-child-node", "doc:scroll-to-target", },
+    ["ctrl+l"] = doall { "monkey:select-next-sibling-node", "doc:scroll-to-target", },
+    ["ctrl+h"] = doall { "monkey:select-previous-sibling-node", "doc:scroll-to-target", },
     -- selections
     ["x"] = "doc:select-lines",
     ["ctrl+up"] = "doc:create-cursor-previous-line",
@@ -145,7 +148,7 @@ modal.map {
     -- easier and faster completions
     ["ctrl+j"] = "autocomplete:next",
     ["ctrl+k"] = "autocomplete:previous",
-    ["ctrl+l"] = "autocomplete:complete",
+    ["ctrl+l"] = { "autocomplete:complete", "snippets:next", },
     fallback = function(key) return #key == 1 or key:match("^shift%+.$") or insertfallback[key] end,
     onenter = function()
       style.caret = caret.style
