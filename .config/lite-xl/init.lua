@@ -5,6 +5,7 @@
 local core = require "core"
 local config = require "core.config"
 local style = require "core.style"
+local command = require "core.command"
 
 -------------------------- Global settings -----------------------------------
 
@@ -103,6 +104,7 @@ do
       },
     },
     fontconfig = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
+    indent_convert = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/indent_convert.lua",
     lfautoinsert = raw {
       "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
       patch = "lfautoinsert.patch",
@@ -215,6 +217,15 @@ end
 
 -- load modal keymaps from different module (for code organization)
 core.reload_module("keymap-modal")
+
+-- on document save actions
+local doc = require "core.doc"
+local save = doc.save
+function doc:save(filename, abs_filename)
+  -- automatically convert indentation to spaces on save
+  command.perform "indent-convert:tabs-to-spaces"
+  save(self, filename, abs_filename)
+end
 
 -- Experimental
 

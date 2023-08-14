@@ -67,7 +67,7 @@ extend(insertfallback, commonfallback)
 insertfallback = toset(insertfallback)
 
 local normalfallback = {
-  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s",
+  "ctrl+shift+p", "ctrl+p", "ctrl+\\", "alt+ctrl+r", "escape", "ctrl+s", "ctrl+n",
   "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
   "ctrl+shift+k", "ctrl+/",
 }
@@ -152,11 +152,12 @@ modal.map {
     end,
   },
   insert = {
-    ["escape"] = modal.mode "normal",
+    ["escape"] = { "snippets:exit", modal.mode "normal", },
     -- easier and faster completions
     ["ctrl+j"] = "autocomplete:next",
     ["ctrl+k"] = "autocomplete:previous",
-    ["ctrl+l"] = { "autocomplete:complete", "snippets:next", },
+    ["ctrl+l"] = { "autocomplete:complete", "snippets:next-or-exit", },
+    ["ctrl+h"] = "snippets:previous",
     fallback = function(key) return #key == 1 or key:match("^shift%+.$") or insertfallback[key] end,
     onenter = function()
       style.caret = caret.style
