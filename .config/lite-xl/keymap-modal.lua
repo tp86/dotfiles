@@ -23,13 +23,16 @@ end
 
 local function doall(actions)
   return function()
+    local performed = false
     for _, action in ipairs(actions) do
       if type(action) == "function" then
-        action()
+        performed = action()
       else
-        command.perform(action)
+        performed = command.perform(action)
       end
+      if not performed then break end
     end
+    return performed
   end
 end
 
