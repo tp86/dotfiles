@@ -137,8 +137,13 @@ modal.map {
       ["l"] = "doc:move-to-end-of-line",
       ["j"] = "doc:move-to-end-of-doc",
       ["k"] = "doc:move-to-start-of-doc",
+      ["shift+h"] = "doc:select-to-start-of-line",
+      ["shift+l"] = "doc:select-to-end-of-line",
+      ["shift+j"] = "doc:select-to-end-of-doc",
+      ["shift+k"] = "doc:select-to-start-of-doc",
       ["d"] = "lsp:goto-definition",
       ["r"] = "lsp:find-references",
+      ["g"] = doall { "doc:go-to-line", modal.mode "insert" },
     },
     -- searching & replacing
     ["/"] = "find-replace:find",

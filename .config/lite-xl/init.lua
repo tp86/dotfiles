@@ -119,6 +119,7 @@ do
       requires = {
         "lintplus", "lsp_snippets", "snippets", "widget"
       },
+      patch = "lsp.patch",
     },
     -- with utils in post-install run action
     lspkind = git {
