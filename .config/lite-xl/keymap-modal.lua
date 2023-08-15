@@ -46,7 +46,12 @@ keymap.add {
   end,
   ["j"] = "treeview:next",
   ["k"] = "treeview:previous",
-  ["o"] = "treeview:open",
+  ["o"] = doall { "treeview:open", function()
+    local treeview = require "plugins.treeview"
+    if core.active_view ~= treeview then
+      command.perform "treeview:toggle"
+    end
+  end },
   ["a"] = "treeview:new-file",
   ["shift+a"] = "treeview:new-folder",
   ["d"] = "treeview:delete",

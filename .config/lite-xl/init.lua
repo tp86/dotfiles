@@ -220,13 +220,7 @@ end
 core.reload_module("keymap-modal")
 
 -- on document save actions
-local doc = require "core.doc"
-local save = doc.save
-function doc:save(filename, abs_filename)
-  -- automatically convert indentation to spaces on save
-  command.perform "indent-convert:tabs-to-spaces"
-  save(self, filename, abs_filename)
-end
+require "onsave"
 
 -- Experimental
 
