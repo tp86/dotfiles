@@ -84,7 +84,10 @@ do
     bracketmatch = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/bracketmatch.lua",
     colorpreview = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/colorpreview.lua",
     -- download git repository plugin
-    console = git "https://github.com/lite-xl/console.git",
+    console = git {
+      "https://github.com/lite-xl/console.git",
+      patch = "console.patch",
+    },
     ephemeraltabs = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/ephemeral_tabs.lua",
     -- single plugin file with patch
     eofnewline = raw {

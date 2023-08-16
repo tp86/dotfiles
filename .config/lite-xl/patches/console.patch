@@ -1,0 +1,25 @@
+diff --git a/init.lua b/init.lua
+index a078597..501fd62 100644
+--- a/init.lua
++++ b/init.lua
+@@ -296,11 +296,13 @@ function ConsoleView:on_mouse_pressed(...)
+       return
+     end
+     core.try(function()
+-      core.root_view:open_doc(core.open_doc(resolved_file))
++      local doc = core.open_doc(resolved_file)
++      local view = core.root_view:open_doc(doc)
+       line = tonumber(line) or 1
+       col = tonumber(col) or 1
+       core.add_thread(function()
+-        core.active_view.doc:set_selection(line, col)
++        doc:set_selection(line, col)
++        view.mouse_selecting = nil
+       end)
+     end)
+   end
+@@ -422,3 +424,4 @@ package.loaded["plugins.console.view"] = ConsoleView
+ 
+ console.clear()
+ return console
++
