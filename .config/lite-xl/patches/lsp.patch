@@ -1,5 +1,5 @@
 diff --git a/init.lua b/init.lua
-index 2a44edf..d834d97 100644
+index 2a44edf..3a898f1 100644
 --- a/init.lua
 +++ b/init.lua
 @@ -1866,7 +1866,7 @@ function lsp.request_document_format(doc)
@@ -11,3 +11,26 @@ index 2a44edf..d834d97 100644
              insertFinalNewline = false,
              trimFinalNewlines = true
            }
+@@ -1875,9 +1875,22 @@ function lsp.request_document_format(doc)
+           if response.error and response.error.message then
+             log(server, "Error formatting: " .. response.error.message)
+           elseif response.result and #response.result > 0 then
++            -- store selection and scroll
++            local line, column = doc:get_selection()
++            local scrolly
++            local view = core.active_view
++            if view:is(DocView) and view.doc == doc then
++              scrolly = view.scroll.y
++            end
+             for _, result in pairs(response.result) do
+               apply_edit(server, doc, result)
+             end
++            -- restore selection and scroll
++            doc:set_selection(line, column, line, column)
++            view = core.active_view
++            if view:is(DocView) and view.doc == doc and scrolly then
++              view.scroll.to.y = scrolly
++            end
+             log(server, "Formatted document")
+           else
+             log(server, "Formatting not required")
