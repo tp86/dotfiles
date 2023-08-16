@@ -126,6 +126,7 @@ modal.map {
     -- miscellaneous
     -- needed for interaction with LSP plugin (multiple definitions to go to)
     ["return"] = "listbox:select",
+    ["="] = "lsp:format-document",
     -- moving around
     ["["] = "doc:move-to-previous-page",
     ["]"] = "doc:move-to-next-page",
