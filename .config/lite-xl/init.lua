@@ -25,6 +25,7 @@ config.max_project_files = 10000
 config.blink_period = 1.2
 config.line_limit = 120
 config.undo_merge_timeout = 1.0
+config.find_regex = true
 
 ------------------------------ Themes ----------------------------------------
 

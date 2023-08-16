@@ -153,6 +153,7 @@ modal.map {
     -- searching & replacing
     ["/"] = "find-replace:find",
     ["n"] = "find-replace:repeat-find",
+    -- TODO switches for repeat and toggles (sensitivity, regex) in find view
     ["shift+n"] = "find-replace:previous-find",
     ["shift+/"] = "regex-replace-preview:find-replace-regex",
     fallback = normalfallback,
