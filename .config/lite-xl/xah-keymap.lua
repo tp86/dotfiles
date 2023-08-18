@@ -71,7 +71,6 @@ local commandfallback = {
   "alt+ctrl+r",
 
   "escape",
-  "ctrl+s", "ctrl+n",
   "ctrl+tab", "ctrl+shift+tab", "ctrl+w",
   "left", "right",
 }
@@ -83,8 +82,8 @@ local caret = {
 }
 
 keymap.add {
-  ["right"] = "find-replace:repeat-find",
-  ["left"] = "find-replace:previous-find",
+  ["ctrl+n"] = "find-replace:repeat-find",
+  ["ctrl+shift+n"] = "find-replace:previous-find",
 
   ["ctrl+\\"] = function() ---@diagnostic disable-line:assign-type-mismatch
     local treeview = require "plugins.treeview"
@@ -93,8 +92,8 @@ keymap.add {
     end
     command.perform "treeview:toggle"
   end,
-  ["j"] = "treeview:next",
-  ["k"] = "treeview:previous",
+  ["k"] = "treeview:next",
+  ["i"] = "treeview:previous",
   ["f"] = doall { "treeview:open", function()
     local treeview = require "plugins.treeview"
     if core.active_view ~= treeview then
@@ -105,6 +104,55 @@ keymap.add {
   ["shift+s"] = "treeview:new-folder",
   ["d"] = "treeview:delete",
 }
+
+local function smartmove(move)
+  return function()
+    local doc = core.active_view.doc
+    local cursorline, cursorcolumn, otherline, othercolumn = doc:get_selection()
+    local currentline, previousline = doc.lines[cursorline], doc.lines[cursorline - 1]
+    local _, currentindent = currentline:find("^%s*")
+    currentindent = currentindent + 1
+    move(doc, cursorline, cursorcolumn, currentindent, currentline, otherline, othercolumn, previousline)
+  end
+end
+local smartmoveback = smartmove(function(doc, linenr, column, indent, _, _, _, previousline)
+  if column > indent then
+    doc:set_selection(linenr, indent)
+  elseif column > 1 then
+    command.perform "doc:move-to-start-of-line"
+  else
+    command.perform "doc:move-to-previous-block-start"
+    command.perform "doc:move-to-start-of-line"
+  end
+end)
+local smartmoveforward = smartmove(function(doc, linenr, column, indent, currentline)
+  if column == #currentline then
+    command.perform "doc:move-to-next-block-end"
+  elseif column >= indent then
+    command.perform "doc:move-to-end-of-line"
+  else
+    doc:set_selection(linenr, indent)
+  end
+end)
+local smartselectback = smartmove(function(doc, linenr, column, indent, _, otherlinenr, othercolumn, previousline)
+  if column > indent then
+    doc:set_selection(linenr, indent, otherlinenr, othercolumn)
+  elseif column > 1 then
+    command.perform "doc:select-to-start-of-line"
+  else
+    command.perform "doc:select-to-previous-block-start"
+    command.perform "doc:select-to-start-of-line"
+  end
+end)
+local smartselectforward = smartmove(function(doc, linenr, column, indent, currentline, otherlinenr, othercolumn)
+  if column == #currentline then
+    command.perform "doc:select-to-next-block-end"
+  elseif column >= indent then
+    command.perform "doc:select-to-end-of-line"
+  else
+    doc:set_selection(linenr, indent, otherlinenr, othercolumn)
+  end
+end)
 
 modal.map {
   command = {
@@ -117,34 +165,9 @@ modal.map {
     ["u"] = "doc:move-to-previous-word-start",
     ["o"] = "doc:move-to-next-word-end",
 
-    ["h"] = function()
-      local doc = core.active_view.doc
-      local line, column = doc:get_selection()
-      local _, indent_end = doc.lines[line]:find("^%s*")
-      local previousline = doc.lines[line - 1]
-      indent_end = indent_end + 1
-      if column > indent_end then
-        doc:set_selection(line, indent_end)
-      elseif column > 1 and not (previousline and previousline:match("^%s*$")) then
-        command.perform "doc:move-to-start-of-line"
-      else
-        command.perform "doc:move-to-previous-block-start"
-      end
-    end,
+    ["h"] = smartmoveback,
 
-    [";"] = function()
-      local doc = core.active_view.doc
-      local line, column = doc:get_selection()
-      local _, indent_end = doc.lines[line]:find("^%s*")
-      indent_end = indent_end + 1
-      if column == #doc.lines[line] then
-        command.perform "doc:move-to-next-block-end"
-      elseif column < indent_end then
-        doc:set_selection(line, indent_end)
-      else
-        command.perform "doc:move-to-end-of-line"
-      end
-    end,
+    [";"] = smartmoveforward,
 
     ["g"] = modal.submap {
       ["i"] = "doc:move-to-start-of-doc",
@@ -174,40 +197,30 @@ modal.map {
     ["shift+u"] = "doc:select-to-previous-word-start",
     ["shift+o"] = "doc:select-to-next-word-end",
 
-    ["shift+h"] = function()
-      local doc = core.active_view.doc
-      local line, column, line2, column2 = doc:get_selection()
-      local _, indent_end = doc.lines[line]:find("^%s*")
-      local previousline = doc.lines[line - 1]
-      indent_end = indent_end + 1
-      if column > indent_end then
-        doc:set_selection(line, indent_end, line2, column2)
-      elseif column > 1 and not (previousline and previousline:match("^%s*$")) then
-        command.perform "doc:select-to-start-of-line"
-      else
-        command.perform "doc:select-to-previous-block-start"
-      end
-    end,
+    ["shift+h"] = smartselectback,
 
-    ["shift+;"] = function()
-      local doc = core.active_view.doc
-      local line, column, line2, column2 = doc:get_selection()
-      local _, indent_end = doc.lines[line]:find("^%s*")
-      indent_end = indent_end + 1
-      if column == #doc.lines[line] then
-        command.perform "doc:select-to-next-block-end"
-      elseif column < indent_end then
-        doc:set_selection(line, indent_end, line2, column2)
-      else
-        command.perform "doc:select-to-end-of-line"
-      end
-    end,
+    ["shift+;"] = smartselectforward,
 
     -- editing
-    ["shift+f"] = doall { }, -- TODO
+    ["shift+f"] = function()
+      local doc = core.active_view.doc
+      local linenr = doc:get_selection()
+      local line = doc.lines[linenr]
+      local _, first = line:find("^%s*")
+      first = first + 1
+      doc:set_selection(linenr, first, linenr, #line)
+      modal.mode "insert"()
+    end,
     ["e"] = "doc:delete-to-previous-word-start",
     ["r"] = "doc:delete-to-next-word-end",
-    ["d"] = "doc:delete",
+    ["d"] = function()
+      local doc = core.active_view.doc
+      if doc:has_selection() then
+        command.perform "doc:delete"
+      else
+        command.perform "doc:delete-lines"
+      end
+    end,
     ["y"] = "doc:undo",
     ["shift+y"] = "doc:redo",
     ["x"] = function()
@@ -219,10 +232,15 @@ modal.map {
     end,
     ["c"] = function()
       local doc = core.active_view.doc
+      local line, column
       if not doc:has_selection() then
+        line, column = doc:get_selection()
         command.perform "doc:select-lines"
       end
       command.perform "doc:copy"
+      if line then
+        doc:set_selection(line, column)
+      end
     end,
     ["v"] = "doc:paste",
     ["ctrl+i"] = "doc:move-lines-up",
@@ -237,11 +255,16 @@ modal.map {
     ["ctrl+shift+n"] = "project-search:find-regex",
 
     -- tabs management
-
+    ["alt+h"] = "root:switch-to-left",
+    ["alt+j"] = "root:switch-to-down",
+    ["alt+k"] = "root:switch-to-up",
+    ["alt+l"] = "root:switch-to-right",
 
     -- misc
     ["a"] = "core:find-command",
     ["ctrl+o"] = "core:find-file",
+    ["w"] = "doc:save",
+    ["ctrl+n"] = "core:new-doc",
 
     fallback = commandfallback,
     onenter = function()
