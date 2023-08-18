@@ -26,6 +26,7 @@ config.blink_period = 1.2
 config.line_limit = 120
 config.undo_merge_timeout = 1.0
 config.find_regex = true
+config.message_timeout = 2
 
 ------------------------------ Themes ----------------------------------------
 
@@ -223,8 +224,8 @@ end
 -- load modal keymaps from different module (for code organization)
 core.reload_module("keymap-modal")
 
--- on document save actions
-require "onsave"
+-- on init one-time actions
+require "oninit"
 
 -- Experimental
 

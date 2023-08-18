@@ -116,7 +116,7 @@ modal.map {
     -- editing
     ["o"] = "doc:newline-below",
     ["shift+o"] = "doc:newline-above",
-    ["ctrl+z"] = function()
+    ["z"] = function()
       local doc = core.active_view.doc
       if doc:has_selection() then
         command.perform "doc:delete"
@@ -157,6 +157,7 @@ modal.map {
     -- TODO switches for repeat and toggles (sensitivity, regex) in find view
     ["shift+n"] = "find-replace:previous-find",
     ["shift+/"] = "regex-replace-preview:find-replace-regex",
+    ["ctrl+shift+/"] = "project-search:find-regex",
     fallback = normalfallback,
     onenter = function()
       style.caret = { color "#ff0000" }
