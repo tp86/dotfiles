@@ -204,6 +204,7 @@ modal.map {
     end,
 
     -- editing
+    ["shift+f"] = doall { }, -- TODO
     ["e"] = "doc:delete-to-previous-word-start",
     ["r"] = "doc:delete-to-next-word-end",
     ["d"] = "doc:delete",
