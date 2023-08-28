@@ -223,7 +223,6 @@ end
 
 -- load modal keymaps from different module (for code organization)
 -- core.reload_module("keymap-modal")
-core.reload_module("xah-keymap")
 
 -- on init one-time actions
 require "oninit"
