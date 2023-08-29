@@ -110,6 +110,8 @@ do
     },
     fontconfig = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/fontconfig.lua",
     indent_convert = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/indent_convert.lua",
+    language_java = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/language_java.lua",
+    language_yaml = raw "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/language_yaml.lua",
     lfautoinsert = raw {
       "https://raw.githubusercontent.com/lite-xl/lite-xl-plugins/master/plugins/lfautoinsert.lua",
       patch = "lfautoinsert.patch",

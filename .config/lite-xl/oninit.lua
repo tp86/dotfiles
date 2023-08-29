@@ -38,6 +38,7 @@ function command.perform(name, ...)
       local commandlogfile = io.open(USERDIR .. PATHSEP .. "command.log", "a")
       if commandlogfile then
         commandlogfile:write(("%s: %s\n"):format(time, name))
+        commandlogfile:flush()
         commandlogfile:close()
       end
     end)
