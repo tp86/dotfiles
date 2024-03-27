@@ -1,0 +1,15 @@
+short_path() {
+  echo "$PWD" | sed "s:^$HOME:~:" | sed -E "s:(/?\.?.)[^/]*/:\1/:g"
+}
+
+git_status() {
+  [[ -z $(git status --porcelain 2> /dev/null) ]] || echo "*"
+}
+
+git_branch() {
+    if [ $(pwd) != $HOME ]; then
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/($(git_status)\1)/"
+    fi
+}
+
+PS1='\e[1m\e[32m\u\e[0m \e[2m@\e[22m \e[1m\e[34m$(short_path) \e[91m$(git_branch)\e[0m\n\\$ '
