@@ -17,3 +17,4 @@
 .config/lite-xl/ltreesitter.so
 .config/lite-xl/fonts/
 .config/awesome/wallpaper
+.textadept/session*

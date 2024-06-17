@@ -12,3 +12,5 @@ events.connect(events.LEXER_LOADED, function(name)
 end)
 
 textadept.editing.strip_trailing_spaces = true
+
+require('keymap')
