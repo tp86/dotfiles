@@ -39,9 +39,11 @@ events.connect(events.LEXER_LOADED, function(lexer_name)
   local module_name = 'lang.' .. lexer_name
   local found = package.searchpath(module_name, package.path)
   if found then
+  
     local loader, err = loadfile(found)
     if loader then
       with({enter = set_buffer_proxy, exit = unset_buffer_proxy}, loader)
     else print(err) end
   end
 end)
+  

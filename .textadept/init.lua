@@ -14,6 +14,7 @@ events.connect(events.INITIALIZED, function()
 end)
 --]]
 
+
 if not CURSES then
   view:set_theme('light', { font = 'Hack', size = 14 })
 end
@@ -26,3 +27,4 @@ textadept.editing.strip_trailing_spaces = true
 require('custom.keys')
 require('custom.ui')
 require('custom.lang')
+  

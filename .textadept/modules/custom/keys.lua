@@ -32,11 +32,11 @@ local function connect_all(event_names, handler)
   end
 end
 
-local set_mode = helpers.defer(function(mode_name)
+local set_mode = function(mode_name)
   keys.mode = mode_name
   events.emit(KEYMODE_CHANGED, mode_name)
-end)
-local set_default_mode = set_mode 'command_mode'
+end
+local set_default_mode = helpers.defer(set_mode, 'command_mode')
 
 connect_all({
     events.INITIALIZED,
@@ -53,7 +53,6 @@ end)
 
 local function open_line_below()
   -- TODO smart indent
-  -- TODO fix undo (as single operation)
   -- TODO stay on the same column
   buffer:line_end()
   buffer:new_line()
@@ -68,9 +67,16 @@ local function open_line_above()
   buffer:line_down()
 end
 
+local function single_action(action)
+  return helpers.defer(helpers.with, {
+    enter=helpers.method(buffer, 'begin_undo_action'),
+    exit=helpers.method(buffer, 'end_undo_action'),
+  }, action)
+end
+
 keys.command_mode = setmetatable({
   -- modes
-  ['f'] = set_mode 'insert_mode',
+  ['f'] = helpers.defer(set_mode, 'insert_mode'),
 
   -- movements
   ['i'] = view.line_up,
@@ -97,12 +103,15 @@ keys.command_mode = setmetatable({
   ['u'] = view.word_left,
   ['o'] = view.word_right,
 
+  -- TODO which-key/helix/kakoune-like helper menu
   ['h'] = {
     ['h'] = ui.find.focus,
     ['d'] = ui.switch_buffer,
     ['f'] = io.quick_open,
     ['o'] = io.open_file,
   },
+
+  -- TODO selections (permanent/toggle select mode)
 
   -- changes
   ['r'] = buffer.undo,
@@ -113,20 +122,20 @@ keys.command_mode = setmetatable({
     buffer.clear()
   end,
   ['s'] = buffer.paste_reindent,
-  ['a'] = function() -- open a new line below
+  ['a'] = single_action(function() -- open a new line below
     open_line_below()
     buffer:line_down()
-    set_mode('insert_mode')()
-  end,
-  ['A'] = function()
+    set_mode('insert_mode')
+  end),
+  ['A'] = single_action(function()
     open_line_above()
     buffer:line_up()
-    set_mode('insert_mode')()
-  end,
-  ['alt+a'] = open_line_below,
-  ['alt+A'] = open_line_above,
+    set_mode('insert_mode')
+  end),
+  ['alt+a'] = single_action(open_line_below),
+  ['alt+A'] = single_action(open_line_above),
 
-  [';'] = helpers.apply(ui.command_entry.run, ':'),
+  [';'] = helpers.defer(ui.command_entry.run, ':'),
 
   [' '] = {
     ['r'] = function()
@@ -134,11 +143,12 @@ keys.command_mode = setmetatable({
       reset()
     end,
     ['s'] = buffer.save,
+    ['t'] = helpers.defer(os.spawn, "exo-open --launch TerminalEmulator", io.get_project_root())
   },
 }, nop_mt) -- do not propagate unknown keys
 
 keys.insert_mode = {
-  ['esc'] = set_mode 'command_mode',
+  ['esc'] = helpers.defer(set_mode, 'command_mode'),
 }
 
 -- prevent handling keycodes sent with AltGr in command mode
@@ -147,3 +157,5 @@ events.connect(events.KEY, function(code, modifiers)
     return true
   end
 end)
+
+
