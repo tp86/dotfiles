@@ -51,6 +51,23 @@ events.connect(command_entry.events.FOCUS, function(active)
   end
 end)
 
+local function open_line_below()
+  -- TODO smart indent
+  -- TODO fix undo (as single operation)
+  -- TODO stay on the same column
+  buffer:line_end()
+  buffer:new_line()
+  buffer:line_up()
+end
+
+local function open_line_above()
+  local line = buffer:line_from_position(buffer.current_pos)
+  buffer:line_up()
+  if line > 1 then buffer:line_end() end
+  buffer:new_line()
+  buffer:line_down()
+end
+
 keys.command_mode = setmetatable({
   -- modes
   ['f'] = set_mode 'insert_mode',
@@ -64,7 +81,7 @@ keys.command_mode = setmetatable({
   ['K'] = view.stuttered_page_down,
   ['J'] = function()
     local _, col = helpers.get_pos()
-    if col ~= 0 then
+    if col ~= 1 then
       view.vc_home_wrap()
     else
       view.para_up()
@@ -80,10 +97,36 @@ keys.command_mode = setmetatable({
   ['u'] = view.word_left,
   ['o'] = view.word_right,
 
+  ['h'] = {
+    ['h'] = ui.find.focus,
+    ['d'] = ui.switch_buffer,
+    ['f'] = io.quick_open,
+    ['o'] = io.open_file,
+  },
+
   -- changes
+  ['r'] = buffer.undo,
+  ['R'] = buffer.redo,
+  ['d'] = buffer.cut,
+  ['D'] = function()
+    if buffer.selection_empty then return end
+    buffer.clear()
+  end,
+  ['s'] = buffer.paste_reindent,
+  ['a'] = function() -- open a new line below
+    open_line_below()
+    buffer:line_down()
+    set_mode('insert_mode')()
+  end,
+  ['A'] = function()
+    open_line_above()
+    buffer:line_up()
+    set_mode('insert_mode')()
+  end,
+  ['alt+a'] = open_line_below,
+  ['alt+A'] = open_line_above,
 
-
-  ['a'] = helpers.apply(ui.command_entry.run, ':'),
+  [';'] = helpers.apply(ui.command_entry.run, ':'),
 
   [' '] = {
     ['r'] = function()
