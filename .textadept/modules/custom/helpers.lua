@@ -7,13 +7,6 @@ end
 
 local function nop() end
 
-local function get_pos()
-  local pos = buffer.current_pos
-  local line = buffer:line_from_position(pos)
-  local col = buffer.column[pos]
-  return line, col, pos
-end
-
 local function with(ctx, action)
   local ctx_value
   if type(ctx.enter) == 'function' then
@@ -39,7 +32,6 @@ end
 return {
   defer = defer,
   nop = nop,
-  get_pos = get_pos,
   with = with,
   method = method,
 }

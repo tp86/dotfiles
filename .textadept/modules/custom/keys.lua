@@ -86,7 +86,7 @@ keys.command_mode = setmetatable({
   ['I'] = view.stuttered_page_up,
   ['K'] = view.stuttered_page_down,
   ['J'] = function()
-    local _, col = helpers.get_pos()
+    local col = buffer.column[buffer.current_pos]
     if col ~= 1 then
       view.vc_home_wrap()
     else
@@ -94,8 +94,8 @@ keys.command_mode = setmetatable({
     end
   end,
   ['L'] = function()
-    local line, _, pos = helpers.get_pos()
-    if pos == buffer.line_end_position[line] then
+    local pos = buffer.current_pos
+    if pos == buffer.line_end_position[buffer:line_from_position(pos)] then
       view.para_down()
     end
     view.line_end_wrap()
