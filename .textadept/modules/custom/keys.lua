@@ -69,8 +69,8 @@ end
 
 local function single_action(action)
   return helpers.defer(helpers.with, {
-    enter=helpers.method(buffer, 'begin_undo_action'),
-    exit=helpers.method(buffer, 'end_undo_action'),
+    enter=function() buffer:begin_undo_action() end,
+    exit=function() buffer:end_undo_action() end,
   }, action)
 end
 

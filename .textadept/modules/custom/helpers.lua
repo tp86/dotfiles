@@ -23,16 +23,9 @@ local function with(ctx, action)
   end
 end
 
-local function method(obj, name)
-  return function(...)
-    return obj[name](obj, ...)
-  end
-end
-
 return {
   defer = defer,
   nop = nop,
   with = with,
-  method = method,
 }
 
