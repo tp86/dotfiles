@@ -93,6 +93,7 @@ end
 keys.command_mode = setmetatable({
   -- modes
   ['f'] = function() set_mode 'insert_mode' end,
+  ['g'] = function() set_mode 'select_mode' end,
 
   -- movements
   ['i'] = view.line_up,
@@ -126,8 +127,6 @@ keys.command_mode = setmetatable({
     ['f'] = io.quick_open,
     ['o'] = io.open_file,
   },
-
-  -- TODO selections (permanent/toggle select mode)
 
   -- changes
   ['r'] = buffer.undo,
@@ -163,9 +162,20 @@ keys.command_mode = setmetatable({
   },
 }, nop_mt) -- do not propagate unknown keys
 
-keys.insert_mode = {
+keys.insert_mode = setmetatable({
   ['esc'] = set_default_mode,
-}
+}, {
+  __index = function(_, key)
+    if key:match("ctrl") or
+       key:match("alt") or
+       key:match("meta")
+    then return helpers.nop end
+  end,
+})
+
+keys.select_mode = setmetatable({
+  ['esc'] = set_default_mode,
+}, nop_mt)
 
 -- prevent handling keycodes sent with AltGr in command mode
 events.connect(events.KEY, function(code, modifiers)
