@@ -1,10 +1,3 @@
-local function defer(f, ...)
-  local args = table.pack(...)
-  return function()
-    return f(table.unpack(args))
-  end
-end
-
 local function nop() end
 
 local function with(ctx, action)
@@ -24,8 +17,6 @@ local function with(ctx, action)
 end
 
 return {
-  defer = defer,
   nop = nop,
   with = with,
 }
-

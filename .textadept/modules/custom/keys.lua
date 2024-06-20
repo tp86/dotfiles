@@ -1,6 +1,9 @@
+
 local helpers = require('custom.helpers')
 local nop_mt = {
-  __index = helpers.defer(helpers.nop),
+  __index = function()
+    return helpers.nop
+  end,
 }
 
 local KEYMODE_CHANGED = {}
@@ -36,13 +39,13 @@ local set_mode = function(mode_name)
   keys.mode = mode_name
   events.emit(KEYMODE_CHANGED, mode_name)
 end
-local set_default_mode = helpers.defer(set_mode, 'command_mode')
+local set_default_mode = function() set_mode 'command_mode' end
 
 connect_all({
-    events.INITIALIZED,
-    events.VIEW_AFTER_SWITCH,
-    events.BUFFER_AFTER_SWITCH,
-  }, set_default_mode)
+  events.INITIALIZED,
+  events.VIEW_AFTER_SWITCH,
+  events.BUFFER_AFTER_SWITCH,
+}, set_default_mode)
 
 local command_entry = require("custom.command_entry")
 events.connect(command_entry.events.FOCUS, function(active)
@@ -51,32 +54,45 @@ events.connect(command_entry.events.FOCUS, function(active)
   end
 end)
 
+local eols = {
+  [buffer.EOL_LF] = '\n',
+  [buffer.EOL_CRLF] = '\r\n',
+  [buffer.EOL_CR] = '\r',
+}
+
 local function open_line_below()
   -- TODO smart indent
-  -- TODO stay on the same column
-  buffer:line_end()
-  buffer:new_line()
-  buffer:line_up()
+  local pos = buffer.current_pos
+  local eol_pos = buffer.line_end_position[buffer:line_from_position(pos)]
+  buffer:insert_text(eol_pos, eols[buffer.eol_mode])
+  buffer:goto_pos(pos)
 end
 
 local function open_line_above()
-  local line = buffer:line_from_position(buffer.current_pos)
-  buffer:line_up()
-  if line > 1 then buffer:line_end() end
-  buffer:new_line()
-  buffer:line_down()
+  local pos = buffer.current_pos
+  local line = buffer:line_from_position(pos)
+  local start_pos = buffer:find_column(line, 1)
+  local eol = eols[buffer.eol_mode]
+  buffer:insert_text(start_pos, eol)
+  buffer:goto_pos(pos + #eol)
 end
 
 local function single_action(action)
-  return helpers.defer(helpers.with, {
-    enter=function() buffer:begin_undo_action() end,
-    exit=function() buffer:end_undo_action() end,
-  }, action)
+  return function()
+    return helpers.with({
+      enter = function()
+        buffer:begin_undo_action()
+      end,
+      exit = function()
+        buffer:end_undo_action()
+      end,
+    }, action)
+  end
 end
 
 keys.command_mode = setmetatable({
   -- modes
-  ['f'] = helpers.defer(set_mode, 'insert_mode'),
+  ['f'] = function() set_mode 'insert_mode' end,
 
   -- movements
   ['i'] = view.line_up,
@@ -121,7 +137,7 @@ keys.command_mode = setmetatable({
     if buffer.selection_empty then return end
     buffer.clear()
   end,
-  ['s'] = buffer.paste_reindent,
+  ['s'] = textadept.editing.paste_reindent,
   ['a'] = single_action(function() -- open a new line below
     open_line_below()
     buffer:line_down()
@@ -132,10 +148,10 @@ keys.command_mode = setmetatable({
     buffer:line_up()
     set_mode('insert_mode')
   end),
-  ['alt+a'] = single_action(open_line_below),
-  ['alt+A'] = single_action(open_line_above),
+  ['ctrl+a'] = single_action(open_line_below),
+  ['ctrl+A'] = single_action(open_line_above),
 
-  [';'] = helpers.defer(ui.command_entry.run, ':'),
+  [';'] = function() ui.command_entry.run(':') end,
 
   [' '] = {
     ['r'] = function()
@@ -143,12 +159,12 @@ keys.command_mode = setmetatable({
       reset()
     end,
     ['s'] = buffer.save,
-    ['t'] = helpers.defer(os.spawn, "exo-open --launch TerminalEmulator", io.get_project_root())
+    ['t'] = function() os.spawn("exo-open --launch TerminalEmulator", io.get_project_root()) end,
   },
 }, nop_mt) -- do not propagate unknown keys
 
 keys.insert_mode = {
-  ['esc'] = helpers.defer(set_mode, 'command_mode'),
+  ['esc'] = set_default_mode,
 }
 
 -- prevent handling keycodes sent with AltGr in command mode
@@ -157,5 +173,3 @@ events.connect(events.KEY, function(code, modifiers)
     return true
   end
 end)
-
-
