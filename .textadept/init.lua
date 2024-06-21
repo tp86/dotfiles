@@ -21,10 +21,15 @@ end
 
 buffer.use_tabs = false
 buffer.tab_width = 2
+view.h_scroll_bar = false
+view.v_scroll_bar = false
+local policy = view.CARET_STRICT | view.CARET_SLOP| view.CARET_EVEN
+local char_width = view:text_width(view.STYLE_DEFAULT, ' ')
+view:set_x_caret_policy(policy, math.floor(10.5 * char_width))
+view:set_y_caret_policy(policy, 4)
 
 textadept.editing.strip_trailing_spaces = true
 
 require('custom.keys')
 require('custom.ui')
 require('custom.lang')
-  
