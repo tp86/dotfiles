@@ -1,0 +1,12 @@
+{
+  "Lua": {
+    "runtime": {
+      "version": "Lua 5.4"
+    },
+    "diagnostics": {
+      "globals": [
+        "lfs"
+      ]
+    }
+  }
+}
