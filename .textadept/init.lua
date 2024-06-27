@@ -17,7 +17,17 @@ end)
 --]]
 
 if not CURSES then
-  view:set_theme('light', { font = 'Hack', size = 14 })
+  local function set_theme()
+    local hour = os.date('*t').hour
+    local theme = 'light'
+    if hour < 8 or hour >= 19 then
+      theme = 'dark'
+    end
+    view:set_theme(theme, { font = 'Hack', size = 14 })
+    return true
+  end
+  set_theme()
+  timeout(30*60, set_theme)
 end
 
 buffer.use_tabs = false

@@ -6,6 +6,7 @@ local DIR = {
 }
 local TYPE = {
   CHAR = 'char',
+  CHAR_LINE = 'char_line',
   WORD = 'word',
   VISIT = 'visit',
 }
@@ -52,13 +53,17 @@ M.selection = setmetatable({}, {
   __newindex = function() end,
 })
 
-local function no_extend_char_move(direction, base_func_name)
+local function no_extend_char_move(direction, base_func_name, line)
   return function()
     set_selection_direction(direction)
-    if selection.type == TYPE.CHAR and selection.extendable then
+    if (selection.type == TYPE.CHAR or selection.type == TYPE.CHAR_LINE) and selection.extendable then
       buffer[base_func_name..'_extend'](buffer)
     else
-      set_selection_type(TYPE.CHAR, false)
+      local type = TYPE.CHAR
+      if line then
+        type = TYPE.CHAR_LINE
+      end
+      set_selection_type(type, false)
       buffer[base_func_name](buffer)
     end
   end
@@ -66,8 +71,8 @@ end
 
 M.left = no_extend_char_move(DIR.BACKWARD, 'char_left')
 M.right = no_extend_char_move(DIR.FORWARD, 'char_right')
-M.prev = no_extend_char_move(DIR.BACKWARD, 'line_up')
-M.next = no_extend_char_move(DIR.BACKWARD, 'line_down')
+M.prev = no_extend_char_move(DIR.BACKWARD, 'line_up', true)
+M.next = no_extend_char_move(DIR.FORWARD, 'line_down', true)
 
 local function no_extend_word_move(direction, base_func_name)
   return function()
@@ -86,18 +91,22 @@ end
 M.next_word = no_extend_word_move(DIR.FORWARD, 'word_right_end_extend')
 M.back_word = no_extend_word_move(DIR.BACKWARD, 'word_left_extend')
 
-local function extend_char_move(direction, base_func_name)
+local function extend_char_move(direction, base_func_name, line)
   return function()
     set_selection_direction(direction)
-    set_selection_type(TYPE.CHAR, true)
+    local type = TYPE.CHAR
+    if line then
+      type = TYPE.CHAR_LINE
+    end
+    set_selection_type(type, true)
     buffer[base_func_name](buffer)
   end
 end
 
 M.left_extend = extend_char_move(DIR.BACKWARD, 'char_left_extend')
 M.right_extend = extend_char_move(DIR.FORWARD, 'char_right_extend')
-M.prev_extend = extend_char_move(DIR.BACKWARD, 'line_up_extend')
-M.next_extend = extend_char_move(DIR.FORWARD, 'line_down_extend')
+M.prev_extend = extend_char_move(DIR.BACKWARD, 'line_up_extend', true)
+M.next_extend = extend_char_move(DIR.FORWARD, 'line_down_extend', true)
 
 local CHAR_CLASS = {
   WORD = "word",
@@ -203,6 +212,10 @@ local type_and_dir_to_expansion_func = setmetatable({
     [DIR.BACKWARD] = M.left,
     [DIR.FORWARD] = M.right,
   },
+  [TYPE.CHAR_LINE] = {
+    [DIR.BACKWARD] = M.prev,
+    [DIR.FORWARD] = M.next,
+  },
   [TYPE.WORD] = {
     [DIR.BACKWARD] = M.back_word,
     [DIR.FORWARD] = M.next_word,
@@ -221,10 +234,18 @@ end
 local last_search_text = ""
 
 local function search()
-  ui.print_silent(last_search_text)
+  -- TODO search in selections if not empty
+  ui.print_silent('search', last_search_text)
+  -- remember current selection start
+  local sel_start = buffer.selection_n_start[buffer.main_selection]
+  -- set selection start to be caret position for search_anchor to work correctly
+  buffer.selection_n_start[buffer.main_selection] = buffer.current_pos
   buffer:search_anchor()
+  -- restore current selection start
+  buffer.selection_n_start[buffer.main_selection] = sel_start
   if selection.direction == DIR.FORWARD then
     buffer:search_next(buffer.FIND_REGEXP, last_search_text)
+    direct_selections(selection.direction)
   else
     buffer:search_prev(buffer.FIND_REGEXP, last_search_text)
   end
@@ -242,7 +263,6 @@ function M.visit()
 end
 
 local function escape_regex(text)
-  ui.print_silent(text)
   local escaped = {}
   for char in text:gmatch('.') do
     if char == '[' then
@@ -263,8 +283,7 @@ function M.search()
     local search_flags = buffer.search_flags
     buffer.search_flags = buffer.FIND_REGEXP
     -- search for main selection text
-    -- XXX debug
-    if buffer:search_in_target(last_search_text) < 0 then
+    if last_search_text == "" or buffer:search_in_target(last_search_text) < 0 then
       last_search_text = escape_regex(buffer:text_range(buffer.target_start, buffer.target_end))
     end
     -- restore search flags
