@@ -11,6 +11,7 @@ local TYPE = {
   CHAR_LINE = 'char_line',
   WORD = 'word',
   VISIT = 'visit',
+  LINE = 'line',
 }
 
 -- default selection
@@ -31,12 +32,6 @@ local function set_selection_direction(direction)
   selection.direction = direction or selection.direction
 end
 
-local function empty_selections()
-  for n = 1, buffer.selections do
-    buffer.selection_n_anchor[n] = buffer.selection_n_caret[n]
-  end
-end
-
 local function direct_selections(direction)
   for n = 1, buffer.selections do
     local anchor, caret = buffer.selection_n_anchor[n], buffer.selection_n_caret[n]
@@ -49,6 +44,12 @@ local function direct_selections(direction)
 end
 
 local M = {}
+
+function M.empty_selections()
+  for n = 1, buffer.selections do
+    buffer.selection_n_anchor[n] = buffer.selection_n_caret[n]
+  end
+end
 
 M.selection = setmetatable({}, {
   __index = selection,
@@ -84,7 +85,7 @@ local function no_extend_word_move(direction, base_func_name)
       buffer[base_func_name](buffer)
     else
       set_selection_type(TYPE.WORD, false)
-      empty_selections()
+      M.empty_selections()
       buffer[base_func_name](buffer)
     end
   end
@@ -221,7 +222,11 @@ local type_and_dir_to_expansion_func = setmetatable({
   [TYPE.WORD] = {
     [DIR.BACKWARD] = M.back_word,
     [DIR.FORWARD] = M.next_word,
-  }
+  },
+  [TYPE.LINE] = {
+    [DIR.BACKWARD] = function() M.line() end,
+    [DIR.FORWARD] = function() M.line() end,
+  },
 }, {
   __index = function() end,
 })
@@ -236,7 +241,7 @@ end
 local last_search_text = ""
 
 local function simple_search()
-  ui.print_silent('search', last_search_text)
+  -- TODO rewrite to search in target instead and to wrap around
   -- remember current selection start
   local sel_start = buffer.selection_n_start[buffer.main_selection]
   -- set selection start to be caret position for search_anchor to work correctly
@@ -246,17 +251,17 @@ local function simple_search()
   buffer.selection_n_start[buffer.main_selection] = sel_start
   if selection.direction == DIR.FORWARD then
     buffer:search_next(buffer.FIND_REGEXP, last_search_text)
-    direct_selections(selection.direction)
   else
     buffer:search_prev(buffer.FIND_REGEXP, last_search_text)
   end
+  direct_selections(selection.direction)
   view:scroll_caret()
 end
 
 local function search_in_selections()
   -- remember all selections
   local selections = {}
-  for n = 1, buffer.selections  do
+  for n = 1, buffer.selections do
     selections[n] = {
       buffer.selection_n_start[n],
       buffer.selection_n_end[n],
@@ -266,6 +271,9 @@ local function search_in_selections()
     buffer.selection_n_start[buffer.main_selection],
     buffer.selection_n_end[buffer.main_selection],
   }
+  -- remember search_flags
+  local search_flags = buffer.search_flags
+  buffer.search_flags = buffer.FIND_REGEXP
   -- perform search in each selection
   local matches = {}
   for _, selection in ipairs(selections) do
@@ -283,7 +291,8 @@ local function search_in_selections()
       })
     end
   end
-  ui.print_silent(#matches)
+  -- restore search flags
+  buffer.search_flags = search_flags
   -- select all matches
   if matches[1] then
     buffer:set_selection(matches[1][2], matches[1][1])
@@ -305,10 +314,10 @@ local function search_in_selections()
     end
   end
   if closest_match then
-    ui.print_silent(closest_match)
     buffer.main_selection = closest_match
   end
   direct_selections(selection.direction)
+  view:scroll_caret()
 end
 
 local function on_visit(text)
@@ -371,6 +380,56 @@ function M.search()
   simple_search()
 end
 
+function M.line()
+  -- select lines forward unless type is LINE and direction is BACKWARD
+  if not (selection.type == TYPE.LINE and selection.direction == DIR.BACKWARD)
+  then
+    set_selection_direction(DIR.FORWARD)
+  end
+  set_selection_type(TYPE.LINE, true)
+  local selections_lines = {}
+  local select_whole_line
+  for n = 1, buffer.selections do
+    local selection_lines = {}
+    local sel_start, sel_end = buffer.selection_n_start[n], buffer.selection_n_end[n]
+    local sel_start_line, sel_end_line = buffer:line_from_position(sel_start), buffer:line_from_position(sel_end)
+    local sel_start_line_start, sel_end_line_end = buffer:position_from_line(sel_start_line), buffer.line_end_position[sel_end_line]
+    selection_lines = {
+      sel_start = sel_start,
+      sel_end = sel_end,
+      start_line = sel_start_line,
+      end_line = sel_end_line,
+      line_start = sel_start_line_start,
+      line_end = sel_end_line_end,
+    }
+    if sel_start > sel_start_line_start or sel_end < sel_end_line_end then
+      select_whole_line = true
+      selection_lines.select_whole = true
+    end
+    selections_lines[n] = selection_lines
+  end
+  if select_whole_line then
+    for n = 1, buffer.selections do
+      local selection_lines = selections_lines[n]
+      if selection_lines.select_whole then
+        buffer.selection_n_start[n] = selection_lines.line_start
+        buffer.selection_n_end[n] = selection_lines.line_end
+      end
+    end
+  else
+    for n = 1, buffer.selections do
+      local selection_lines = selections_lines[n]
+      if selection.direction == DIR.FORWARD then
+        buffer.selection_n_end[n] = buffer.line_end_position[selection_lines.end_line+1]
+      else
+        buffer.selection_n_start[n] = buffer:position_from_line(selection_lines.start_line-1)
+        buffer.selection_n_end[n] = selection_lines.sel_end -- ensure that selection end stay the same
+      end
+    end
+  end
+  direct_selections(selection.direction)
+end
+
 -- keys for testing
 keys['alt+i'] = M.prev
 keys['alt+I'] = M.prev_extend
@@ -397,5 +456,13 @@ keys['alt+9'] = function() M.expand_n(9) end
 keys['alt+-'] = M.reverse_direction
 keys['alt+/'] = M.visit
 keys['alt+n'] = M.search
+keys['alt+x'] = M.line
+keys['alt+;'] = function()
+  if buffer.selection_empty then
+    buffer:set_selection(buffer.current_pos, buffer.current_pos)
+  else
+    M.empty_selections()
+  end
+end
 
 return M
