@@ -12,6 +12,7 @@ local TYPE = {
   WORD = 'word',
   VISIT = 'visit',
   LINE = 'line',
+  BLOCK = 'block',
 }
 
 -- default selection
@@ -49,6 +50,7 @@ function M.empty_selections()
   for n = 1, buffer.selections do
     buffer.selection_n_anchor[n] = buffer.selection_n_caret[n]
   end
+  set_selection_type(selection.type, false)
 end
 
 M.selection = setmetatable({}, {
@@ -226,6 +228,10 @@ local type_and_dir_to_expansion_func = setmetatable({
   [TYPE.LINE] = {
     [DIR.BACKWARD] = function() M.line() end,
     [DIR.FORWARD] = function() M.line() end,
+  },
+  [TYPE.BLOCK] = {
+    [DIR.BACKWARD] = function() M.block() end,
+    [DIR.FORWARD] = function() M.block() end,
   },
 }, {
   __index = function() end,
@@ -426,6 +432,16 @@ function M.line()
         buffer.selection_n_end[n] = selection_lines.sel_end -- ensure that selection end stay the same
       end
     end
+  end
+  direct_selections(selection.direction)
+end
+
+-- TODO select between matching autopairs handling nested matches
+-- for each selection, find closest matching pair that encloses whole selection
+function M.block()
+  set_selection_type(TYPE.BLOCK, true)
+  for n = 1, buffer.selections do
+
   end
   direct_selections(selection.direction)
 end

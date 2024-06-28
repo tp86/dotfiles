@@ -39,6 +39,9 @@ local char_width = view:text_width(view.STYLE_DEFAULT, ' ')
 view:set_x_caret_policy(policy, math.floor(10.5 * char_width))
 view:set_y_caret_policy(policy, 4)
 view.caret_width = 2
+view.view_eol = true
+view.representation['\n'] = '⤶'
+view.representation_appearance['\n'] = view.REPRESENTATION_PLAIN
 
 textadept.editing.strip_trailing_spaces = true
 
