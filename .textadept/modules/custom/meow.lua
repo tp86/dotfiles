@@ -1,5 +1,7 @@
 -- inspired by https://github.com/meow-edit/meow
 
+-- TODO refactor
+
 local DIR = {
   FORWARD = 'forward',
   BACKWARD = 'backward',
@@ -233,8 +235,7 @@ end
 
 local last_search_text = ""
 
-local function search()
-  -- TODO search in selections if not empty
+local function simple_search()
   ui.print_silent('search', last_search_text)
   -- remember current selection start
   local sel_start = buffer.selection_n_start[buffer.main_selection]
@@ -252,9 +253,71 @@ local function search()
   view:scroll_caret()
 end
 
+local function search_in_selections()
+  -- remember all selections
+  local selections = {}
+  for n = 1, buffer.selections  do
+    selections[n] = {
+      buffer.selection_n_start[n],
+      buffer.selection_n_end[n],
+    }
+  end
+  local main_selection = {
+    buffer.selection_n_start[buffer.main_selection],
+    buffer.selection_n_end[buffer.main_selection],
+  }
+  -- perform search in each selection
+  local matches = {}
+  for _, selection in ipairs(selections) do
+    local target_start, target_end = selection[1], selection[2]
+    while true do
+      buffer:set_target_range(target_start, target_end)
+      if buffer:search_in_target(last_search_text) < 0 then break end
+      -- search_in_target sets target range, use new values in next search
+      target_start = buffer.target_end -- search for next occurence after found one
+      target_end = selection[2] -- search until end of selection
+      -- remember match
+      table.insert(matches, {
+        buffer.target_start,
+        buffer.target_end,
+      })
+    end
+  end
+  ui.print_silent(#matches)
+  -- select all matches
+  if matches[1] then
+    buffer:set_selection(matches[1][2], matches[1][1])
+  end
+  for n = 2, #matches do
+    local match = matches[n]
+    buffer:add_selection(match[2], match[1])
+  end
+  -- find match closest to original main selection
+  -- TODO prefer matches in main selection
+  -- TODO take selection.direction into account
+  local distance = math.huge
+  local closest_match
+  for n, match in ipairs(matches) do
+    local match_distance = math.abs(match[1] - main_selection[1])
+    if match_distance < distance then
+      distance = match_distance
+      closest_match = n
+    end
+  end
+  if closest_match then
+    ui.print_silent(closest_match)
+    buffer.main_selection = closest_match
+  end
+  direct_selections(selection.direction)
+end
+
 local function on_visit(text)
   last_search_text = text
-  search()
+  if buffer.selection_empty then
+    simple_search()
+  else
+    search_in_selections()
+  end
 end
 
 function M.visit()
@@ -262,10 +325,26 @@ function M.visit()
   ui.command_entry.run('/', on_visit)
 end
 
+local regex_magic_chars = {
+  ['.'] = true,
+  ['['] = true,
+  [']'] = true,
+  ['\\'] = true,
+  ['*'] = true,
+  ['+'] = true,
+  ['?'] = true,
+  ['{'] = true,
+  ['}'] = true,
+  ['|'] = true,
+  ['^'] = true,
+  ['$'] = true,
+  ['('] = true,
+  [')'] = true,
+}
 local function escape_regex(text)
   local escaped = {}
   for char in text:gmatch('.') do
-    if char == '[' then
+    if regex_magic_chars[char] then
       table.insert(escaped, '\\')
     end
     table.insert(escaped, char)
@@ -289,7 +368,7 @@ function M.search()
     -- restore search flags
     buffer.search_flags = search_flags
   end
-  search()
+  simple_search()
 end
 
 -- keys for testing
