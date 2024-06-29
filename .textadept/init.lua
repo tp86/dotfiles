@@ -45,8 +45,11 @@ for _, event_name in ipairs{events.INITIALIZED, events.VIEW_NEW} do
     view.view_eol = true
     view.representation['\n'] = '⤶'
     view.representation_appearance['\n'] = view.REPRESENTATION_PLAIN
-    view.representation_color['\n'] = view.styles[view.STYLE_INDENTGUIDE].fore
+    if not CURSES then
+      view.representation_color['\n'] = view.styles[view.STYLE_INDENTGUIDE].fore
+    end
   end)
+
 end
 
 textadept.editing.strip_trailing_spaces = true
