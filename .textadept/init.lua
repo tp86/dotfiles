@@ -39,18 +39,19 @@ local char_width = view:text_width(view.STYLE_DEFAULT, ' ')
 view:set_x_caret_policy(policy, math.floor(10.5 * char_width))
 view:set_y_caret_policy(policy, 4)
 view.caret_width = 2
--- for some reason, just setting following does not work
-for _, event_name in ipairs{events.INITIALIZED, events.VIEW_NEW} do
+-- for some reason, just setting representation does not work
+for _, event_name in ipairs{events.INITIALIZED, events.BUFFER_AFTER_SWITCH, events.BUFFER_NEW, events.VIEW_NEW} do
   events.connect(event_name, function()
-    view.view_eol = true
     view.representation['\n'] = '⤶'
     view.representation_appearance['\n'] = view.REPRESENTATION_PLAIN
-    if not CURSES then
+    if not CURSES and view.styles then
       view.representation_color['\n'] = view.styles[view.STYLE_INDENTGUIDE].fore
     end
+    view.view_eol = true
   end)
-
 end
+
+view.indentation_guides = view.IV_NONE
 
 textadept.editing.strip_trailing_spaces = true
 

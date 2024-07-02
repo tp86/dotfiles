@@ -459,7 +459,6 @@ keys['alt+o'] = M.next_word
 keys['alt+O'] = M.mark_right_word
 keys['alt+u'] = M.back_word
 keys['alt+U'] = M.mark_left_word
-keys['alt+0'] = function() M.expand_n(0) end
 keys['alt+1'] = function() M.expand_n(1) end
 keys['alt+2'] = function() M.expand_n(2) end
 keys['alt+3'] = function() M.expand_n(3) end
