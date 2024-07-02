@@ -23,7 +23,9 @@ if not CURSES then
     if hour < 8 or hour >= 19 then
       theme = 'dark'
     end
-    view:set_theme(theme, { font = 'Hack', size = 14 })
+    for _, view in ipairs(_VIEWS) do
+      view:set_theme(theme, { font = 'Hack', size = 14 })
+    end
     return true
   end
   set_theme()
