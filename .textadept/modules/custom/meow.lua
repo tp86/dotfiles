@@ -1,3 +1,6 @@
+-- "
+-- "
+
 -- inspired by https://github.com/meow-edit/meow
 
 -- TODO refactor
@@ -442,25 +445,25 @@ function M.in_block()
   set_selection_type(TYPE.BLOCK, false)
   for n = 1, buffer.selections do
     -- based on textadept.editing.select_enclosed
-    -- get the caret position
     local caret = buffer.selection_n_caret[n]
+    local caret_style = buffer.style_at[caret]
+    local style_changed
     local pos = caret - 1
     while pos >= 1 do
       local char = string.char(buffer.char_at[pos])
+      local pos_style = buffer.style_at[pos]
+      style_changed = style_changed or (
+        not buffer:name_of_style(pos_style):match('^whitespace')
+        and pos_style ~= caret_style)
       local match_char = textadept.editing.auto_pairs[char]
       if match_char then
         local match_pos = buffer:brace_match(pos, 0)
         if match_pos < 0 then -- handle non-braces pairs
-          if buffer.style_at[pos] == buffer.style_at[caret] then
+          if not style_changed then
             buffer.search_flags = 0
             buffer:set_target_range(pos + 1, buffer.length + 1)
             match_pos = buffer:search_in_target(match_char)
             -- TODO handle escaped string characters
-            -- TODO handle string delimiters in non-continuous comments
-            -- TODO handle comments?
-            -- (
-            local x
-            -- )
           end
         end
         if match_pos >= caret then
@@ -474,6 +477,8 @@ function M.in_block()
   end
   direct_selections(selection.direction)
 end
+
+-- TODO go to closest beginning/end of block in current selection direction
 
 -- keys for testing
 keys['alt+i'] = M.prev
