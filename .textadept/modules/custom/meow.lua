@@ -437,11 +437,40 @@ function M.line()
 end
 
 -- TODO select between matching autopairs handling nested matches
--- for each selection, find closest matching pair that encloses whole selection
-function M.block()
-  set_selection_type(TYPE.BLOCK, true)
+-- for each selection, find closest matching pair that encloses selection's caret
+function M.in_block()
+  set_selection_type(TYPE.BLOCK, false)
   for n = 1, buffer.selections do
-
+    -- based on textadept.editing.select_enclosed
+    -- get the caret position
+    local caret = buffer.selection_n_caret[n]
+    local pos = caret - 1
+    while pos >= 1 do
+      local char = string.char(buffer.char_at[pos])
+      local match_char = textadept.editing.auto_pairs[char]
+      if match_char then
+        local match_pos = buffer:brace_match(pos, 0)
+        if match_pos < 0 then -- handle non-braces pairs
+          if buffer.style_at[pos] == buffer.style_at[caret] then
+            buffer.search_flags = 0
+            buffer:set_target_range(pos + 1, buffer.length + 1)
+            match_pos = buffer:search_in_target(match_char)
+            -- TODO handle escaped string characters
+            -- TODO handle string delimiters in non-continuous comments
+            -- TODO handle comments?
+            -- (
+            local x
+            -- )
+          end
+        end
+        if match_pos >= caret then
+          buffer.selection_n_start[n] = pos + 1
+          buffer.selection_n_end[n] = match_pos
+          break
+        end
+      end
+      pos = pos - 1
+    end
   end
   direct_selections(selection.direction)
 end
@@ -479,5 +508,6 @@ keys['alt+;'] = function()
     M.empty_selections()
   end
 end
+keys['ctrl+alt+b'] = M.in_block
 
 return M
