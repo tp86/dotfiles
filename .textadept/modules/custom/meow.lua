@@ -1,6 +1,3 @@
--- "
--- "
-
 -- inspired by https://github.com/meow-edit/meow
 
 -- TODO refactor
@@ -34,6 +31,11 @@ end
 
 local function set_selection_direction(direction)
   selection.direction = direction or selection.direction
+end
+
+local function set_default_selection()
+  set_selection_type(TYPE.CHAR, false)
+  set_selection_direction(DIR.FORWARD)
 end
 
 local function direct_selections(direction)
@@ -442,7 +444,6 @@ end
 -- TODO select between matching autopairs handling nested matches
 -- for each selection, find closest matching pair that encloses selection's caret
 function M.in_block()
-  set_selection_type(TYPE.BLOCK, false)
   for n = 1, buffer.selections do
     -- based on textadept.editing.select_enclosed
     local caret = buffer.selection_n_caret[n]
@@ -467,18 +468,29 @@ function M.in_block()
           end
         end
         if match_pos >= caret then
-          buffer.selection_n_start[n] = pos + 1
-          buffer.selection_n_end[n] = match_pos
+          local anchor = buffer.selection_n_anchor[n]
+          if anchor > match_pos then
+            buffer.selection_n_caret[n] = pos + 1
+          else
+            buffer.selection_n_caret[n] = match_pos
+          end
+          if anchor > pos and anchor <= match_pos then
+            buffer.selection_n_anchor[n] = pos + 1
+          end
           break
         end
       end
       pos = pos - 1
     end
   end
+  set_selection_type(TYPE.BLOCK, true)
   direct_selections(selection.direction)
 end
 
 -- TODO go to closest beginning/end of block in current selection direction
+function M.to_block_start()
+
+end
 
 -- keys for testing
 keys['alt+i'] = M.prev
@@ -509,6 +521,7 @@ keys['alt+x'] = M.line
 keys['alt+;'] = function()
   if buffer.selection_empty then
     buffer:set_selection(buffer.current_pos, buffer.current_pos)
+    set_default_selection()
   else
     M.empty_selections()
   end
