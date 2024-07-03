@@ -26,6 +26,7 @@ if not CURSES then
     for _, view in ipairs(_VIEWS) do
       view:set_theme(theme, { font = 'Hack', size = 14 })
     end
+    ui.command_entry:set_theme(theme, { font = 'Hack', size = 14 })
     return true
   end
   set_theme()
