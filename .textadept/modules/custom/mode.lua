@@ -474,7 +474,7 @@ function M.in_block()
           else
             buffer.selection_n_caret[n] = match_pos
           end
-          if anchor > pos and anchor <= match_pos then
+          if not (selection.type == TYPE.BLOCK and selection.extendable) or (anchor > pos and anchor <= match_pos) then
             buffer.selection_n_anchor[n] = pos + 1
           end
           break
@@ -492,33 +492,7 @@ function M.to_block_start()
 
 end
 
--- keys for testing
-keys['alt+i'] = M.prev
-keys['alt+I'] = M.prev_extend
-keys['alt+k'] = M.next
-keys['alt+K'] = M.next_extend
-keys['alt+j'] = M.left
-keys['alt+J'] = M.left_extend
-keys['alt+l'] = M.right
-keys['alt+L'] = M.right_extend
-keys['alt+o'] = M.next_word
-keys['alt+O'] = M.mark_right_word
-keys['alt+u'] = M.back_word
-keys['alt+U'] = M.mark_left_word
-keys['alt+1'] = function() M.expand_n(1) end
-keys['alt+2'] = function() M.expand_n(2) end
-keys['alt+3'] = function() M.expand_n(3) end
-keys['alt+4'] = function() M.expand_n(4) end
-keys['alt+5'] = function() M.expand_n(5) end
-keys['alt+6'] = function() M.expand_n(6) end
-keys['alt+7'] = function() M.expand_n(7) end
-keys['alt+8'] = function() M.expand_n(8) end
-keys['alt+9'] = function() M.expand_n(9) end
-keys['alt+-'] = M.reverse_direction
-keys['alt+/'] = M.visit
-keys['alt+n'] = M.search
-keys['alt+x'] = M.line
-keys['alt+;'] = function()
+function M.cancel()
   if buffer.selection_empty then
     buffer:set_selection(buffer.current_pos, buffer.current_pos)
     set_default_selection()
@@ -526,6 +500,5 @@ keys['alt+;'] = function()
     M.empty_selections()
   end
 end
-keys['ctrl+alt+b'] = M.in_block
 
 return M

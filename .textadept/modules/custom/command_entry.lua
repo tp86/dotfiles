@@ -1,4 +1,4 @@
-local FOCUS = {}
+local FOCUS = "custom.command_entry.focus"
 
 local focus = ui.command_entry.focus
 ui.command_entry.focus = function()

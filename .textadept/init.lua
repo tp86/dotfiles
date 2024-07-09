@@ -60,13 +60,13 @@ view.indentation_guides = view.IV_NONE
 
 textadept.editing.strip_trailing_spaces = true
 
---[[
 require('custom.keys')
+--[[
 require('custom.ui')
 require('custom.lang')
 --]]
 
-require('custom.meow')
+--require('custom.meow')
 
 --[[
 local lext = require('custom.lua_ext')
