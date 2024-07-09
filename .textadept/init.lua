@@ -18,6 +18,10 @@ end)
 
 local debug = 'debug'
 args.register('-d', '--debug', 0, function() events.emit(debug) end, 'Debug mode')
+events.connect(events.RESET_BEFORE, function(persist)
+  print('before', persist)
+  persist.debug = true
+end)
 
 if not CURSES then
   local function set_theme()
@@ -48,7 +52,7 @@ view:set_x_caret_policy(policy, math.floor(10.5 * char_width))
 view:set_y_caret_policy(policy, 4)
 view.caret_width = 2
 -- for some reason, just setting representation does not work
-for _, event_name in ipairs{events.INITIALIZED, events.BUFFER_AFTER_SWITCH, events.BUFFER_NEW, events.VIEW_NEW} do
+for _, event_name in ipairs{events.BUFFER_AFTER_SWITCH, events.BUFFER_NEW, events.VIEW_NEW} do
   events.connect(event_name, function()
     view.representation['\n'] = '⤶'
     view.representation_appearance['\n'] = view.REPRESENTATION_PLAIN
@@ -63,8 +67,17 @@ view.indentation_guides = view.IV_NONE
 
 textadept.editing.strip_trailing_spaces = true
 
-events.connect(debug, function()
+local function on_debug()
+  print('on debug')
   require('custom.keys')
+end
+events.connect(debug, function()
+  on_debug()
+end)
+events.connect(events.RESET_AFTER, function(persist)
+  print('after', persist)
+  print(package.loaded['custom.keys'])
+  if persist.debug then on_debug() end
 end)
 --[[
 require('custom.ui')

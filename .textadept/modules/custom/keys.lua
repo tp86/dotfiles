@@ -49,6 +49,7 @@ connect_all({
   events.INITIALIZED,
   events.VIEW_AFTER_SWITCH,
   events.BUFFER_AFTER_SWITCH,
+  events.RESET_AFTER,
 }, set_default_mode)
 
 -- prevent handling keycodes sent with AltGr in command mode

@@ -252,19 +252,44 @@ end
 local last_search_text = ""
 
 local function simple_search()
-  -- TODO rewrite to search in target instead and to wrap around
-  -- remember current selection start
-  local sel_start = buffer.selection_n_start[buffer.main_selection]
-  -- set selection start to be caret position for search_anchor to work correctly
-  buffer.selection_n_start[buffer.main_selection] = buffer.current_pos
-  buffer:search_anchor()
-  -- restore current selection start
-  buffer.selection_n_start[buffer.main_selection] = sel_start
+  -- TODO wrap around
+  buffer.search_flags = buffer.FIND_REGEXP
   if selection.direction == DIR.FORWARD then
-    buffer:search_next(buffer.FIND_REGEXP, last_search_text)
+    buffer:set_target_range(buffer.current_pos, buffer.length + 1)
   else
-    buffer:search_prev(buffer.FIND_REGEXP, last_search_text)
+    buffer:set_target_range(buffer.current_pos, 1)
   end
+  local newlines = {
+    ['\\n'] = true,
+  }
+  local split_positions = {}
+  local s, e = 0, 0
+  repeat
+    for eol in pairs(newlines) do
+      s, e = last_search_text:find(eol, s + (e - s))
+      if s then
+        table.insert(split_positions, {s, e})
+        break
+      end
+    end
+  until not s
+  ui.print_silent(#split_positions)
+  if #split_positions > 0 then
+    local lst_s = 1
+    for _, pos in ipairs(split_positions) do
+      if buffer:search_in_target(last_search_text:sub(lst_s, pos[1] - 1)) >= 0 then
+
+      end
+    end
+
+    buffer.search_flags = 0
+    last_search_text = '\n'
+    ui.print_silent('newline found')
+  end
+  if buffer:search_in_target(last_search_text) < 0 then return end
+  local main_selection = buffer.main_selection
+  buffer.selection_n_start[main_selection] = buffer.target_start
+  buffer.selection_n_end[main_selection] = buffer.target_end
   direct_selections(selection.direction)
   view:scroll_caret()
 end
@@ -282,8 +307,6 @@ local function search_in_selections()
     buffer.selection_n_start[buffer.main_selection],
     buffer.selection_n_end[buffer.main_selection],
   }
-  -- remember search_flags
-  local search_flags = buffer.search_flags
   buffer.search_flags = buffer.FIND_REGEXP
   -- perform search in each selection
   local matches = {}
@@ -302,8 +325,6 @@ local function search_in_selections()
       })
     end
   end
-  -- restore search flags
-  buffer.search_flags = search_flags
   -- select all matches
   if matches[1] then
     buffer:set_selection(matches[1][2], matches[1][1])
@@ -378,15 +399,11 @@ function M.search()
   if not buffer.selection_empty then
     -- set target to be main selection
     buffer:target_from_selection()
-    -- remember search_flags
-    local search_flags = buffer.search_flags
     buffer.search_flags = buffer.FIND_REGEXP
     -- search for main selection text
     if last_search_text == "" or buffer:search_in_target(last_search_text) < 0 then
       last_search_text = escape_regex(buffer:text_range(buffer.target_start, buffer.target_end))
     end
-    -- restore search flags
-    buffer.search_flags = search_flags
   end
   simple_search()
 end
