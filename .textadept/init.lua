@@ -16,6 +16,9 @@ events.connect(events.INITIALIZED, function()
 end)
 --]]
 
+local debug = 'debug'
+args.register('-d', '--debug', 0, function() events.emit(debug) end, 'Debug mode')
+
 if not CURSES then
   local function set_theme()
     local hour = os.date('*t').hour
@@ -60,7 +63,9 @@ view.indentation_guides = view.IV_NONE
 
 textadept.editing.strip_trailing_spaces = true
 
-require('custom.keys')
+events.connect(debug, function()
+  require('custom.keys')
+end)
 --[[
 require('custom.ui')
 require('custom.lang')
