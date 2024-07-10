@@ -2,13 +2,9 @@ theme = "boo_berry"
 
 [editor]
 line-number = "relative"
-rulers = [150]
 color-modes = true
-scrolloff = 3
-cursorline = true
-
-[editor.cursor-shape]
-insert = "bar"
+scrolloff = 4
+cursorline = false
 
 [editor.statusline]
 right = ["diagnostics", "position", "position-percentage"]

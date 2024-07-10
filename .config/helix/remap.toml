@@ -1,0 +1,25 @@
+[keys.normal]
+# modes
+f = "insert_mode"
+F = "append_mode"
+a = "command_mode"
+# moving around
+i = "move_visual_line_up"
+k = "move_visual_line_down"
+j = "move_char_left"
+l = "move_char_right"
+o = "move_next_word_start"
+O = "move_next_long_word_start"
+u = "move_prev_word_end"
+U = "move_prev_long_word_end"
+h = "find_next_char"
+"A-h" = "find_till_char"
+H = "find_prev_char"
+"A-H" = "till_prev_char"
+# changes
+r = "undo"
+R = "redo"
+
+[keys.insert]
+esc = "normal_mode"
+
