@@ -1,10 +1,19 @@
-theme = "boo_berry"
+theme = "everforest_dark"
 
 [editor]
 line-number = "relative"
 color-modes = true
-scrolloff = 4
-cursorline = false
 
 [editor.statusline]
-right = ["diagnostics", "position", "position-percentage"]
+left = ["mode", "spinner", "version-control"]
+center = ["file-name", "read-only-indicator", "file-modification-indicator"]
+right = ["diagnostics", "selections", "register", "position", "position-percentage", "file-encoding"]
+
+[editor.lsp]
+display-inlay-hints = true
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.file-picker]
+hidden = false
