@@ -11,9 +11,17 @@ right = ["diagnostics", "selections", "register", "position", "position-percenta
 
 [editor.lsp]
 display-inlay-hints = true
+auto-signature-help = false
 
 [editor.cursor-shape]
 insert = "bar"
 
 [editor.file-picker]
 hidden = false
+
+[keys.normal]
+C-e = [":new", ":insert-output lf --print-selection", ":redraw", "goto_file"]
+A-h = "select_prev_sibling"
+A-j = "shrink_selection"
+A-k = "expand_selection"
+A-l = "select_next_sibling"

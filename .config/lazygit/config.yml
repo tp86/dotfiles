@@ -1,0 +1,13 @@
+customCommands:
+  - key: 'P'
+    description: "Push"
+    context: 'global'
+    loadingText: 'Pushing...'
+    prompts:
+      - type: 'menu'
+        title: 'How to push?'
+        options:
+          - value: 'push'
+          - value: 'push --force'
+          - value: 'push --force-with-lease'
+    command: "git {{index .PromptResponses 0}}"
