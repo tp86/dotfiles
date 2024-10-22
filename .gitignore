@@ -18,3 +18,4 @@
 .config/lite-xl/fonts/
 .config/awesome/wallpaper
 .textadept/session*
+.config/helix/runtime
