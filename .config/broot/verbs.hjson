@@ -34,8 +34,8 @@ verbs: [
     }
 
     {
-        invocation: edit
-        shortcut: e
+        invocation: preview
+        shortcut: pr
         key: tab
         apply_to: text_file
         execution: "tmux send-keys -t $helix_pane :e Space {file} Enter"
