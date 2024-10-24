@@ -23,6 +23,7 @@ hidden = false
 "esc" = ["collapse_selection", "keep_primary_selection"]
 # Tmux+Broot integration
 C-e = ":run-shell-command tmux split-pane -h -e helix_tmux_pane=$TMUX_PANE broot"
+C-x = ":run-shell-command tmux split-pane -h -e EDITOR=\"tmux send-keys -t $TMUX_PANE :e Space \" broot"
 # Tmux+Lazygit integration
 C-g = ":run-shell-command tmux split-pane -e helix_tmux_pane=$TMUX_PANE lazygit"
 A-h = "select_prev_sibling"

@@ -29,17 +29,9 @@ verbs: [
         shortcut: e
         key: enter
         apply_to: text_file
-        external: "sh -c \"if test -n $TMUX -a -n $helix_tmux_pane; then tmux send-keys -t $helix_tmux_pane Escape && tmux send-keys -t $helix_tmux_pane :e Space {file} Enter; fi\""
+        # external: "sh -c \"if test -n $TMUX -a -n $helix_tmux_pane; then tmux send-keys -t $helix_tmux_pane Escape && tmux send-keys -t $helix_tmux_pane :e Space {file} Enter; fi\""
+        execution: "$EDITOR {file}"
         leave_broot: true
-    }
-
-    {
-        invocation: preview
-        shortcut: pr
-        key: tab
-        apply_to: text_file
-        external: "sh -c \"if test -n $TMUX -a -n $helix_tmux_pane; then tmux send-keys -t $helix_tmux_pane Escape && tmux send-keys -t $helix_tmux_pane :e Space {file} Enter; fi\""
-        leave_broot: false
     }
 
     # Example 1: launching `tail -n` on the selected file (leaving broot)
