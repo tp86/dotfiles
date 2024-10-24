@@ -29,7 +29,7 @@ verbs: [
         shortcut: e
         key: enter
         apply_to: text_file
-        execution: "tmux send-keys -t $helix_pane :e Space {file} Enter"
+        external: "sh -c \"if test -n $TMUX -a -n $helix_tmux_pane; then tmux send-keys -t $helix_tmux_pane Escape && tmux send-keys -t $helix_tmux_pane :e Space {file} Enter; fi\""
         leave_broot: true
     }
 
@@ -38,7 +38,7 @@ verbs: [
         shortcut: pr
         key: tab
         apply_to: text_file
-        execution: "tmux send-keys -t $helix_pane :e Space {file} Enter"
+        external: "sh -c \"if test -n $TMUX -a -n $helix_tmux_pane; then tmux send-keys -t $helix_tmux_pane Escape && tmux send-keys -t $helix_tmux_pane :e Space {file} Enter; fi\""
         leave_broot: false
     }
 
