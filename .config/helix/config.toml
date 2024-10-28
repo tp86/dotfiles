@@ -23,8 +23,11 @@ hidden = false
 [keys.normal]
 "esc" = ["collapse_selection", "keep_primary_selection"]
 # Tmux+Broot integration
-C-e = ":run-shell-command tmux split-pane -h -e helix_tmux_pane=$TMUX_PANE broot"
-C-x = ":run-shell-command tmux split-pane -h -e EDITOR=\"tmux send-keys -t $TMUX_PANE :e Space \" broot"
+# C-e = ":run-shell-command tmux split-pane -h -e helix_tmux_pane=$TMUX_PANE broot"
+# C-x = ":run-shell-command tmux split-pane -h -e EDITOR=\"tmux send-keys -t $TMUX_PANE :e Space \" broot"
+# LF (selecting multiple files and browsing file tree) integration
+C-e = ":run-shell-command tmux split-pane -h ~/.config/helix/hxlf"
+C-A-e = [":open ~/.cache/hxlf/selected", "select_all", "split_selection_on_newline", "goto_file", ":open ~/.cache/hxlf/selected", ":buffer-close!"]
 # Tmux+Lazygit integration
 C-g = ":run-shell-command tmux display-popup -E -h 90% -w 90% lazygit"
 A-h = "select_prev_sibling"

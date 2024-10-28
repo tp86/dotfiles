@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p ~/.cache/hxlf
+lf -selection-path ~/.cache/hxlf/selected
