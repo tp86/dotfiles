@@ -1,4 +1,19 @@
 #!/bin/bash
 
+# make sure there is a directory for hxlf selection files
 mkdir -p ~/.cache/hxlf
-lf -selection-path ~/.cache/hxlf/selected
+command="lf -selection-path ~/.cache/hxlf/selected"
+
+# check if running inside Tmux
+if [ -n "$TMUX" ]; then
+  helix_pid=$(echo "$helix_pid" | tr -d ' ')
+  pane_id="$TMUX_PANE"
+  if [ -n "$helix_pid" ]; then
+    # command="${command}_${helix_pid}" TODO
+    command="${command}"
+  fi
+  current_time=$(date +%s)
+  # TODO: get command at tmux split and check if it's still same helix instance (or find pane with helix instance)
+  command="sh -c \"${command} && [ \\\$(stat ~/.cache/hxlf/selected -c %Y) -ge $current_time ] && tmux send-keys -t $pane_id Escape Escape g C-e\""
+  tmux split-pane -h "${command}"
+fi
