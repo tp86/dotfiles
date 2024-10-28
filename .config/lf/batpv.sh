@@ -1,2 +1,2 @@
 #!/bin/sh
-batcat --theme everforest-soft --color always --plain "$@"
+batcat --theme everforest-soft --color always --style=changes "$@"
