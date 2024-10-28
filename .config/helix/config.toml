@@ -26,7 +26,7 @@ hidden = false
 # C-e = ":run-shell-command tmux split-pane -h -e helix_tmux_pane=$TMUX_PANE broot"
 # C-x = ":run-shell-command tmux split-pane -h -e EDITOR=\"tmux send-keys -t $TMUX_PANE :e Space \" broot"
 # Tmux+Lazygit integration
-C-g = ":run-shell-command tmux display-popup -E -h 90% -w 90% lazygit -w $(pwd)"
+C-g = ":run-shell-command tmux display-popup -E -h 90% -w 90% lazygit -w $(git rev-parse --show-toplevel)"
 A-h = "select_prev_sibling"
 A-j = "shrink_selection"
 A-k = "expand_selection"
