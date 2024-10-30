@@ -7,7 +7,6 @@ color-modes = true
 [editor.statusline]
 left = ["mode", "spinner", "version-control"]
 center = ["file-name", "read-only-indicator", "file-modification-indicator"]
-# add language (servers)
 right = ["diagnostics", "selections", "register", "position", "position-percentage", "file-encoding"]
 
 [editor.lsp]
@@ -31,6 +30,7 @@ A-h = "select_prev_sibling"
 A-j = "shrink_selection"
 A-k = "expand_selection"
 A-l = "select_next_sibling"
+
 H = ["select_mode", "extend_char_left"]
 J = ["select_mode", "extend_line_down"]
 K = ["select_mode", "extend_line_up"]
