@@ -6,7 +6,7 @@ color-modes = true
 
 [editor.statusline]
 left = ["mode", "spinner", "version-control"]
-center = ["file-name", "read-only-indicator", "file-modification-indicator"]
+center = ["file-name", "read-only-indicator", "file-modification-indicator", "file-type"]
 right = ["diagnostics", "selections", "register", "position", "position-percentage", "file-encoding"]
 
 [editor.lsp]
@@ -21,20 +21,15 @@ hidden = false
 
 [keys.normal]
 "esc" = ["collapse_selection", "keep_primary_selection"]
-# Tmux+Broot integration
-# C-e = ":run-shell-command tmux split-pane -h -e helix_tmux_pane=$TMUX_PANE broot"
-# C-x = ":run-shell-command tmux split-pane -h -e EDITOR=\"tmux send-keys -t $TMUX_PANE :e Space \" broot"
-# Tmux+Lazygit integration
-C-g = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)"
 A-h = "select_prev_sibling"
 A-j = "shrink_selection"
 A-k = "expand_selection"
 A-l = "select_next_sibling"
-
 H = ["select_mode", "extend_char_left"]
 J = ["select_mode", "extend_line_down"]
 K = ["select_mode", "extend_line_up"]
 L = ["select_mode", "extend_char_right"]
+
 C-j = "join_selections"
 C-A-j = "join_selections_space"
 C-k = "keep_selections"
@@ -73,18 +68,32 @@ k = ["select_mode", "extend_visual_line_up"]
 w = ["select_mode", "extend_to_word"]
 [keys.normal.m]
 M = ["select_mode", "match_brackets"]
-# LF (selecting multiple files and browsing file tree) integration
-[keys.normal.space]
-C-e = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf"
-[keys.normal.g]
-C-e = [":open ~/.cache/hxlf/selected", "select_all", "split_selection_on_newline", "goto_file", ":open ~/.cache/hxlf/selected", ":buffer-close!"]
+
+# integrations with external tools via Tmux
+[keys.normal."C-e"]
+label = "External tools"
+g = { label = "lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
+l = { label = "lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
+A-l = { label = "Open files selected with lf", command = [":open ~/.cache/hxlf/selected", "select_all", "split_selection_on_newline", "goto_file", ":open ~/.cache/hxlf/selected", ":buffer-close!"] }
+# test sticky mode
+[keys.normal."'"]
+h = { label = "Go right with macro", command = ["@h", "no_op"] }
 
 [keys.select]
-"esc" = ["normal_mode", "collapse_selection", "keep_primary_selection"]
-H = "extend_char_left"
-J = "extend_line_down"
-K = "extend_line_up"
-L = "extend_char_right"
+# "esc" = ["normal_mode", "collapse_selection", "keep_primary_selection"]
+A-h = "select_prev_sibling"
+A-j = "shrink_selection"
+A-k = "expand_selection"
+A-l = "select_next_sibling"
+
+h = "extend_char_left"
+j = "extend_line_down"
+k = "extend_line_up"
+l = "extend_char_right"
+H = [ "ensure_selections_forward", "flip_selections", "extend_char_left" ]
+J = [ "ensure_selections_forward", "extend_line_down" ]
+K = [ "ensure_selections_forward", "flip_selections", "extend_line_up" ]
+L = [ "ensure_selections_forward", "extend_char_right" ]
 C-j = "join_selections"
 C-A-j = "join_selections_space"
 C-k = "keep_selections"
