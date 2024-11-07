@@ -15,105 +15,137 @@ auto-signature-help = false
 
 [editor.cursor-shape]
 insert = "bar"
+select = "underline"
 
 [editor.file-picker]
 hidden = false
 
+# TODO remap
+# J - join selections
+# K - keep selections
+# A-o - expand selection
+# A-i - shrink_selection
+# A-I - select_all_children
+# A-u - earlier
+# A-U - later
+# f - find_next_char
+# F - find_prev_char
+# t - till_next_char
+# T - till_prev_char
+# DONE
+# u - undo
+# U - redo
+# o - open_below
+# O - open_above
+# i - insert_mode
+# I - insert_at_line_start
 [keys.normal]
 "esc" = ["collapse_selection", "keep_primary_selection"]
-A-h = "select_prev_sibling"
-A-j = "shrink_selection"
-A-k = "expand_selection"
-A-l = "select_next_sibling"
 H = ["select_mode", "extend_char_left"]
-J = ["select_mode", "extend_line_down"]
-K = ["select_mode", "extend_line_up"]
+J = ["select_mode", "extend_visual_line_down"]
+K = ["select_mode", "extend_visual_line_up"]
 L = ["select_mode", "extend_char_right"]
+A-h = ["ensure_selections_forward", "flip_selections", "move_char_left"]
+A-j = ["ensure_selections_forward", "move_visual_line_down"]
+A-k = ["ensure_selections_forward", "flip_selections", "move_visual_line_up"]
+A-l = ["ensure_selections_forward", "move_char_right"]
+A-H = ["select_mode", "ensure_selections_forward", "flip_selections", "move_char_left"]
+A-J = ["select_mode", "ensure_selections_forward", "move_visual_line_down"]
+A-K = ["select_mode", "ensure_selections_forward", "flip_selections", "move_visual_line_up"]
+A-L = ["select_mode", "ensure_selections_forward", "move_char_right"]
+u = "move_prev_word_start"
+o = "move_next_word_start"
+U = ["select_mode", "extend_prev_word_start"]
+O = ["select_mode", "extend_next_word_start"]
+A-u = "move_prev_long_word_start"
+A-o = "move_next_long_word_start"
+A-U = ["select_mode", "extend_prev_long_word_start"]
+A-O = ["select_mode", "extend_next_long_word_start"]
+e = "undo"
+A-e = "redo"
+E = "no_op"
+A-E = "no_op"
+"ret" = ["save_selection", "open_below"]
+"A-ret" = ["save_selection", "open_above"]
+x = ["select_mode", "extend_line"]
+# A-x = ["select_mode", "extend_visual_line_up", "extend_line"]
+i = { label = "", command = ["select_textobject_inner", "@w*"]}
+I = { label = "", command = ["select_mode", "select_textobject_inner", "@w*"]}
+A-i = ["select_textobject_inner", "select_mode"]
+A-I = ["select_textobject_around", "select_mode"]
+f = ["save_selection", "collapse_selection", "insert_mode", "jump_backward"]
+F = "append_mode"
+A-f = "insert_mode"
+T = "no_op"
+a = "no_op"
+A = "no_op"
 
-C-j = "join_selections"
-C-A-j = "join_selections_space"
-C-k = "keep_selections"
-C-A-k = "remove_selections"
-X = ["select_mode", "extend_line_below"]
-q = "move_prev_word_start"
-Q = ["select_mode", "extend_prev_word_start"]
-b = "replay_macro"
-B = "record_macro"
-w = "@miw*"
-W = "no_op"
-E = ["select_mode", "extend_next_word_end"]
-A-q = "move_prev_long_word_start"
-A-Q = ["select_mode", "extend_prev_long_word_start"]
-A-w = "@miw"
-A-e = "move_next_long_word_end"
-A-E = ["select_mode", "extend_next_long_word_end"]
-F = ["select_mode", "extend_next_char"]
-T = ["select_mode", "extend_till_char"]
-A-f = "find_prev_char"
-A-F = ["select_mode", "extend_prev_char"]
-A-t = "till_prev_char"
-A-T = ["select_mode", "extend_till_prev_char"]
-[keys.normal.G]
-g = ["select_mode", "goto_file_start"]
-e = ["select_mode", "goto_last_line"]
-h = ["select_mode", "goto_line_start"]
-l = ["select_mode", "goto_line_end"]
-s = ["select_mode", "goto_first_nonwhitespace"]
-t = ["select_mode", "goto_window_top"]
-c = ["select_mode", "goto_window_center"]
-b = ["select_mode", "goto_window_bottom"]
-"." = ["select_mode", "goto_last_modification"]
-j = ["select_mode", "extend_visual_line_down"]
-k = ["select_mode", "extend_visual_line_up"]
-w = ["select_mode", "extend_to_word"]
-[keys.normal.m]
-M = ["select_mode", "match_brackets"]
+[keys.normal."A-F"]
+label = "Insert..."
+h = "insert_at_line_start"
+j = "open_below"
+k = "open_above"
+l = "insert_at_line_end"
 
 # integrations with external tools via Tmux
-[keys.normal."C-e"]
+[keys.normal.t]
 label = "External tools"
-g = { label = "lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
-l = { label = "lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
+g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
+l = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
 A-l = { label = "Open files selected with lf", command = [":open ~/.cache/hxlf/selected", "select_all", "split_selection_on_newline", "goto_file", ":open ~/.cache/hxlf/selected", ":buffer-close!"] }
-# test sticky mode
+
+# # test sticky mode
 [keys.normal."'"]
-h = { label = "Go right with macro", command = ["@h", "no_op"] }
+h = { label = "Go left with macro", command = ["move_char_left", "@'"] }
 
 [keys.select]
-# "esc" = ["normal_mode", "collapse_selection", "keep_primary_selection"]
-A-h = "select_prev_sibling"
-A-j = "shrink_selection"
-A-k = "expand_selection"
-A-l = "select_next_sibling"
+H = "extend_char_left"
+J = "extend_visual_line_down"
+K = "extend_visual_line_up"
+L = "extend_char_right"
+A-h = ["ensure_selections_forward", "flip_selections", "extend_char_left"]
+A-j = ["ensure_selections_forward", "extend_visual_line_down"]
+A-k = ["ensure_selections_forward", "flip_selections", "extend_visual_line_up"]
+A-l = ["ensure_selections_forward", "extend_char_right"]
+A-H = ["ensure_selections_forward", "flip_selections", "extend_char_left"]
+A-J = ["ensure_selections_forward", "extend_visual_line_down"]
+A-K = ["ensure_selections_forward", "flip_selections", "extend_visual_line_up"]
+A-L = ["ensure_selections_forward", "extend_char_right"]
+u = "extend_prev_word_start"
+o = "extend_next_word_start"
+U = "extend_prev_word_start"
+O = "extend_next_word_start"
+A-u = "extend_prev_long_word_start"
+A-o = "extend_next_long_word_start"
+A-U = "extend_prev_long_word_start"
+A-O = "extend_next_long_word_start"
+e = "undo"
+A-e = "redo"
+E = "no_op"
+A-E = "no_op"
+"ret" = ["save_selection", "open_below"]
+"A-ret" = ["save_selection", "open_above"]
+# A-x = ["extend_visual_line_up", "extend_line"]
+f = ["save_selection", "collapse_selection", "insert_mode", "jump_backward"]
+F = "append_mode"
+A-f = "insert_mode"
+i = { label = "", command = ["select_textobject_inner", "@w*"]}
+I = { label = "", command = ["select_textobject_inner", "@w*"]}
+A-i = "select_textobject_inner"
+A-I = "select_textobject_around"
+T = "no_op"
+a = "no_op"
+A = "no_op"
 
-h = "extend_char_left"
-j = "extend_line_down"
-k = "extend_line_up"
-l = "extend_char_right"
-H = [ "ensure_selections_forward", "flip_selections", "extend_char_left" ]
-J = [ "ensure_selections_forward", "extend_line_down" ]
-K = [ "ensure_selections_forward", "flip_selections", "extend_line_up" ]
-L = [ "ensure_selections_forward", "extend_char_right" ]
-C-j = "join_selections"
-C-A-j = "join_selections_space"
-C-k = "keep_selections"
-C-A-k = "remove_selections"
-X = "extend_line_below"
-q = "extend_prev_word_start"
-Q = "extend_prev_word_start"
-b = "replay_macro"
-B = "record_macro"
-w = "@miw*"
-W = "no_op"
-E = "extend_next_word_end"
-A-q = "extend_prev_long_word_start"
-A-Q = "extend_prev_long_word_start"
-A-w = "@miw"
-A-e = "extend_next_long_word_end"
-A-E = "extend_next_long_word_end"
-F = "extend_next_char"
-T = "extend_till_char"
-A-f = "extend_prev_char"
-A-F = "extend_prev_char"
-A-t = "extend_till_prev_char"
-A-T = "extend_till_prev_char"
+[keys.select.t]
+label = "External tools"
+g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
+l = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
+A-l = { label = "Open files selected with lf", command = [":open ~/.cache/hxlf/selected", "select_all", "split_selection_on_newline", "goto_file", ":open ~/.cache/hxlf/selected", ":buffer-close!"] }
+
+[keys.select."A-F"]
+label = "Insert..."
+h = "insert_at_line_start"
+j = "open_below"
+k = "open_above"
+l = "insert_at_line_end"

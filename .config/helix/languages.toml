@@ -1,0 +1,2 @@
+[language-server.taplo.config]
+root_dir = [".git", "*.toml"]
