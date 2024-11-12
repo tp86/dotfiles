@@ -11,3 +11,7 @@ customCommands:
           - value: 'push --force'
           - value: 'push --force-with-lease'
     command: "git {{index .PromptResponses 0}}"
+gui:
+  theme:
+    selectedLineBgColor:
+      - "#3f5865"
