@@ -6,16 +6,16 @@ color-modes = true
 
 [editor.statusline]
 left = ["mode", "spinner", "version-control"]
-center = ["file-name", "read-only-indicator", "file-modification-indicator", "file-type"]
+center = ["file-name", "read-only-indicator", "file-modification-indicator"]#, "file-type"]
 right = ["diagnostics", "selections", "register", "position", "position-percentage", "file-encoding"]
 
 [editor.lsp]
-display-inlay-hints = true
+# display-inlay-hints = true
 auto-signature-help = false
 
-[editor.cursor-shape]
-insert = "bar"
-select = "underline"
+# [editor.cursor-shape]
+# insert = "bar"
+# select = "underline"
 
 [editor.file-picker]
 hidden = false
@@ -35,14 +35,14 @@ x = "extend_line"
 [keys.normal."\\"]
 label = "External tools"
 g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
-l = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
-A-l = { label = "Open files selected with lf", command = [":new", ":insert-output cat ~/.cache/hxlf/selected", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!"] }
+e = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
+A-e = { label = "Open files selected with lf", command = [":new", ":insert-output cat ~/.cache/hxlf/selected", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!"] }
 
 [keys.select."\\"]
 label = "External tools"
 g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
-l = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
-A-l = { label = "Open files selected with lf", command = [":new", ":insert-output cat ~/.cache/hxlf/selected", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!"] }
+e = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
+A-e = { label = "Open files selected with lf", command = [":new", ":insert-output cat ~/.cache/hxlf/selected", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!"] }
 
 # TESTS
 # sticky mode

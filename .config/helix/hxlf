@@ -14,6 +14,6 @@ if [ -n "$TMUX" ]; then
   fi
   current_time=$(date +%s)
   # TODO: get command at tmux split and check if it's still same helix instance (or find pane with helix instance)
-  command="sh -c \"${command} && [ \\\$(stat ~/.cache/hxlf/selected -c %Y) -ge $current_time ] && tmux send-keys -t $pane_id Escape Escape \\\\\ M-l\""
+  command="sh -c \"${command} && [ \\\$(stat ~/.cache/hxlf/selected -c %Y) -ge $current_time ] && tmux send-keys -t $pane_id Escape Escape \\\\\ M-e\""
   tmux split-pane -h -l 60% "${command}"
 fi
