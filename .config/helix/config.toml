@@ -25,11 +25,27 @@ hidden = false
 H = "extend_to_line_start"
 L = "extend_to_line_end"
 x = "extend_line"
+S-tab = "unindent"
+tab = "indent"
+"<" = "select_textobject_inner"
+">" = "select_textobject_around"
+
+[keys.normal.m]
+a = "no_op"
+i = "no_op"
 
 [keys.select]
 H = "extend_to_line_start"
 L = "extend_to_line_end"
 x = "extend_line"
+"<" = "select_textobject_inner"
+">" = "select_textobject_around"
+S-tab = "unindent"
+tab = "indent"
+
+[keys.select.m]
+a = "no_op"
+i = "no_op"
 
 # integrations with external tools via Tmux
 [keys.normal."\\"]
