@@ -4,6 +4,7 @@ theme = "everforest_dark"
 line-number = "relative"
 color-modes = true
 jump-label-alphabet = "jfkdls;aieownvmghtybqpx.z/"
+cursorline = true
 
 [editor.statusline]
 left = ["mode", "spinner", "version-control"]
@@ -71,12 +72,12 @@ l = "extend_next_char"
 a = "no_op"
 i = "no_op"
 
-[keys.select."]"]
-g = {label = "Goto next change", command = ["goto_next_change", "ensure_selections_forward", "flip_selections"]}
-G = {label = "Goto last change", command = ["goto_last_change", "ensure_selections_forward", "flip_selections"]}
-f = {label = "Goto next function", command = ["goto_next_function", "ensure_selections_forward", "flip_selections"]}
-t = {label = "Goto next type definition", command = ["goto_next_class", "ensure_selections_forward", "flip_selections"]}
-T = {label = "Goto next test", command = ["goto_next_test", "ensure_selections_forward", "flip_selections"]}
+# [keys.select."]"]
+# g = {label = "Goto next change", command = ["goto_next_change", "ensure_selections_forward", "flip_selections"]}
+# G = {label = "Goto last change", command = ["goto_last_change", "ensure_selections_forward", "flip_selections"]}
+# f = {label = "Goto next function", command = ["goto_next_function", "ensure_selections_forward", "flip_selections"]}
+# t = {label = "Goto next type definition", command = ["goto_next_class", "ensure_selections_forward", "flip_selections"]}
+# T = {label = "Goto next test", command = ["goto_next_test", "ensure_selections_forward", "flip_selections"]}
 
 # integrations with external tools via Tmux
 [keys.normal."\\"]
