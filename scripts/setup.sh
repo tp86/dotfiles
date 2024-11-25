@@ -6,44 +6,63 @@
 # git is installed
 # bash is the shell
 
+sys=xubuntu
+
 log() {
   { x_opt=$(shopt -op xtrace); set +x; } 2>/dev/null
   echo -e "\e[32m$1\e[0m"
   eval "$x_opt"
 }
 
-set -x
+not_installed() {
+  log "Checking if $1 is installed"
+  return ! command -v $1 &>/dev/null
+}
+
+set -xe
 
 # Basic setup
 curdir=$(pwd)
 sudo chmod 777 -R /opt
-log "Installing tools"
-tools=$(cat <<EOF
-cargo
-ripgrep
-EOF
-)
 
-sudo apt install -y $tools
+tools=$(cat tools_$sys)
+
+source install_$sys
+log "Installing tools"
+install $tools
 log "Configuring tools"
 if ! rg cargo/bin ~/.bashrc &>/dev/null
 then
   echo 'export PATH="$PATH:HOME/.cargo/bin"' >> ~/.bashrc
 fi
 
+source config_$sys
+
 # clone dotfiles
 log "Checking if dotfiles repository is cloned"
-if ! test -d $HOME/Projects/other/dotfiles
+if ! test -d $dotfiles_path
 then
   log "Cloning dotfiles repository"
-  mkdir -p $HOME/Projects/other
-  cd $HOME/Projects/other
+  dotfiles_dir=$(basename $dotfiles_path)
+  mkdir -p $dotfiles_dir
+  cd $dotfiles_dir
   git clone https://github.com/tp86/dotfiles
 fi
 
+# Install tmux
+if not_installed tmux
+then
+  install tmux
+fi
+log "Checking need for configuring tmux"
+if ! test -L $HOME/.tmux.conf
+then
+  log "Configuring tmux"
+  ln -sf $dotfiles_path/.tmux.conf $HOME/.tmux.conf
+fi
+
 # Install helix
-log "Checking if helix is already installed in correct version"
-if ! command -v hx &>/dev/null
+if not_installed hx
 then
   log "Installing helix"
   cd /opt
@@ -58,14 +77,15 @@ log "Checking need for configuring helix"
 if ! test -L $HOME/.config/helix
 then
   log "Configuring helix"
-  ln -sf $HOME/Projects/other/dotfiles/.config/helix $HOME/.config/helix
+  ln -sf $dotfiles_path/.config/helix $HOME/.config/helix
 fi
 
 # Language servers
 ## bash
-log "Checking if language server for bash is installed"
-if ! command -v bash-language-server &>/dev/null
+if not_installed bash-language-server
 then
   log "Installing language server for bash"
   sudo snap install bash-language-server --classic
 fi
+
+cd $curdir
