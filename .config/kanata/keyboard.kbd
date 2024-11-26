@@ -19,13 +19,13 @@
 	hold-time 200
 )
 
-(deflayer r
+(deflayer ralted
 	@ą @ś _ _
 	_ _ @ł _
 	@ó @ę @ż @ź @ć @ń
 )
 
-;; TODO handle shifts while holding k(ralt)
+;; TODO handle mods (left and right) while holding k(ralt)
 
 (defalias
 	a-mod (tap-hold $tap-time $hold-time a lmet)
@@ -33,16 +33,17 @@
 	d-mod (tap-hold $tap-time $hold-time d lalt)
 	f-mod (tap-hold $tap-time $hold-time f lctl)
 	j-mod (tap-hold $tap-time $hold-time j rctl)
-	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle r)))
+	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle ralted)))
 	l-mod (tap-hold $tap-time $hold-time l rsft)
 	;-mod (tap-hold $tap-time $hold-time ; rmet)
+	;; ralted layer-aliases
 	ó (multi (release-key lalt) RA-o)
 	ą (multi (release-key lalt) RA-a)
-	ę (multi (release-key lalt) RA-e)
+	ę (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
 	ż (multi (release-key lalt) RA-z)
 	ź (multi (release-key lalt) RA-x)
-	ć (multi (release-key lalt) RA-c)
+	ć (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-c) A-c)
 	ń (multi (release-key lalt) RA-n)
-	ł (multi (release-key lalt) RA-l)
+	ł (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-l) lsft)
 	ś (multi (release-key lalt) RA-s)
 )
