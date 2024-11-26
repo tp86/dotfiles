@@ -1,0 +1,46 @@
+(defcfg
+	process-unmapped-keys yes
+)
+
+(defsrc
+	a s d f
+	j k l ;
+	o e z x c n
+)
+
+(deflayer mod
+	@a-mod @s-mod @d-mod @f-mod
+	@j-mod @k-mod @l-mod @;-mod
+	_ _ _ _ _ _
+)
+
+(defvar
+	tap-time 200
+	hold-time 200
+)
+
+(deflayer r
+	@ą @ś _ _
+	_ _ @ł _
+	@ó @ę @ż @ź @ć @ń
+)
+
+(defalias
+	a-mod (tap-hold $tap-time $hold-time a lmet)
+	s-mod (tap-hold $tap-time $hold-time s lsft)
+	d-mod (tap-hold $tap-time $hold-time d lalt)
+	f-mod (tap-hold $tap-time $hold-time f lctl)
+	j-mod (tap-hold $tap-time $hold-time j rctl)
+	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle r)))
+	l-mod (tap-hold $tap-time $hold-time l rsft)
+	;-mod (tap-hold $tap-time $hold-time ; rmet)
+	ó RA-o
+	ą RA-a
+	ę RA-e
+	ż RA-z
+	ź RA-x
+	ć RA-c
+	ń RA-n
+	ł RA-l
+	ś RA-s
+)
