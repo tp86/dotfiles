@@ -25,6 +25,8 @@
 	@ó @ę @ż @ź @ć @ń
 )
 
+;; TODO handle shifts while holding k(ralt)
+
 (defalias
 	a-mod (tap-hold $tap-time $hold-time a lmet)
 	s-mod (tap-hold $tap-time $hold-time s lsft)
@@ -34,13 +36,13 @@
 	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle r)))
 	l-mod (tap-hold $tap-time $hold-time l rsft)
 	;-mod (tap-hold $tap-time $hold-time ; rmet)
-	ó RA-o
-	ą RA-a
-	ę RA-e
-	ż RA-z
-	ź RA-x
-	ć RA-c
-	ń RA-n
-	ł RA-l
-	ś RA-s
+	ó (multi (release-key lalt) RA-o)
+	ą (multi (release-key lalt) RA-a)
+	ę (multi (release-key lalt) RA-e)
+	ż (multi (release-key lalt) RA-z)
+	ź (multi (release-key lalt) RA-x)
+	ć (multi (release-key lalt) RA-c)
+	ń (multi (release-key lalt) RA-n)
+	ł (multi (release-key lalt) RA-l)
+	ś (multi (release-key lalt) RA-s)
 )
