@@ -7,6 +7,7 @@
 # bash is the shell
 
 sys=xubuntu
+source config_$sys
 
 log() {
   { x_opt=$(shopt -op xtrace); set +x; } 2>/dev/null
@@ -19,24 +20,33 @@ not_installed() {
   return ! command -v $1 &>/dev/null
 }
 
+configure_cargo() {
+	if ! rg cargo/bin ~/.bashrc &>/dev/null
+	then
+		echo 'export PATH="$PATH:HOME/.cargo/bin"' >> ~/.bashrc
+	fi
+}
+
+configure() {
+	for target in $@
+	do
+		if command -v configure_$target
+		then
+			configure_$target
+		fi
+	done
+}
+
 set -xe
 
 # Basic setup
 curdir=$(pwd)
 sudo chmod 777 -R /opt
 
-tools=$(cat tools_$sys)
-
-source install_$sys
 log "Installing tools"
 install $tools
 log "Configuring tools"
-if ! rg cargo/bin ~/.bashrc &>/dev/null
-then
-  echo 'export PATH="$PATH:HOME/.cargo/bin"' >> ~/.bashrc
-fi
-
-source config_$sys
+configure $tools
 
 # clone dotfiles
 log "Checking if dotfiles repository is cloned"
