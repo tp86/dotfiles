@@ -71,6 +71,11 @@ then
   ln -sf $dotfiles_path/.tmux.conf $HOME/.tmux.conf
 fi
 
+# TODO
+# kanata, batcat, lazygit, lf, delta, themes (tools + xfce4-terminal), fzf
+# lf ideas: https://github.com/gokcehan/lf/wiki/Integrations#fzf
+# bash configuration + aliases
+
 # Install helix
 if not_installed hx
 then
