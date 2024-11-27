@@ -20,9 +20,9 @@
 )
 
 (deflayer ralted
-	@ą @ś _ _
-	_ _ @ł _
-	@ó @ę @ż @ź @ć @ń
+	@a-ralt @s-ralt _ @f-ralt
+	@j-ralt _ @l-ralt @;-ralt
+	@o-ralt @e-ralt @z-ralt @x-ralt @c-ralt @n-ralt
 )
 
 ;; TODO handle mods (left and right) while holding k(ralt)
@@ -36,14 +36,17 @@
 	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle ralted)))
 	l-mod (tap-hold $tap-time $hold-time l rsft)
 	;-mod (tap-hold $tap-time $hold-time ; rmet)
-	;; ralted layer-aliases
-	ó (multi (release-key lalt) RA-o)
-	ą (multi (release-key lalt) RA-a)
-	ę (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
-	ż (multi (release-key lalt) RA-z)
-	ź (multi (release-key lalt) RA-x)
-	ć (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-c) A-c)
-	ń (multi (release-key lalt) RA-n)
-	ł (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-l) lsft)
-	ś (multi (release-key lalt) RA-s)
+
+	a-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-a) lmet)
+	s-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-s) lsft)
+	f-ralt (tap-hold $tap-time $hold-time A-f lctl) ;; this is probably overkill
+	j-ralt (tap-hold $tap-time $hold-time A-j rctl) ;; this is probably overkill
+	l-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-l) rsft)
+	;-ralt (tap-hold $tap-time $hold-time A-; rmet) ;; this is probably overkill
+	o-ralt (multi (release-key lalt) RA-o)
+	e-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
+	z-ralt (multi (release-key lalt) RA-z)
+	x-ralt (multi (release-key lalt) RA-x)
+	c-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-c) A-c)
+	n-ralt (multi (release-key lalt) RA-n)
 )
