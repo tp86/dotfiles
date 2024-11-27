@@ -95,6 +95,18 @@ then
   ln -sf $dotfiles_path/.config/helix $HOME/.config/helix
 fi
 
+# Install zathura
+if not_installed zathura
+then
+  log "Installing zathura"
+  install zathura
+fi
+if ! test -L $HOME/.config/zathura
+then
+  log "Configuring zathura"
+  ln -sf $dotfiles_path/.config/zathura $HOME/.config/zathura
+fi
+
 # Language servers
 ## bash
 if not_installed bash-language-server

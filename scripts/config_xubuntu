@@ -17,6 +17,10 @@ install_tmux() {
 	sudo apt install tmux
 }
 
+install_zathura() {
+	sudo apt install zathura
+}
+
 install() {
 	for target in $@
 	do
