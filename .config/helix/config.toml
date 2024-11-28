@@ -81,6 +81,8 @@ A-e = { label = "Open files selected with lf", command = [":new", ":insert-outpu
 
 [keys.insert]
 C-c = "normal_mode"
+"A-\"" = ":insert-output printf \"\\\"\\\"\""
+"A-'" = ":insert-output printf \"''\""
 # TESTS
 # sticky mode
 # X = "extend_line" # both directions!
