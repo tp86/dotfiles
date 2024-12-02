@@ -1,0 +1,147 @@
+#|
+An experiment for using kanata to prepare for 34-key Ferris Sweep keyboard.
+
+Essentially, it allows only 34 keys to be pressed in similar layout as target Ferris Sweep.
+
+When I buy Ferris Sweep, transition should be much more smooth after practicing with this layout.
+
+This layout will be supposedly translated to Ferris Sweep firmware.
+|#
+(defsrc
+	q w e r t y u i o p
+	a s d f g h j k l ;
+	z x c v b n m , . /
+	   lalt spc ralt
+
+	esc f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12
+	grv 1 2 3 4 5 6 7 8 9 0 - = bspc
+	tab [ ] \
+	caps ' ret
+	lsft rsft
+	lctl lmet rmet rctl
+)
+
+#|
+	_ _ _ _ _ _ _ _ _ _
+	_ _ _ _ _ _ _ _ _ _
+	_ _ _ _ _ _ _ _ _ _
+           _ _ _
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+|#
+
+(deflayer base
+	_ _ _ _ _ _ _ _ _ _
+	@base-a @base-s @base-d @base-f _ _ @base-j @base-k @base-l @base-;
+	_ _ _ _ _ _ _ @base-com @base-dot @test
+           @tabfn @spcesc @bspnum
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer base-ralt
+	_ _ @ralt-e _ _ _ _ _ @ralt-o _
+	@ralt-a @ralt-s _ _ _ _ _ _ @ralt-l _
+	@ralt-z @ralt-x @ralt-c _ _ @ralt-n _ _ _ _
+           _ _ _
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer num
+	@num-q @num-w @num-e @num-r XX XX XX @num-i @num-o XX
+	@num-a @num-s @num-d @num-f 5 6 @num-j @num-k @num-l @num-;
+	@num-z @num-x @num-c @num-v XX XX XX XX XX XX
+           @num-lalt XX @num-ralt
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer fn
+	q w e r _ _ _ _ _ _
+	a s d f _ h j k l _
+	z x c v _ _ _ _ _ _
+           lalt _ ralt
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(defvar
+	tap-time 200
+	hold-time 200
+)
+
+(defalias
+	base-a (tap-hold $tap-time $hold-time a lmet)
+	base-s (tap-hold $tap-time $hold-time s lsft)
+	base-d (tap-hold $tap-time $hold-time d lalt)
+	base-f (tap-hold $tap-time $hold-time f lctl)
+	base-j (tap-hold $tap-time $hold-time j rctl)
+	base-k (tap-hold $tap-time $hold-time k (multi (layer-toggle base-ralt) lalt))
+	base-l (tap-hold $tap-time $hold-time l rsft)
+	base-; (tap-hold $tap-time $hold-time ret rmet)
+
+	tabfn tab
+	spcesc (tap-hold $tap-time $hold-time spc esc)
+	bspnum (tap-hold $tap-time $hold-time bspc (layer-toggle num))
+
+	base-com (fork , (multi (release-key lsft) (release-key rsft) ;) (lsft rsft))
+ 	base-dot (fork . S-; (lsft rsft))
+	test XX
+
+	ralt-e (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
+	ralt-o (multi (release-key lalt) RA-o)
+	ralt-a (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-a) lmet)
+	ralt-s (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-s) lsft)
+	ralt-l (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-l) rsft)
+	ralt-z (multi (release-key lalt) RA-z)
+	ralt-x (multi (release-key lalt) RA-x)
+	ralt-c (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-c) A-c)
+	ralt-n (multi (release-key lalt) RA-n)
+
+	num-q grv
+	num-w '
+	num-e /
+	num-r \
+	num-i -
+	num-o =
+	num-a (tap-hold $tap-time $hold-time 1 lmet)
+	num-s (tap-hold $tap-time $hold-time 2 lsft)
+	num-d (tap-hold $tap-time $hold-time 3 lalt)
+	num-f (tap-hold $tap-time $hold-time 4 lctl)
+	num-j (tap-hold $tap-time $hold-time 7 rctl)
+	num-k (tap-hold $tap-time $hold-time 8 lalt)
+	num-l (tap-hold $tap-time $hold-time 9 rsft)
+	num-; (tap-hold $tap-time $hold-time 0 rmet)
+	num-z S-,
+	num-x [
+	num-c ]
+	num-v S-.
+	num-lalt (layer-switch num)
+	num-ralt (layer-switch base)
+)
