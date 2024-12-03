@@ -67,13 +67,13 @@ l = "extend_next_char"
 # T = {label = "Goto next test", command = ["goto_next_test", "ensure_selections_forward", "flip_selections"]}
 
 # integrations with external tools via Tmux
-[keys.normal."\\"]
+[keys.normal."C-e"]
 label = "External tools"
 g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
 e = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
 A-e = { label = "Open files selected with lf", command = [":new", ":insert-output cat ~/.cache/hxlf/selected", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!"] }
 
-[keys.select."\\"]
+[keys.select."C-e"]
 label = "External tools"
 g = { label = "Open lazygit", command = ":run-shell-command tmux split-pane -l 75% lazygit -w $(git rev-parse --show-toplevel)" }
 e = { label = "Select files with lf", command = ":run-shell-command helix_pid=\"$(ps -o ppid= $$)\" ~/.config/helix/hxlf" }
