@@ -78,7 +78,7 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 )
 
 (deflayer fn
-	@fn-q @fn-w @fn-e @fn-r XX XX @fn-u @fn-i _ _
+	@fn-q @fn-w @fn-e @fn-r XX XX XX @fn-i @fn-o XX
 	@fn-a @fn-s @fn-d @fn-f XX @fn-h @fn-j @fn-k @fn-l @fn-;
 	@fn-z @fn-x @fn-c @fn-v XX XX @fn-m @fn-com @fn-dot @fn-/
            @fn-lalt _ @fn-ralt
@@ -163,11 +163,11 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 	fn-k (tap-hold $tap-time $hold-time up lalt)
 	fn-l (tap-hold $tap-time $hold-time rght rsft)
 	fn-; (tap-hold $tap-time $hold-time ret rmet)
-	fn-u home
-	fn-i end
-	fn-m pgup
-	fn-com pgdn
-	fn-dot ins
+	fn-i home
+	fn-o end
+	fn-m ins
+	fn-com pgup
+	fn-dot pgdn
 	fn-/ del
 	fn-lalt (layer-switch base)
 	fn-ralt (layer-switch fn)
