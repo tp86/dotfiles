@@ -80,7 +80,7 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 (deflayer fn
 	@fn-q @fn-w @fn-e @fn-r XX XX XX @fn-i @fn-o XX
 	@fn-a @fn-s @fn-d @fn-f XX @fn-h @fn-j @fn-k @fn-l @fn-;
-	@fn-z @fn-x @fn-c @fn-v XX XX @fn-m @fn-com @fn-dot @fn-/
+	@fn-z @fn-x @fn-c @fn-v XX XX @fn-m @fn-com @fn-dot _
            @fn-lalt _ @fn-ralt
 
 	XX XX XX XX XX XX XX XX XX XX XX XX XX 
@@ -104,7 +104,7 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 	base-j (tap-hold $tap-time $hold-time j rctl)
 	base-k (tap-hold $tap-time $hold-time k (multi (layer-toggle base-ralt) lalt))
 	base-l (tap-hold $tap-time $hold-time l rsft)
-	base-; (tap-hold $tap-time $hold-time ret rmet)
+	base-; (tap-hold $tap-time $hold-time bspc rmet)
 
 	fn (tap-hold $tap-time $hold-time tab (layer-toggle fn))
 	tabesc (tap-hold $tap-time $hold-time tab esc)
@@ -113,7 +113,7 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 
 	base-com (fork , (multi (release-key lsft) (release-key rsft) ;) (lsft rsft))
  	base-dot (fork . S-; (lsft rsft))
-	base-/ bspc
+	base-/ ret
 
 	ralt-e (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
 	ralt-o (multi (release-key lalt) RA-o)
@@ -126,9 +126,9 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 	ralt-n (multi (release-key lalt) RA-n)
 
 	num-q `
-	num-w '
-	num-e /
-	num-r \
+	num-w (fork S-9 S-, (lsft rsft))
+	num-e (fork S-0 S-. (lsft rsft))
+	num-r '
 	num-i -
 	num-o =
 	num-a (tap-hold $tap-time $hold-time 1 lmet)
@@ -139,10 +139,10 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 	num-k (tap-hold $tap-time $hold-time 8 lalt)
 	num-l (tap-hold $tap-time $hold-time 9 rsft)
 	num-; (tap-hold $tap-time $hold-time 0 rmet)
-	num-z S-,
+	num-z \
 	num-x [
 	num-c ]
-	num-v S-.
+	num-v /
 	num-lalt (layer-switch num)
 	num-ralt (layer-switch base)
 
@@ -162,13 +162,13 @@ This layout will be supposedly translated to Ferris Sweep firmware.
 	fn-j (tap-hold $tap-time $hold-time down rctl)
 	fn-k (tap-hold $tap-time $hold-time up lalt)
 	fn-l (tap-hold $tap-time $hold-time rght rsft)
-	fn-; (tap-hold $tap-time $hold-time ret rmet)
+	fn-; (tap-hold $tap-time $hold-time del rmet)
 	fn-i home
 	fn-o end
 	fn-m ins
 	fn-com pgup
 	fn-dot pgdn
-	fn-/ del
+	;; fn-/ ret
 	fn-lalt (layer-switch base)
 	fn-ralt (layer-switch fn)
 )
