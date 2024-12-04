@@ -77,10 +77,10 @@ Note that standard layout has single space bar which should handle 3 keys in kan
 
 (deflayer num
 
-	    1         2           3         4     5        6     7       8      9   0
-	@grv-mod @lparen-mod @rparen-mod @'-mod  XX       XX    rctl  @--mod @=-mod _
-	    XX        [           ]         \    XX       XX     /       _      _   _
-                                             @fn _ @to-base
+	    1         2           3         4     5           6     7       8      9       0
+	@grv-mod @lparen-mod @rparen-mod @'-mod  XX          XX    rctl  @--mod @=-mod @bspc-mod ;; TODO - _ = + bspc
+	    XX        [           ]         \    XX          XX     /       _      _      ret
+                                             @fn @spc @to-base
 
 	XX XX XX XX XX XX XX XX XX XX XX XX XX 
 	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
@@ -92,10 +92,10 @@ Note that standard layout has single space bar which should handle 3 keys in kan
 
 (deflayer fn
 
-	   f1      f2       f3       f4   XX       XX      _        _       _         _
-	@f5-mod @f6-mod  @f7-mod  @f8-mod XX      left @down-mod @up-mod @rght-mod @del-mod
-	   f9      f10      f11      f12  XX       XX     ins      pgup    pgdn       _
-                                   @to-base _ @num
+	   f1      f2       f3       f4   XX          XX      XX      home    end       XX
+	@f5-mod @f6-mod  @f7-mod  @f8-mod XX         left @down-mod @up-mod @rght-mod @del-mod
+	   f9      f10      f11      f12  XX          XX     ins      pgup    pgdn      ret
+                                   @to-base @spc @num
 
 	XX XX XX XX XX XX XX XX XX XX XX XX XX 
 	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
