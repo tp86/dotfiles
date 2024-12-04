@@ -135,7 +135,7 @@ Note that standard layout has single space bar which should handle 3 keys in kan
 (defalias
 
 	fn (tap-hold $tap-time $hold-time (layer-switch fn) (layer-toggle fn))
-	spc (tap-hold $tap-time $hold-time (tap-dance 115 (spc tab)) esc)
+	spc (tap-hold $tap-time $hold-time (tap-dance 115 (spc tab)) esc) ;; Tap Dance (vial), but shouldn't be needed
 	num (tap-hold $tap-time $hold-time (layer-switch num) (layer-toggle num))
 	to-base (tap-dance $tap-time ((layer-switch base) (layer-switch base)))
 
@@ -144,11 +144,11 @@ Note that standard layout has single space bar which should handle 3 keys in kan
 	d-mod (tap-hold $tap-time $hold-time d lalt)
 	f-mod (tap-hold $tap-time $hold-time f lctl)
 	j-mod (tap-hold $tap-time $hold-time j rctl)
-	k-mod (tap-hold $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM()
+	k-mod (tap-hold $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM(), Tap Dance (vial)
 	l-mod (tap-hold $tap-time $hold-time l rsft)
 	bspc-mod (tap-hold $tap-time $hold-time bspc rmet)
 	
-	e-alt (tap-hold $tap-time $hold-time RA-e A-e)
+	e-alt (tap-hold $tap-time $hold-time RA-e A-e) ;; Tap Dance (vial)
 	o-alt RA-o
 	a-alt (tap-hold $tap-time $hold-time RA-a lmet)
 	s-alt (tap-hold $tap-time $hold-time RA-s lsft)
