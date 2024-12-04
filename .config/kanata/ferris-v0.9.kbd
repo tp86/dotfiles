@@ -1,0 +1,176 @@
+#|
+An experiment for using kanata to prepare for 34-key Ferris Sweep keyboard.
+
+Essentially, it allows only 34 keys to be pressed in similar layout as target Ferris Sweep.
+
+When I buy Ferris Sweep, transition should be much more smooth after practicing with this layout.
+
+This layout will be supposedly translated to Ferris Sweep firmware.
+
+Designed at https://jaroslaw-weber.github.io/keyfab/share?id=qtvnwhb6ckctyuy
+
+Still a lot of potential for adjusting, especially in num and fn layers.
+
+Note that standard layout has single space bar which should handle 3 keys in kanata.
+|#
+
+(defsrc
+
+	q w e r t y u i o p
+	a s d f g h j k l ;
+	z x c v b n m , . /
+	   lalt spc ralt
+
+	;; forcefully hide following keys
+	esc f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12
+	grv 1 2 3 4 5 6 7 8 9 0 - = bspc
+	tab [ ] \
+	caps ' ret
+	lsft rsft
+	lctl lmet rmet rctl
+)
+
+;; empty pass-through layout template
+#|
+	_ _ _ _ _ _ _ _ _ _
+	_ _ _ _ _ _ _ _ _ _
+	_ _ _ _ _ _ _ _ _ _
+           _ _ _
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+|#
+
+(deflayer base
+
+	   _      _      _      _   _ _    _      _      _      _
+	@a-mod @s-mod @d-mod @f-mod _ _ @j-mod @k-mod @l-mod @bspc-mod
+	   _      _      _      _   _ _    _      _      _     ret
+                           @fn @spc  @num
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer ralt
+
+	   _      _   @e-alt _ _    _   _ _ @o-alt _
+	@a-alt @s-alt    _   _ _    _   _ _ @l-alt _
+	@z-alt @x-alt @c-alt _ _ @n-alt _ _    _   _
+                        _ _ _
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer num
+
+	    1         2           3         4     5        6     7       8      9   0
+	@grv-mod @lparen-mod @rparen-mod @'-mod  XX       XX    rctl  @--mod @=-mod _
+	    XX        [           ]         \    XX       XX     /       _      _   _
+                                             @fn _ @to-base
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(deflayer fn
+
+	   f1      f2       f3       f4   XX       XX      _        _       _         _
+	@f5-mod @f6-mod  @f7-mod  @f8-mod XX      left @down-mod @up-mod @rght-mod @del-mod
+	   f9      f10      f11      f12  XX       XX     ins      pgup    pgdn       _
+                                   @to-base _ @num
+
+	XX XX XX XX XX XX XX XX XX XX XX XX XX 
+	XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+	XX XX XX XX
+	XX XX XX
+	XX XX
+	XX XX XX XX
+)
+
+(defvar
+
+	tap-time 200
+	hold-time 200
+)
+
+(defoverrides ;; key overrides (vial)
+
+	(lsft ,) (;)
+	(rsft ,) (;)
+	(lsft .) (lsft ;)
+	(rsft .) (rsft ;)
+
+	(lalt ralt e) (ralt e)
+	(lalt ralt o) (ralt o)
+	(lalt ralt a) (ralt a)
+	(lalt ralt s) (ralt s)
+	(lalt ralt l) (ralt l)
+	(lalt ralt z) (ralt z)
+	(lalt ralt x) (ralt x)
+	(lalt ralt c) (ralt c)
+	(lalt ralt n) (ralt n)
+
+	(lsft rsft 9) (lsft ,)
+	(lsft rsft 0) (lsft .)
+)
+
+(defalias
+
+	fn (tap-hold $tap-time $hold-time (layer-switch fn) (layer-toggle fn))
+	spc (tap-hold $tap-time $hold-time (tap-dance 115 (spc tab)) esc)
+	num (tap-hold $tap-time $hold-time (layer-switch num) (layer-toggle num))
+	to-base (tap-dance $tap-time ((layer-switch base) (layer-switch base)))
+
+	a-mod (tap-hold $tap-time $hold-time a lmet) ;; MT()
+	s-mod (tap-hold $tap-time $hold-time s lsft)
+	d-mod (tap-hold $tap-time $hold-time d lalt)
+	f-mod (tap-hold $tap-time $hold-time f lctl)
+	j-mod (tap-hold $tap-time $hold-time j rctl)
+	k-mod (tap-hold $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM()
+	l-mod (tap-hold $tap-time $hold-time l rsft)
+	bspc-mod (tap-hold $tap-time $hold-time bspc rmet)
+	
+	e-alt (tap-hold $tap-time $hold-time RA-e A-e)
+	o-alt RA-o
+	a-alt (tap-hold $tap-time $hold-time RA-a lmet)
+	s-alt (tap-hold $tap-time $hold-time RA-s lsft)
+	l-alt (tap-hold $tap-time $hold-time RA-l rsft)
+	z-alt RA-z
+	x-alt RA-x
+	c-alt (tap-hold $tap-time $hold-time RA-c A-c)
+	n-alt RA-n
+
+	grv-mod (tap-hold $tap-time $hold-time ` lmet)
+	lparen-mod (tap-hold $tap-time $hold-time S-9 lsft)
+	rparen-mod (tap-hold $tap-time $hold-time S-0 lalt)
+	'-mod (tap-hold $tap-time $hold-time ' lctl)
+	--mod (tap-hold $tap-time $hold-time - lalt)
+	=-mod (tap-hold $tap-time $hold-time = rsft)
+
+	f5-mod (tap-hold $tap-time $hold-time f5 lmet)
+	f6-mod (tap-hold $tap-time $hold-time f6 lsft)
+	f7-mod (tap-hold $tap-time $hold-time f7 lalt)
+	f8-mod (tap-hold $tap-time $hold-time f8 lctl)
+	down-mod (tap-hold $tap-time $hold-time down rctl)
+	up-mod (tap-hold $tap-time $hold-time up lalt)
+	rght-mod (tap-hold $tap-time $hold-time rght rsft)
+	del-mod (tap-hold $tap-time $hold-time del rmet)
+)
