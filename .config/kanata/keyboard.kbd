@@ -19,31 +19,42 @@
 	hold-time 200
 )
 
-(deflayer ralted
-	@a-ralt @s-ralt _  _
-	_ _ @l-ralt _
-	@o-ralt @e-ralt @z-ralt @x-ralt @c-ralt @n-ralt
+(deflayer ralt
+	@a-alt @s-alt _  _
+	_ _ @l-alt _
+	@o-alt @e-alt @z-alt @x-alt @c-alt @n-alt
 )
 
-;; TODO handle mods (left and right) while holding k(ralt)
+(defoverrides ;; key overrides (vial)
+
+	(lalt ralt e) (ralt e)
+	(lalt ralt o) (ralt o)
+	(lalt ralt a) (ralt a)
+	(lalt ralt s) (ralt s)
+	(lalt ralt l) (ralt l)
+	(lalt ralt z) (ralt z)
+	(lalt ralt x) (ralt x)
+	(lalt ralt c) (ralt c)
+	(lalt ralt n) (ralt n)
+)
 
 (defalias
-	a-mod (tap-hold $tap-time $hold-time a lmet)
+	a-mod (tap-hold $tap-time $hold-time a lmet) ;; MT()
 	s-mod (tap-hold $tap-time $hold-time s lsft)
 	d-mod (tap-hold $tap-time $hold-time d lalt)
 	f-mod (tap-hold $tap-time $hold-time f lctl)
 	j-mod (tap-hold $tap-time $hold-time j rctl)
-	k-mod (tap-hold $tap-time $hold-time k (multi lalt (layer-toggle ralted)))
+	k-mod (tap-hold $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM(), Tap Dance (vial)
 	l-mod (tap-hold $tap-time $hold-time l rsft)
 	;-mod (tap-hold $tap-time $hold-time ; rmet)
 
-	a-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-a) lmet)
-	s-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-s) lsft)
-	l-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-l) rsft)
-	o-ralt (multi (release-key lalt) RA-o)
-	e-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-e) A-e)
-	z-ralt (multi (release-key lalt) RA-z)
-	x-ralt (multi (release-key lalt) RA-x)
-	c-ralt (tap-hold $tap-time $hold-time (multi (release-key lalt) RA-c) A-c)
-	n-ralt (multi (release-key lalt) RA-n)
+	e-alt (tap-hold $tap-time $hold-time RA-e A-e) ;; Tap Dance (vial)
+	o-alt RA-o
+	a-alt (tap-hold $tap-time $hold-time RA-a lmet)
+	s-alt (tap-hold $tap-time $hold-time RA-s lsft)
+	l-alt (tap-hold $tap-time $hold-time RA-l rsft)
+	z-alt RA-z
+	x-alt RA-x
+	c-alt (tap-hold $tap-time $hold-time RA-c A-c)
+	n-alt RA-n
 )
