@@ -39,22 +39,22 @@
 )
 
 (defalias
-	a-mod (tap-hold $tap-time $hold-time a lmet) ;; MT()
-	s-mod (tap-hold $tap-time $hold-time s lsft)
-	d-mod (tap-hold $tap-time $hold-time d lalt)
-	f-mod (tap-hold $tap-time $hold-time f lctl)
-	j-mod (tap-hold $tap-time $hold-time j rctl)
-	k-mod (tap-hold $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM(), Tap Dance (vial)
-	l-mod (tap-hold $tap-time $hold-time l rsft)
-	;-mod (tap-hold $tap-time $hold-time ; rmet)
+	a-mod (tap-hold-press $tap-time $hold-time a lmet) ;; MT()
+	s-mod (tap-hold-release-keys $tap-time $hold-time s lsft (e d))
+	d-mod (tap-hold-press $tap-time $hold-time d lalt)
+	f-mod (tap-hold-press $tap-time $hold-time f lctl)
+	j-mod (tap-hold-press $tap-time $hold-time j rctl)
+	k-mod (tap-hold-press $tap-time $hold-time k (multi (layer-toggle ralt) lalt)) ;; LM(), Tap Dance (vial)
+	l-mod (tap-hold-release-keys $tap-time $hold-time l rsft (i k))
+	;-mod (tap-hold-press $tap-time $hold-time ; rmet)
 
-	e-alt (tap-hold $tap-time $hold-time RA-e A-e) ;; Tap Dance (vial)
+	e-alt (tap-hold-press $tap-time $hold-time RA-e A-e) ;; Tap Dance (vial)
 	o-alt RA-o
-	a-alt (tap-hold $tap-time $hold-time RA-a lmet)
-	s-alt (tap-hold $tap-time $hold-time RA-s lsft)
-	l-alt (tap-hold $tap-time $hold-time RA-l rsft)
+	a-alt (tap-hold-press $tap-time $hold-time RA-a lmet)
+	s-alt (tap-hold-press $tap-time $hold-time RA-s lsft)
+	l-alt (tap-hold-press $tap-time $hold-time RA-l rsft)
 	z-alt RA-z
 	x-alt RA-x
-	c-alt (tap-hold $tap-time $hold-time RA-c A-c)
+	c-alt (tap-hold-press $tap-time $hold-time RA-c A-c)
 	n-alt RA-n
 )
