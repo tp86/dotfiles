@@ -6,9 +6,6 @@
 # git is installed
 # bash is the shell
 
-sys=xubuntu
-source config_$sys
-
 log() {
   { x_opt=$(shopt -op xtrace); set +x; } 2>/dev/null
   echo -e "\e[32m$1\e[0m"
@@ -20,6 +17,26 @@ not_installed() {
   return ! command -v $1 &>/dev/null
 }
 
+sys=xubuntu
+
+xubuntu_dotfiles_path="$HOME/Projects/other/dotfiles"
+
+xubuntu_install_cargo() {
+	sudo apt install cargo
+}
+
+xubuntu_install_ripgrep() {
+	sudo apt install ripgrep
+}
+
+xubuntu_install_tmux() {
+	sudo apt install tmux
+}
+
+xubuntu_install_zathura() {
+	sudo apt install zathura
+}
+
 configure_cargo() {
 	if ! rg cargo/bin ~/.bashrc &>/dev/null
 	then
@@ -27,12 +44,23 @@ configure_cargo() {
 	fi
 }
 
+xubuntu_configure_cargo() {
+  configure_cargo
+}
+
+install() {
+  for pkg_name in $@
+  do
+    ${sys}_install_${pkg_name}
+  done
+}
+
 configure() {
 	for target in $@
 	do
-		if command -v configure_$target
+		if command -v ${sys}_configure_${target}
 		then
-			configure_$target
+			${sys}_configure_${target}
 		fi
 	done
 }
@@ -44,11 +72,11 @@ curdir=$(pwd)
 sudo chmod 777 -R /opt
 
 log "Installing tools"
-install $tools
+install cargo ripgrep
 log "Configuring tools"
-configure $tools
-
+configure cargo ripgrep
 # clone dotfiles
+eval "dotfiles_path=\$${sys}_dotfiles_path"
 log "Checking if dotfiles repository is cloned"
 if ! test -d $dotfiles_path
 then
