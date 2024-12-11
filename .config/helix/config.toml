@@ -3,7 +3,7 @@ theme = "everforest_dark"
 [editor]
 line-number = "relative"
 color-modes = true
-jump-label-alphabet = "jfkdls;aieownvmghtybqpx.z/"
+jump-label-alphabet = "jfkdls,aieownvmghtybqpx.z"
 cursorline = true
 
 [editor.whitespace.render]
