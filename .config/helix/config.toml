@@ -6,6 +6,9 @@ color-modes = true
 jump-label-alphabet = "jfkdls;aieownvmghtybqpx.z/"
 cursorline = true
 
+[editor.whitespace.render]
+newline = "all"
+
 [editor.statusline]
 left = ["mode", "spinner", "version-control"]
 center = ["file-name", "read-only-indicator", "file-modification-indicator"]#, "file-type"]
