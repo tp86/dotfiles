@@ -84,8 +84,8 @@ A-e = { label = "Open files selected with lf", command = [":new", ":insert-outpu
 
 [keys.insert]
 C-c = "normal_mode"
-"A-\"" = {label = "", command = [":insert-output printf \"\\\"\\\"\"", "@<right>"]}
-"A-'" = {label = "", command = [":insert-output printf \"''\"", "@<right>"]}
+"A-\"" = {label = "", command = ["collapse_selection", ":insert-output printf \"\\\"\\\"\""]}
+"A-'" = {label = "", command = ["collapse_selection", ":insert-output printf \"''\""]}
 # TESTS
 # sticky mode
 # X = "extend_line" # both directions!
