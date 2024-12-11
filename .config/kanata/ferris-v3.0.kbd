@@ -1,0 +1,111 @@
+(defcfg
+    ;; process-unmapped-keys yes
+    ;; block-unmapped-keys yes
+)
+
+(defsrc
+	  q     w     e     r     t     y     u     i     o     p  
+	  a     s     d     f     g     h     j     k     l     ;  
+	  z     x     c     v     b     n     m     ,     .     /  
+	                     lalt   spc   ralt
+)
+
+;; empty pass-through layout template
+#|
+	  _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+                           _     _     _  
+|#
+
+(defvar
+	mod-tap-time 200
+	mod-hold-time 200
+	mod-alt-hold-release-time 300
+	alt-tap-time 200
+	alt-hold-time 200
+	func-layer-timeout 2000
+)
+
+(deflayer alpha
+	  q     w   @ealt   r     t     y     u     i   @oalt   p  
+	@amet @salt @dctl @fsft   g     h   @jsft @kctl @lalt @bsmt
+	@zalt @xalt @calt   v     b   @nalt   m     .     ,    ret 
+                         @tbnm @spcl @symb
+)
+
+(defalias
+	amet (tap-hold-release-timeout $mod-tap-time $mod-alt-hold-release-time a lmet RA-a)
+	salt (tap-hold-release-timeout $mod-tap-time $mod-alt-hold-release-time s lalt RA-s)
+	dctl (tap-hold-release $mod-tap-time $mod-hold-time d lctl)
+	fsft (tap-hold-release $mod-tap-time $mod-hold-time f lsft)
+	jsft (tap-hold-release $mod-tap-time $mod-hold-time j rsft)
+	kctl (tap-hold-release $mod-tap-time $mod-hold-time k rctl)
+	lalt (tap-hold-release-timeout $mod-tap-time $mod-alt-hold-release-time l lalt RA-l)
+	bsmt (tap-hold-release $mod-tap-time $mod-hold-time bspc rmet)
+
+	ealt (tap-hold $alt-tap-time $alt-hold-time e RA-e)
+	oalt (tap-hold $alt-tap-time $alt-hold-time o RA-o)
+	zalt (tap-hold $alt-tap-time $alt-hold-time z RA-z)
+	xalt (tap-hold $alt-tap-time $alt-hold-time x RA-x)
+	calt (tap-hold $alt-tap-time $alt-hold-time c RA-c)
+	nalt (tap-hold $alt-tap-time $alt-hold-time n RA-n)
+
+	tbnm (tap-hold $mod-tap-time $mod-hold-time tab (layer-toggle num))
+	symb (layer-toggle sym)
+	spcl (tap-hold $mod-tap-time $mod-hold-time spc (layer-toggle space-layers))
+)
+
+(deflayer space-layers
+	  _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+                         @esnv   _   @func
+)
+
+(defalias 
+	esnv (tap-hold $mod-tap-time $mod-hold-time esc (layer-toggle nav))
+	func (one-shot $func-layer-timeout (layer-toggle fn) ;; nope
+)
+
+(deflayer num
+	  _     _     _     _     _     ,     7     8     9    tab 
+	 lmet  lalt  lctl  lsft   _     .     4     5     6    bspc
+	  _     _     _     _     _     0     1     2     3    ret 
+                           _    spc  @symb
+)
+
+;; TODO other symbols based on their frequency in code
+(deflayer sym
+	  _     _     _     _     _     _     _     _     _     _  
+	@angl @brck @brac @parn @quot   _    rsft  rctl  lalt  rmet
+	  _     _     _     _     _     _     _     _     _     _  
+                         @tbnm  spc    _  
+)
+
+(defalias
+	angl (tap-hold $mod-tap-time $mod-hold-time S-, S-.)
+	brck (tap-hold $mod-tap-time $mod-hold-time [ ])
+	brac (tap-hold $mod-tap-time $mod-hold-time S-[ S-])
+	parn (tap-hold $mod-tap-time $mod-hold-time S-9 S-0)
+	quot (tap-hold $mod-tap-time $mod-hold-time ' `)
+)
+
+(deflayer nav
+	  _     _     _     _     _     _   @puhm @pden  ins   del 
+	 lmet  lalt  lctl  lsft   _    left  down   up   rght  bspc
+	  _     _     _     _     _     _    tab  A-tab   _    ret 
+                           _    spc    _  
+)
+
+(defalias
+	puhm (tap-hold $mod-tap-time $mod-hold-time pgup home)
+	pden (tap-hold $mod-tap-time $mod-hold-time pgdn end)
+)
+
+(deflayer fn
+	 f10    f7    f4    f1    _     _     _     _     _     _  
+	 f11    f8    f5    f2    _     _    rsft  rctl  lalt  rmet
+	 f12    f9    f6    f3    _     _     _     _     _     _  
+                           _     _     _  
+)
