@@ -1,7 +1,23 @@
+#|
+	Layout design goals:
+
+	- easy to learn and adapt to from QWERTY standard keyboard
+	- QWERTY alpha layer
+	- home row mods (AltGr Ctrl Shift Alt Meta - right hand)
+	- allow AltGr needed for Polish letters
+	- limited number of layers
+	- layers activated by thumb keys on hold and most if not all keys under opposite hand
+	- layer switching and common functional keys under thumbs shared across all layers
+	- numpad layer under right hand with common arithmetic symbols if needed
+	- navigation layer under right hand (allow hjkl to move cursor), with additional helper keys
+	- double symbols layer (with shift as modifier switching sublayer) based on usage frequency in code (Python and Go) - under left hand since both right thumb keys already switch layers
+	- functional layer under left hand, also with some helper keys
+	- MAYBE some combos for frequent shortcuts (e.g. Ctrl+T used for TMUX)
+|#
+
 ;; source mapping idea for practising taken from
 ;; https://github.com/manna-harbour/miryoku_kmonad?tab=readme-ov-file#no-reverse-angle
 (defsrc
-
 	  `     1     2     3     4     8     9     0     -     =  
      tab    q     w     e     r     i     o     p     [     ]  
 	 caps   a     s     d     f     k     l     ;     '    ret 
