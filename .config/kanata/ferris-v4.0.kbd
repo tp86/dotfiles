@@ -1,0 +1,11 @@
+;; source mapping idea for practising taken from
+;; https://github.com/manna-harbour/miryoku_kmonad?tab=readme-ov-file#no-reverse-angle
+(defsrc
+
+	  `     1     2     3     4     8     9     0     -     =  
+     tab    q     w     e     r     i     o     p     [     ]  
+	 caps   a     s     d     f     k     l     ;     '    ret 
+						c     v     ,     m
+)
+
+
