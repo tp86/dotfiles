@@ -25,3 +25,121 @@
 )
 
 
+
+(defvar
+	lt-tap 200
+	lt-hold 200
+	rt-tap 200
+	rt-hold 200
+	home-left-pinky-tap 200
+	home-left-ring-tap 200
+	home-left-middle-tap 200
+	home-left-index-tap 200
+	home-left-index-in-tap 200
+	home-right-index-in-tap 200
+	home-right-index-tap 200
+	home-right-middle-tap 200
+	home-right-ring-tap 200
+	home-right-pinky-tap 200
+	home-left-pinky-hold 200
+	home-left-ring-hold 200
+	home-left-middle-hold 200
+	home-left-index-hold 200
+	home-left-index-in-hold 200
+	home-right-index-in-hold 200
+	home-right-index-hold 200
+	home-right-middle-hold 200
+	home-right-ring-hold 200
+	home-right-pinky-hold 200
+	os-timeout 300
+)
+
+(defalias
+	;; common aliases
+	met (one-shot $os-timeout lmet)
+	alt (one-shot $os-timeout lalt)
+	sft (one-shot $os-timeout lsft)
+	ctl (one-shot $os-timeout lctl)
+
+	tmux C-t
+	rt-0-tap S-;
+	rt-2-tap del
+
+	lt-2 (tap-hold $lt-tap $lt-hold esc (layer-toggle mouse))
+	lt-1 (tap-hold $lt-tap $lt-hold tab (layer-toggle num))
+	lt-0 (tap-hold $lt-tap $lt-hold @tmux (layer-toggle nav))
+	rt-0 (tap-hold $rt-tap $rt-hold @rt-0-tap (layer-toggle sym-1))
+	rt-1 (tap-hold $rt-tap $rt-hold spc (layer-toggle sym-2))
+	rt-2 (tap-hold $rt-tap $rt-hold @rt-2-tap (layer-toggle fun))
+)
+
+(deflayer alpha
+	  q     w     e     r     t     y     u     i     o     p  
+	@al-a @al-s @al-d @al-f @al-g @al-h @al-j @al-k @al-l @bs-m
+	  z     x     c     v     b     n     m   @al-. @al-,  ret 
+	            @lt-2 @lt-1 @lt-0 @rt-0 @rt-1 @rt-2
+)
+
+(defalias
+	al-a (tap-hold $home-left-pinky-tap $home-left-pinky-hold a lmet)
+	al-s (tap-hold $home-left-ring-tap $home-left-ring-hold s lalt)
+	al-d (tap-hold $home-left-middle-tap $home-left-middle-hold d lsft)
+	al-f (tap-hold $home-left-index-tap $home-left-index-hold f lctl)
+	al-g (tap-hold $home-left-index-in-tap $home-left-index-in-hold g ralt)
+	al-h (tap-hold $home-right-index-in-tap $home-right-index-in-hold h ralt)
+	al-j (tap-hold $home-right-index-tap $home-right-index-hold j rctl)
+	al-k (tap-hold $home-right-middle-tap $home-right-middle-hold k rsft)
+	al-l (tap-hold $home-right-ring-tap $home-right-ring-hold l lalt)
+	bs-m (tap-hold $home-right-pinky-tap $home-right-pinky-hold bspc rmet)
+	al-. (fork . S-- (lsft rsft))
+	al-, (fork , S-9 (lsft rsft))
+)
+
+(deflayer num
+	  XX    XX    XX    XX    XX    ,     7     8     9    S-5 
+     @met  @alt  @sft  @ctl   XX    .     4     5     6    bspc
+	  XX    XX    XX    XX    XX    0     1     2     3    ret 
+				  _    	_     _     _     _     _  
+)
+
+(deflayer nav
+	  XX    XX    XX    XX    XX    _     _     _     _     _  
+     @met  @alt  @sft  @ctl   XX   left  down   up   rght   _  
+	  XX    XX    XX    XX    XX    _     _     _     _     _  
+				  _    	_     _     _     _     _  
+)
+
+(deflayer mouse
+	  _     _     _     _     _     _     _     _     _     _  
+      _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+				  _    	_     _     _     _     _  
+)
+
+(deflayer sym-1
+	 S-5   S-[   S-]    `    S--    XX    XX    XX    XX    XX 
+     S-4   S-9   S-0   S-'    '     XX   @ctl  @sft  @alt @bs-m
+	 S-2    [     ]    S-`    \     XX    XX    XX    XX   ret 
+				  _    	_     _     _     _     _  
+)
+
+(deflayer sym-2
+	 S-3    -    S-=   S-1   S-\    XX    XX    XX    XX    XX 
+    @s2-c @s2-l @s2-g   =   @s2-s   XX   @ctl  @sft  @alt @bs-m
+	 S-6   S-8    /    S-/   S-7    XX    XX    XX    XX   ret 
+				  _    	_     _     _     _     _  
+)
+
+(defalias
+	s2-c S-;
+	s2-l S-,
+	s2-g S-.
+	s2-s ;
+)
+
+(deflayer fun
+	  _     _     _     _     _     _     _     _     _     _  
+      _     _     _     _     _     _     _     _     _     _  
+	  _     _     _     _     _     _     _     _     _     _  
+				  _    	_     _     _     _     _  
+)
