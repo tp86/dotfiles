@@ -56,6 +56,8 @@
 
 (defalias
 	;; common aliases
+	bs-m (tap-hold $home-right-pinky-tap $home-right-pinky-hold bspc rmet)
+
 	met (one-shot $os-timeout lmet)
 	alt (one-shot $os-timeout lalt)
 	sft (one-shot $os-timeout lsft)
@@ -90,30 +92,77 @@
 	al-j (tap-hold $home-right-index-tap $home-right-index-hold j rctl)
 	al-k (tap-hold $home-right-middle-tap $home-right-middle-hold k rsft)
 	al-l (tap-hold $home-right-ring-tap $home-right-ring-hold l lalt)
-	bs-m (tap-hold $home-right-pinky-tap $home-right-pinky-hold bspc rmet)
 	al-. (fork . S-- (lsft rsft))
 	al-, (fork , S-9 (lsft rsft))
 )
 
 (deflayer num
 	  XX    XX    XX    XX    XX    ,     7     8     9    S-5 
-     @met  @alt  @sft  @ctl   XX    .     4     5     6    bspc
+	 @met  @alt  @sft  @ctl   XX    .     4     5     6    bspc
 	  XX    XX    XX    XX    XX    0     1     2     3    ret 
 				  _    	_     _     _     _     _  
 )
 
 (deflayer nav
-	  XX    XX    XX    XX    XX    _     _     _     _     _  
-     @met  @alt  @sft  @ctl   XX   left  down   up   rght   _  
-	  XX    XX    XX    XX    XX    _     _     _     _     _  
+	  XX    XX    XX    XX    XX  @nv-b @nv-h @nv-e @nv-f   XX 
+     @met  @alt  @sft  @ctl   XX   left  down   up   rght   XX 
+	  XX    XX    XX    XX    XX  @nv-s  tab  @nv-a @nv-c @nv-m
 				  _    	_     _     _     _     _  
 )
 
+(defvar
+	top-right-index-tap 200
+	top-right-index-hold 200
+	top-right-middle-tap 200
+	top-right-middle-hold 200
+)
+
+(defalias
+	nv-h (tap-hold $top-right-index-tap $top-right-index-hold pgup home)
+	nv-e (tap-hold $top-right-middle-tap $top-right-middle-hold pgdn end)
+	nv-s S-tab
+	nv-a A-tab
+	nv-c C-tab
+	nv-m M-tab
+	nv-b A-left
+	nv-f A-rght
+)
+
 (deflayer mouse
-	  _     _     _     _     _     _     _     _     _     _  
-      _     _     _     _     _     _     _     _     _     _  
-	  _     _     _     _     _     _     _     _     _     _  
+	  XX    XX    XX    XX    XX    XX  @m-lc @m-up @m-rc   XX 
+     @met  @alt  @sft  @ctl   XX  @m-wl @m-lf @m-dn @m-rg @m-wr
+	  XX    XX    XX    XX    XX    XX  @m-wu @m-mc @m-wd   XX 
 				  _    	_     _     _     _     _  
+)
+
+(defvar
+	mouse-move-interval 10
+	mouse-move-accel-time 700
+	mouse-move-min-distance 1
+	mouse-move-max-distance 6
+	mouse-wheel-interval 100
+	mouse-wheel-distance 120
+	mouse-tap 250
+	mouse-hold 350
+)
+
+(defvirtualkeys
+	mlc mlft
+	mrc mrgt
+)
+
+(defalias
+	m-lf (movemouse-accel-left $mouse-move-interval $mouse-move-accel-time $mouse-move-min-distance $mouse-move-max-distance)
+	m-rg (movemouse-accel-right $mouse-move-interval $mouse-move-accel-time $mouse-move-min-distance $mouse-move-max-distance)
+	m-up (movemouse-accel-up $mouse-move-interval $mouse-move-accel-time $mouse-move-min-distance $mouse-move-max-distance)
+	m-dn (movemouse-accel-down $mouse-move-interval $mouse-move-accel-time $mouse-move-min-distance $mouse-move-max-distance)
+	m-lc (tap-hold $mouse-tap $mouse-hold mlft (on-press toggle-virtualkey mlc))
+	m-mc mmid
+	m-rc (tap-hold $mouse-tap $mouse-hold mrgt (on-press toggle-virtualkey mrc))
+	m-wu (mwheel-up $mouse-wheel-interval $mouse-wheel-distance)
+	m-wd (mwheel-down $mouse-wheel-interval $mouse-wheel-distance)
+	m-wl (mwheel-left $mouse-wheel-interval $mouse-wheel-distance)
+	m-wr (mwheel-right $mouse-wheel-interval $mouse-wheel-distance)
 )
 
 (deflayer sym-1
@@ -138,8 +187,8 @@
 )
 
 (deflayer fun
-	  _     _     _     _     _     _     _     _     _     _  
-      _     _     _     _     _     _     _     _     _     _  
-	  _     _     _     _     _     _     _     _     _     _  
+	 f10    f7    f4    f1    XX    XX    XX    XX    XX    XX 
+     f11    f8    f5    f2    XX    XX   @ctl  @sft  @alt  @met
+	 f12    f9    f6    f3    XX    XX    XX    XX    XX   ret 
 				  _    	_     _     _     _     _  
 )
