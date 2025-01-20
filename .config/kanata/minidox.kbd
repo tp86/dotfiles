@@ -24,8 +24,6 @@
 				  x    	c     v     m     ,     .  
 )
 
-
-
 (defvar
 	lt-tap 200
 	lt-hold 200
@@ -64,15 +62,15 @@
 	ctl (one-shot $os-timeout lctl)
 
 	tmux C-t
-	rt-0-tap S-;
-	rt-2-tap del
+	rt-0-tap del
+	rt-2-tap S-;
 
-	lt-2 (tap-hold $lt-tap $lt-hold esc (layer-toggle mouse))
+	lt-2 (tap-hold $lt-tap $lt-hold esc (layer-toggle nav))
 	lt-1 (tap-hold $lt-tap $lt-hold tab (layer-toggle num))
-	lt-0 (tap-hold $lt-tap $lt-hold @tmux (layer-toggle nav))
-	rt-0 (tap-hold $rt-tap $rt-hold @rt-0-tap (layer-toggle sym-1))
+	lt-0 (tap-hold $lt-tap $lt-hold @tmux (layer-toggle mus))
+	rt-0 (tap-hold $rt-tap $rt-hold @rt-0-tap (layer-toggle fun))
 	rt-1 (tap-hold $rt-tap $rt-hold spc (layer-toggle sym-2))
-	rt-2 (tap-hold $rt-tap $rt-hold @rt-2-tap (layer-toggle fun))
+	rt-2 (tap-hold $rt-tap $rt-hold @rt-2-tap (layer-toggle sym-1))
 )
 
 (deflayer alpha
