@@ -10,6 +10,7 @@ customCommands:
           - value: 'push'
           - value: 'push --force'
           - value: 'push --force-with-lease'
+          - value: 'push --set-upstream origin {{.CheckedOutBranch.Name}}'
     command: "git {{index .PromptResponses 0}}"
 gui:
   theme:
