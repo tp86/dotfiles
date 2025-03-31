@@ -74,13 +74,23 @@
 )
 
 (deflayer alpha
-	  q     w     e     r     t     y     u     i     o     p  
+	@al-q @al-w @al-e @al-r @al-t @al-y @al-u @al-i @al-o @al-p
 	@al-a @al-s @al-d @al-f @al-g @al-h @al-j @al-k @al-l @bs-m
 	  z     x     c     v     b     n     m   @al-. @al-,  ret 
 	            @lt-2 @lt-1 @lt-0 @rt-0 @rt-1 @rt-2
 )
 
 (defalias
+	al-q (tap-hold $home-left-pinky-tap $home-left-pinky-hold q 1)
+	al-w (tap-hold $home-left-ring-tap $home-left-ring-hold w 2)
+	al-e (tap-hold $home-left-middle-tap $home-left-middle-hold e 3)
+	al-r (tap-hold $home-left-index-tap $home-left-index-hold r 4)
+	al-t (tap-hold $home-left-index-in-tap $home-left-index-in-hold t 5)
+	al-y (tap-hold $home-left-index-in-tap $home-left-index-in-hold y 6)
+	al-u (tap-hold $home-left-index-tap $home-left-index-hold u 7)
+	al-i (tap-hold $home-left-middle-tap $home-left-middle-hold i 8)
+	al-o (tap-hold $home-left-ring-tap $home-left-ring-hold o 9)
+	al-p (tap-hold $home-left-pinky-tap $home-left-pinky-hold p 0)
 	al-a (tap-hold $home-left-pinky-tap $home-left-pinky-hold a lmet)
 	al-s (tap-hold $home-left-ring-tap $home-left-ring-hold s lalt)
 	al-d (tap-hold $home-left-middle-tap $home-left-middle-hold d lsft)
